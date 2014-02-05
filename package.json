@@ -1,0 +1,14 @@
+{
+	"name":"initial-test-node-over-rabbitmq",
+	"version":"0.0.1",
+	"description": "really nice nodejs app",
+	"scripts": 
+		{
+			"start": "node server"
+		},
+	"dependencies": {
+		"express":"*",
+		"amqp":"*",
+		"jade":"*"
+	}
+}

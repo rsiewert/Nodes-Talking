@@ -1,0 +1,17 @@
+
+doctype html
+html
+	head
+		title=title
+		h3 Please type in a message below:
+	body
+		form(action='/newMessage',method='post')
+			input(name='newMessage',type='text',value='newMessage')
+			input(type='submit',value='Send message')
+		
+		script.
+			if 1
+				alert("Here I am")
+			
+		h3 Here is the message you typed:
+		p= sentMessage
