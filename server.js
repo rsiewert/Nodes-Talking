@@ -103,7 +103,7 @@ app.post('/newMessage',function(req,res) {
 	var newMessage = req.body.newMessage;
 	console.log('newMessage = ' + newMessage);
 	app.e.publish('routingKey', {message: newMessage},{mandatory:true},function(result) {
-		console.log('result of publish = ' + result);
+		console.log('result of publish (false means success) = ' + result);
 	});
 	console.log('after publish');
 
