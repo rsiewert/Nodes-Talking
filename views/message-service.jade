@@ -2,16 +2,23 @@
 doctype html
 html
 	head
+		script(src="//code.jquery.com/jquery-1.10.2.js").
+		script(src="/socket.io/socket.io.js").
 		title=title
 		h3 Please type in a message below:
 	body
 		form(action='/newMessage',method='post')
-			input(name='newMessage',type='text',value='newMessage')
+			input(name='newMessage',type='text')
 			input(type='submit',value='Send message')
 		
 		script.
-			if 1
-				alert("Here I am")
+			var socket = io.connect('http://localhost:3000');
+			socket.on('message',function(data) {
+				//console.log("Connected to client socket");
+				//alert('message = ' + data.sentMessage);				
+				//socket.emit("my return event",{"sentMessage":data.sentMessage});
+				$('#sentMessage').html(data.sentMessage);
+			});
 			
 		h3 Here is the message you typed:
-		p= sentMessage
+		#sentMessage

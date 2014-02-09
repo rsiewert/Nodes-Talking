@@ -9,6 +9,7 @@
 	"dependencies": {
 		"express":"*",
 		"amqp":"*",
-		"jade":"*"
+		"jade":"*",
+		"socket.io":"*"
 	}
 }
