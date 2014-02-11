@@ -147,13 +147,14 @@ app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
 	var newMessage = req.body.newMessage;
 	console.log('newMessage = ' + newMessage);
-	app.e.publish('routingKey', {message: newMessage},{mandatory:true},function(result) {
+	app.e.publish('routingKey', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
 		console.log('result of publish (false means success) = ' + result);
 	});
 	console.log('after publish');
 
 	app.q.subscribe(function(msg,headers,deliveryInfo) {
-		console.log('inside subscribe: msg.message = ' + msg.message);
+		console.log('inside subscribe: msg = ' + msg);
+		//console.log('subscribe status = ' + msg.status);
 		console.log('got a message with routing key = ' + deliveryInfo.routingKey);
 
 /*
@@ -176,7 +177,7 @@ app.post('/newMessage',function(req,res) {
 */
 		io.sockets.on('connection',function(socket) {
 			console.log("Sockets.io is Connected!!");
-			socket.emit('message',{"sentMessage":msg.message})
+			socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
 			socket.on("my return event",function(data) {
 				console.log(data);
 			});

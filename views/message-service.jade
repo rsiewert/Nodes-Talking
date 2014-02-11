@@ -17,7 +17,10 @@ html
 				//console.log("Connected to client socket");
 				//alert('message = ' + data.sentMessage);				
 				//socket.emit("my return event",{"sentMessage":data.sentMessage});
-				$('#sentMessage').html('<br/><h3> You sent : </h3>&nbsp;&nbsp;' + data.sentMessage);
+				$('#sentMessage').html('<br/><h3> Sent message: </h3>&nbsp;&nbsp;' + data.sentMessage);
+				$('#status').html('<br/><h3> Sent status : </h3>&nbsp;&nbsp;' + data.status);
 			});
 			
 		#sentMessage
+		
+		#status
