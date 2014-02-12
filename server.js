@@ -207,3 +207,9 @@ app.post('/newMessage',function(req,res) {
 	console.log('after sockets.io');
 });
 
+app.post('/json-mirror',function(req,res) {
+	var newMessage = req.body.newMessage;
+	res.json(newMessage);
+});
+
+
