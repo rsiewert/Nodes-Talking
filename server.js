@@ -25,19 +25,12 @@ io.sockets.on('connection', function (socket) {
 
 
 
-
-
-
-
-
-
-
-
 var express = require('express'),
 	http = require('http'),
 	path = require('path'),
 	jade = require('jade'),
-	amqp = require('amqp');
+	amqp = require('amqp'),
+	nano = require('nano')('http://localhost:5984');
 
 var app = express();
 
@@ -66,7 +59,28 @@ console.log("The views path is: " + app.get('views'));
 app.connectionStatus = 'No server connection';
 app.exchangeStatus = 'No exchange established';
 app.queueStatus = 'No queue established';
+app.devices = nano.db.use('devices');
 
+
+/*
+nano.db.create('devices');
+var devices = nano.db.use('devices');
+
+
+devices.insert({"crazy":true,},'toDevices',function(err,body,header) {
+	if(err) {
+		console.log("err = " + err.message)
+		return
+	}
+	console.log("you have inserted a device")
+	console.log(body)
+})
+
+*/
+app.post('/devices/:id',function(req,res) {
+})
+
+//**********************************REST API'S***********************************
 app.get('/',function(req,res) {
 	console.log("inside get /");
 	
@@ -79,7 +93,7 @@ app.get('/',function(req,res) {
 		});
 	
 	//res.send("Hello World");
-});
+})
 
 app.post('/start-server',function(req,res) {
 	console.log("Inside start-server");
@@ -92,7 +106,7 @@ app.post('/start-server',function(req,res) {
 		res.redirect('/');
 	});
 	
-});
+})
 
 app.post('/new-exchange',function(req,res) {
 	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
@@ -101,13 +115,13 @@ app.post('/new-exchange',function(req,res) {
 	});
 	
 	res.redirect('/');
-});
+})
 
 app.post('/new-queue',function(req,res) {
 	app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
 		console.log('Queue ' + queue.name + ' is open');
 		app.queueStatus = 'The queue is ready for use!';
-		app.q.bind(app.e,'#');
+		app.q.bind(app.e,'my.routing.key');
 	});
 	
 	res.redirect('/');
@@ -147,12 +161,12 @@ app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
 	var newMessage = req.body.newMessage;
 	console.log('newMessage = ' + newMessage);
-	app.e.publish('routingKey', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+	app.e.publish('my.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
 		console.log('result of publish (false means success) = ' + result);
 	});
 	console.log('after publish');
 
-	app.q.subscribe(function(msg,headers,deliveryInfo) {
+	app.q.subscribe('some.other.key',function(msg,headers,deliveryInfo) {
 		console.log('inside subscribe: msg = ' + msg);
 		//console.log('subscribe status = ' + msg.status);
 		console.log('got a message with routing key = ' + deliveryInfo.routingKey);
@@ -184,6 +198,14 @@ app.post('/newMessage',function(req,res) {
 			
 		});
 
+		app.devices.insert({"data": {"message":msg.message,"status":msg.status}},function(err,body,header) {
+			if(err) {
+				console.log("err.insert = " + err.message)
+				return
+			}
+			console.log("you have inserted a message")
+			console.log(body)
+		})
 		/*
 	var htmlout = app.v(
 		{
@@ -211,5 +233,24 @@ app.post('/json-mirror',function(req,res) {
 	var newMessage = req.body.newMessage;
 	res.json(newMessage);
 });
+
+app.get('/listDB',function(req,res) {
+	var params = {include_docs:true}
+	app.devices.list(params,function(err,body,headers) {
+		if(!err) {
+			body.rows.forEach(function(doc) {
+				console.log(doc)
+				if(doc.doc.message != undefined || doc.doc.data != undefined) {
+					if(doc.doc.message == undefined) {
+						//console.log("doc.doc.message: undefined")
+						console.log(doc.doc.data.message)
+					}
+					else
+						console.log(doc.doc.message)
+				}
+			})
+		}			
+	})
+})
 
 
