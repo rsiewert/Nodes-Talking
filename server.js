@@ -127,7 +127,7 @@ app.post('/newMessage',function(req,res) {
 });
 
 app.post('/json-mirror',function(req,res) {
-	var newMessage = req.body.newMessage;
+	var newMessage = req.body.data;
 	res.json(newMessage);
 });
 
