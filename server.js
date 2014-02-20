@@ -115,10 +115,20 @@ app.get('/message-service',function(req,res) {
 	   });
 	 
 });
+
+app.post('/newData',function(req,res) {
+	console.log("inside /newData")
+	var data = req.body.data
+	console.log("new Data = " + data)
+	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('result of publish (false means success) = ' + result);
+	});
+})
+
 	
 app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
-	var newMessage = req.body.newMessage;
+	var newMessage = req.body.data;
 	console.log('newMessage = ' + newMessage);
 	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
 		console.log('result of publish (false means success) = ' + result);
