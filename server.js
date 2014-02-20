@@ -32,6 +32,7 @@ var express = require('express'),
 	amqp = require('amqp'),
 	nano = require('nano')('http://localhost:5984');
 
+//-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
 
 app.configure(function() {
@@ -52,33 +53,45 @@ var server = http.createServer(app).listen(app.get('port'),function() {
 //setup socket.io to listen to our app
 var io = require('socket.io').listen(server);
 
-
-
 console.log("The views path is: " + app.get('views'));
 
-app.connectionStatus = 'No server connection';
-app.exchangeStatus = 'No exchange established';
-app.queueStatus = 'No queue established';
-app.devices = nano.db.use('devices');
+app.connectionStatus 	= 'No server connection';
+app.exchangeStatus 		= 'No exchange established';
+app.queueStatus 		= 'No queue established';
+app.devices 			= nano.db.use('devices');
 
 
-/*
-nano.db.create('devices');
-var devices = nano.db.use('devices');
+//------------------make connection to rabbitmq, create exchange and queue, set status
+app.rabbitMqConnection = amqp.createConnection({host:'localhost'});
+app.rabbitMqConnection.on('ready',function() {
+	app.connectionStatus = 'RabbitMQ is Connected';
+	//-----------------create rabbit exchange----------------------
+	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
+		console.log('Exchange ' + exchange.name + ' is open');
+		app.exchangeStatus = 'An exchange has been established!';
+		//----------------create rabbit queue and bind to exchange--------
+		app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
+			console.log('Queue ' + queue.name + ' is open');
+			app.queueStatus = 'The queue is ready for use!';
+			queue.bind(app.e,'*.routing.*')
 
-
-devices.insert({"crazy":true,},'toDevices',function(err,body,header) {
-	if(err) {
-		console.log("err = " + err.message)
-		return
-	}
-	console.log("you have inserted a device")
-	console.log(body)
+			//this needs to be abstracted out
+			queue.subscribe('the.routing.one',function(msg,headers,deliveryInfo) {
+				console.log({'log':'1','msg.message':msg.message})
+				insertData(app.devices,msg)
+				io.sockets.on('connection',function(socket) {
+					console.log("Sockets.io is Connected!!")
+					socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+					socket.on("my return event",function(data) {
+						console.log(data)
+					})	
+				})
+			})
+			return queue
+		})
+	})
 })
-
-*/
-app.post('/devices/:id',function(req,res) {
-})
+//---------------------INITIALIZATION END---------------------------------
 
 //**********************************REST API'S***********************************
 app.get('/',function(req,res) {
@@ -91,64 +104,10 @@ app.get('/',function(req,res) {
 			exchangeStatus:app.exchangeStatus,
 			queueStatus:app.queueStatus
 		});
-	
-	//res.send("Hello World");
 })
-
-app.post('/start-server',function(req,res) {
-	console.log("Inside start-server");
-	
-
-	
-	app.rabbitMqConnection = amqp.createConnection({host:'localhost'});
-	app.rabbitMqConnection.on('ready',function() {
-		app.connectionStatus = 'RabbitMQ is Connected';
-		res.redirect('/');
-	});
-	
-})
-
-app.post('/new-exchange',function(req,res) {
-	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
-		console.log('Exchange ' + exchange.name + ' is open');
-		app.exchangeStatus = 'An exchange has been established!';
-	});
-	
-	res.redirect('/');
-})
-
-app.post('/new-queue',function(req,res) {
-	app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
-		console.log('Queue ' + queue.name + ' is open');
-		app.queueStatus = 'The queue is ready for use!';
-		app.q.bind(app.e,'my.routing.key');
-	});
-	
-	res.redirect('/');
-});
 
 app.get('/message-service',function(req,res) {
 	console.log('inside get message-service');
-	//app.v = jade.compile(app.get('views') + '/message-server.jade',{debug:true,pretty:true});
-	//console.log('html = ' + app.v({title:'Welcome',sentMessage:'Hello'}));
-	/*
-	var htmlout = app.v(
-		{
-			title: "Welcome to my new messaging service",
-			sentMessage: 'Hello brave new world'
-		}
-	)
-	res.render(htmlout);
-
-
-	jade.renderFile(app.get('views') + '/message-service.jade',
-			{debug:true,pretty:true,title:'Welcome to the messaging service',sentMessage:'Hello World'},
-			function(err,html) {
-				if(err) throw err;
-				console.log('html = ' + html);
-				//res.render(html);
-			});
-	*/			
 	res.render('message-service',
 	   {
 			title:'Welcome to the messaging service',
@@ -161,72 +120,10 @@ app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
 	var newMessage = req.body.newMessage;
 	console.log('newMessage = ' + newMessage);
-	app.e.publish('my.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
 		console.log('result of publish (false means success) = ' + result);
 	});
-	console.log('after publish');
-
-	app.q.subscribe('some.other.key',function(msg,headers,deliveryInfo) {
-		console.log('inside subscribe: msg = ' + msg);
-		//console.log('subscribe status = ' + msg.status);
-		console.log('got a message with routing key = ' + deliveryInfo.routingKey);
-
-/*
-		
-		jade.renderFile(app.get('views') + '/message-service.jade',
-			{debug:true,pretty:true,title:'Welcome to the messaging service',sentMessage:msg.message},
-			function(err,html) {
-				if(err) throw err;
-				console.log('html = ' + html);
-				//res.send(html);
-				console.log("after res.send");
-			});
-
-			
-		res.render('message-service',
-			{
-				title: "You have new mail!",
-				sentMessage: msg.message
-			});
-*/
-		io.sockets.on('connection',function(socket) {
-			console.log("Sockets.io is Connected!!");
-			socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-			socket.on("my return event",function(data) {
-				console.log(data);
-			});
-			
-		});
-
-		app.devices.insert({"data": {"message":msg.message,"status":msg.status}},function(err,body,header) {
-			if(err) {
-				console.log("err.insert = " + err.message)
-				return
-			}
-			console.log("you have inserted a message")
-			console.log(body)
-		})
-		/*
-	var htmlout = app.v(
-		{
-			title: "Welcome to my new messaging service",
-			sentMessage: msg.message
-		}
-	)
-	res.render(htmlout);
-	
-		
-		res.render('message-service',
-			{
-				title: "You have new mail!",
-				sentMessage: msg.message
-			});
-	*/	
-	
-	});
-	
 	res.redirect('/message-service');
-	console.log('after sockets.io');
 });
 
 app.post('/json-mirror',function(req,res) {
@@ -235,22 +132,80 @@ app.post('/json-mirror',function(req,res) {
 });
 
 app.get('/listDB',function(req,res) {
+
+	getDBContents(app.devices,"other",function(err,results) {
+		if(err) {
+			console.log("error in listRawJson")
+		} else {
+			res.render('index',
+			{
+				title:'Listing CouchDB Documents',
+				connectionStatus:app.connectionStatus,
+				exchangeStatus:app.exchangeStatus,
+				queueStatus:app.queueStatus,
+				"results":results
+			})
+		}
+	})
+})
+
+app.get('/listRawJson', function(req,res) {
+
+	getDBContents(app.devices,"raw",function(err,results) {
+		if(err) {
+			console.log("error in listRawJson")
+		} else {
+			res.json({"results":results})
+		}
+	})
+})
+//****************************END OF REST APIs***********************************
+
+
+//****************************Private methods************************************
+var insertData = function(db,data) {
+	db.insert({"data": {"message":data.message,"status":data.status}},function(err,body,header) {
+		if(err) {
+			console.log("err.insert = " + err.message)
+			return
+		}
+		console.log("you have inserted a message")
+		console.log(body)
+	})
+}
+
+var getDBContents = function(db,type,callback) {
 	var params = {include_docs:true}
-	app.devices.list(params,function(err,body,headers) {
+
+	db.list(params,function(err,body,headers) {
+		var results = []
 		if(!err) {
 			body.rows.forEach(function(doc) {
 				console.log(doc)
+				if(type == 'raw') {
+					results.push(doc)
+				}
 				if(doc.doc.message != undefined || doc.doc.data != undefined) {
 					if(doc.doc.message == undefined) {
-						//console.log("doc.doc.message: undefined")
 						console.log(doc.doc.data.message)
+						if(type != 'raw') {
+							results.push(doc.doc.data.message)
+						}
 					}
-					else
+					else {
 						console.log(doc.doc.message)
+						results.push(doc.doc.message)
+					}
 				}
 			})
-		}			
+		} else {
+			//console.log("err.getDBContents = " + err.message)
+			callback({'status':err.message},[])
+		}
+		callback(0,results)
 	})
-})
+}
+//*******************************END of Private Methods********************************
+
 
 
