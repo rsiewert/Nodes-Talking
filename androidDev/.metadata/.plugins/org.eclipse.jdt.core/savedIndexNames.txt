@@ -1,0 +1,4 @@
+INDEX VERSION 1.126+/home/rbgodwin/git/node-rabbit-prototype/androidDev/.metadata/.plugins/org.eclipse.jdt.core
+3833211475.index
+3898747083.index
+470417618.index
