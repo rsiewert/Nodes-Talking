@@ -120,7 +120,7 @@ app.post('/newData',function(req,res) {
 	console.log("inside /newData")
 	var data = req.body.data
 	console.log("new Data = " + data)
-	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+	app.e.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
 		console.log('result of publish (false means success) = ' + result);
 	});
 })
