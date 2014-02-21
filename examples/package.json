@@ -1,0 +1,14 @@
+{
+	"name":"initial-test-node-over-rabbitmq",
+	"version":"0.0.1",
+	"description": "simple requst with json data and expect a return of the same data",
+	"scripts": 
+		{
+			"start": "node json_request"
+		},
+	"dependencies": {
+		"http":"*",
+		"assert":"*"
+	}
+
+}
