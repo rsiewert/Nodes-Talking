@@ -2,7 +2,8 @@
 
 
 var http = require('http'),
-	assert = require('assert')	
+assert = require('assert'),
+getMac = require('getmac')	
 
 var opts = {
 	host: 'localhost',
@@ -12,17 +13,14 @@ var opts = {
 	headers:{'Content-Type':'application/json'}
 } 
 
-/* Some test data sent from the system */
+
 var sensor_data = {
 	data: {
 		type: 'temperature',
 		value: 100,
-		time: '12:36:05 August 12 2018'
+	        time: new Date().toString()
 	}
 }
-var myjson = 
-	{"data": 
-		{"message":"Let the games begin.","status":"I woke up this morning...","array":[{"myMessage1":"Here I am"}]}}
 
 /* Test 1: Check if we can echo a JSON message containing test sensor data */
  
