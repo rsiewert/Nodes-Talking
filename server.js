@@ -30,6 +30,7 @@ var express = require('express'),
 	path = require('path'),
 	jade = require('jade'),
 	amqp = require('amqp'),
+	Shred = require('shred'),
 	nano = require('nano')('http://localhost:5984');
 
 //-------------------INITIALIZATION BEGIN--------------------------
@@ -68,7 +69,7 @@ app.rabbitMqConnection.on('ready',function() {
 	//-----------------create rabbit exchange----------------------
 	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
 		console.log('Exchange ' + exchange.name + ' is open');
-		app.exchangeStatus = 'An exchange has been established!';
+		app.exchangeStatus = 'An exchange has been established!'
 		//----------------create rabbit queue and bind to exchange--------
 		app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
 			console.log('Queue ' + queue.name + ' is open');
@@ -91,6 +92,7 @@ app.rabbitMqConnection.on('ready',function() {
 		})
 	})
 })
+app.shred = new Shred({logCurl:true})
 //---------------------INITIALIZATION END---------------------------------
 
 //**********************************REST API'S***********************************
@@ -140,6 +142,56 @@ app.post('/json-mirror',function(req,res) {
 	var newMessage = req.body.data;
 	res.json(newMessage);
 });
+
+app.get('/couchDBList',function(req,res) {
+	//get the couchdb list via REST call
+///*
+	var req = app.shred.get({
+		url: "http://localhost:5984/devices/_design/listDB/_view/listDB",
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+		on: {
+			// You can use response codes as events
+			200: function(response) {
+			  // Shred will automatically JSON-decode response bodies that have a
+			  // JSON Content-Type
+			  console.log(response.content.data);
+			  res.json(response.content.data)
+			},
+			// Any other response means something's wrong
+			response: function(response) {
+			  console.log("Houston, we have a problem...");
+			}
+		}
+	})
+//	*/
+	//res.render("")
+})
+
+app.get('/register',function(req,res) {
+	console.log("Here in register: req ip = " + req.ip)
+	res.send('Caller = ' + req.get('Host') + "\nreq ip = " + req.ip)
+})
+
+app.get('/listDB/:type',function(req,res) {
+	getDBContentsById(app.devices,req.params.type,'other',function(err,results) {
+		if(err) {
+			console.log("error in /listDB/:type")
+		} else {
+			console.log("type = " + req.params.type)
+			res.render('index',
+			{
+				title:'Listing CouchDB Documents',
+				connectionStatus:app.connectionStatus,
+				exchangeStatus:app.exchangeStatus,
+				queueStatus:app.queueStatus,
+				"results":results
+			})
+		}
+	})
+})
 
 app.get('/listDB',function(req,res) {
 
@@ -194,6 +246,65 @@ var getDBContents = function(db,type,callback) {
 				console.log(doc)
 				if(type == 'raw') {
 					results.push(doc)
+				} else {
+					if(doc.doc.message != undefined || doc.doc.data != undefined) {
+						if(doc.doc.message == undefined) {
+							console.log(doc.doc.data.message)
+							if(type != 'raw') {
+								results.push(doc.doc.data.message)
+							}
+						}
+						else {
+							console.log(doc.doc.message)
+							results.push(doc.doc.message)
+						}
+					}
+				}
+			})
+		} else {
+			//console.log("err.getDBContents = " + err.message)
+			callback({'status':err.message},[])
+		}
+		callback(0,results)
+	})
+}
+
+var getDBContentsById = function(db,value,msgType,callback) {
+
+	var req = app.shred.get({
+		url: "http://localhost:5984/devices/_design/getById/_view/getById?data.message.type=['"+value+"']",
+		headers: {
+			"Accept": "application/json",
+			"Content-Type": "application/json"
+		},
+		on: {
+			// You can use response codes as events
+			200: function(response) {
+				// Shred will automatically JSON-decode response bodies that have a
+				// JSON Content-Type
+				console.log(response.content.data);
+				callback(0,response.content.data)
+			},
+			// Any other response means something's wrong
+			response: function(response) {
+				console.log("Houston, we have a problem...")
+				callback("Houston we have a problem...",{})
+			}
+		}
+	})
+}
+
+
+/*
+	var params = {include_docs:true}
+
+	db.list(params,function(err,body,headers) {
+		var results = []
+		if(!err) {
+			body.rows.forEach(function(doc) {
+				console.log(doc)
+				if(type == 'raw') {
+					results.push(doc)
 				}
 				if(doc.doc.message != undefined || doc.doc.data != undefined) {
 					if(doc.doc.message == undefined) {
@@ -214,7 +325,9 @@ var getDBContents = function(db,type,callback) {
 		}
 		callback(0,results)
 	})
-}
+*/
+
+
 //*******************************END of Private Methods********************************
 
 
