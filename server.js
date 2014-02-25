@@ -47,7 +47,8 @@ app.rabbitMqConnection.on('ready',function() {
 		app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
 			console.log('Queue ' + queue.name + ' is open');
 			app.queueStatus = 'The queue is ready for use!';
-			queue.bind(app.e,'*.routing.*')
+			queue.bind(app.e,'*.routing.one')
+			queue.bind(app.e,'*.routing.register')
 
 			//this needs to be abstracted out
 			queue.subscribe('the.routing.one',function(msg,headers,deliveryInfo) {
