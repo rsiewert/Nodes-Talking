@@ -1,30 +1,3 @@
-/*
-var app = require('express')()
-  , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server);
-
-server.listen(3000);
-
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-io.sockets.on('connection', function (socket) {
-	console.log("socket connected....");
-	socket.emit('news', { hello: 'world' });
-	
-	socket.on('my other event', function (data) {
-		console.log(data);
-	});
-
-	socket.on('my test event', function (data) {
-		console.log(data);
-	});
-
-});
-});
-*/
-
-
-
 var express = require('express'),
 	http = require('http'),
 	path = require('path'),
@@ -78,7 +51,18 @@ app.rabbitMqConnection.on('ready',function() {
 
 			//this needs to be abstracted out
 			queue.subscribe('the.routing.one',function(msg,headers,deliveryInfo) {
-				console.log({'log':'1','msg.message':msg.message})
+				console.log({'log':'the.routing.one','msg.message':msg.message})
+				insertData(app.devices,msg)
+				io.sockets.on('connection',function(socket) {
+					console.log("Sockets.io is Connected!!")
+					socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+					socket.on("my return event",function(data) {
+						console.log(data)
+					})	
+				})
+			})
+			queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
+				console.log({'log':'the.routing.register','msg.message':msg.message})
 				insertData(app.devices,msg)
 				io.sockets.on('connection',function(socket) {
 					console.log("Sockets.io is Connected!!")
