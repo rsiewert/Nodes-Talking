@@ -17,7 +17,6 @@ app.configure(function() {
 	app.set('view engine','jade');
 	app.set('view options', { pretty: true });
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-
 });
 
 var server = http.createServer(app).listen(app.get('port'),function() {
@@ -29,54 +28,68 @@ var io = require('socket.io').listen(server);
 
 console.log("The views path is: " + app.get('views'));
 
-app.connectionStatus 	= 'No server connection';
-app.exchangeStatus 		= 'No exchange established';
-app.queueStatus 		= 'No queue established';
-app.devices 			= nano.db.use('devices');
+app.connectionStatus 	= 'No server connection'
+app.exchangeStatus 		= 'No exchange established'
+app.queueStatus 		= 'No queue established'
+app.devices 			= nano.db.use('devices')
+app.register			= nano.db.use('register')
 
+var e
+var q_register
+var q_test
 
 //------------------make connection to rabbitmq, create exchange and queue, set status
-app.rabbitMqConnection = amqp.createConnection({host:'localhost'});
-app.rabbitMqConnection.on('ready',function() {
-	app.connectionStatus = 'RabbitMQ is Connected';
-	//-----------------create rabbit exchange----------------------
-	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
-		console.log('Exchange ' + exchange.name + ' is open');
-		app.exchangeStatus = 'An exchange has been established!'
-		//----------------create rabbit queue and bind to exchange--------
-		app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
-			console.log('Queue ' + queue.name + ' is open');
-			app.queueStatus = 'The queue is ready for use!';
-			queue.bind(app.e,'*.routing.one')
-			queue.bind(app.e,'*.routing.register')
+rabbitMqConnection = amqp.createConnection({host:'localhost'})
 
-			//this needs to be abstracted out
-			queue.subscribe('the.routing.one',function(msg,headers,deliveryInfo) {
-				console.log({'log':'the.routing.one','msg.message':msg.message})
-				insertData(app.devices,msg)
-				io.sockets.on('connection',function(socket) {
-					console.log("Sockets.io is Connected!!")
-					socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-					socket.on("my return event",function(data) {
-						console.log(data)
-					})	
-				})
+rabbitMqConnection.addListener('error', function (e) {
+  throw e;
+})
+
+rabbitMqConnection.on('ready',function() {
+	app.connectionStatus = 'RabbitMQ is Connected';
+	console.log("RabbitMq started....")
+	
+	//-----------------create rabbit exchange----------------------
+	e = rabbitMqConnection.exchange('test-exchange',{},function(exchange) {
+		console.log('Exchange ' + exchange.name + ' is open')
+		app.exchangeStatus = 'An exchange has been established!'
+	})	
+
+	//----------------create rabbit queue(s)
+	q_register = rabbitMqConnection.queue('register-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The queue is ready for use!'
+		q_register.bind(e,'the.routing.register')
+		q_register.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
+			console.log({'log':'the.routing.register','msg.message':msg.message})
+			insertData(app.register,msg)
+			io.sockets.on('connection',function(socket) {
+				console.log("Sockets.io is Connected!!")
+				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+				socket.on("my return event",function(data) {
+					console.log(data)
+				})	
 			})
-			queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
-				console.log({'log':'the.routing.register','msg.message':msg.message})
-				insertData(app.devices,msg)
-				io.sockets.on('connection',function(socket) {
-					console.log("Sockets.io is Connected!!")
-					socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-					socket.on("my return event",function(data) {
-						console.log(data)
-					})	
-				})
+		})
+	})
+	q_test = rabbitMqConnection.queue('test-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The queue is ready for use!'
+		q_test.bind(e,'*.routing.key')
+		q_test.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
+			console.log({'log':'the.routing.key','msg.message':msg.message})
+			insertData(app.devices,msg)
+			io.sockets.on('connection',function(socket) {
+				console.log("Sockets.io is Connected!!")
+				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+				socket.on("my return event",function(data) {
+					console.log(data)
+				})	
 			})
-			return queue
 		})
 	})
 })
+
 app.shred = new Shred({logCurl:true})
 //---------------------INITIALIZATION END---------------------------------
 
@@ -103,12 +116,21 @@ app.get('/message-service',function(req,res) {
 	 
 });
 
+app.post('/newReg',function(req,res) {
+	console.log("inside /newReg")
+	var data = req.body.data
+	console.log("new Reg = " + data)
+	e.publish('the.routing.register', {message:data,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newReg: result of publish (false means success) = ' + result);
+	});
+})
+
 app.post('/newData',function(req,res) {
 	console.log("inside /newData")
 	var data = req.body.data
 	console.log("new Data = " + data)
-	app.e.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
-		console.log('result of publish (false means success) = ' + result);
+	e.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newData: result of publish (false means success) = ' + result);
 	});
 })
 
@@ -117,8 +139,8 @@ app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
 	var newMessage = req.body.data;
 	console.log('newMessage = ' + newMessage);
-	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
-		console.log('result of publish (false means success) = ' + result);
+	e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newMessage: result of publish (false means success) = ' + result);
 	});
 	res.redirect('/message-service');
 });
@@ -132,7 +154,7 @@ app.get('/couchDBList',function(req,res) {
 	//get the couchdb list via REST call
 ///*
 	var req = app.shred.get({
-		url: "http://localhost:5984/devices/_design/listDB/_view/listDB",
+		url: "http://localhost:5984/devices/_changes",//_design/listDB/_view/listDB",
 		headers: {
 			"Accept": "application/json",
 			"Content-Type": "application/json"
@@ -168,7 +190,7 @@ app.get('/listDB/:type',function(req,res) {
 			console.log("type = " + req.params.type)
 			res.render('index',
 			{
-				title:'Listing CouchDB Documents',
+				title:'Listing CouchDB Documents By Type',
 				connectionStatus:app.connectionStatus,
 				exchangeStatus:app.exchangeStatus,
 				queueStatus:app.queueStatus,
