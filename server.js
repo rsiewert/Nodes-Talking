@@ -61,10 +61,9 @@ rabbitMqConnection.on('ready',function() {
 		app.queueStatus = 'The queue is ready for use!'
 		q_register.bind(exchange,'the.routing.register')
 		q_register.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
-			console.log({'log':'the.routing.register','msg.message':msg.message})
 			msg.message.timestamp = new Date().getTime()
-			console.log("timestamp = " + msg.message.timestamp)
-			insertData(app.register,msg)
+			console.log({'log':'the.routing.register','msg.message':msg.message})
+			insertData(app.register,msg.message)
 			io.sockets.on('connection',function(socket) {
 				console.log("Sockets.io is Connected!!")
 				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
@@ -77,10 +76,26 @@ rabbitMqConnection.on('ready',function() {
 	q_test = rabbitMqConnection.queue('test-queue',function(queue) {
 		console.log('Queue ' + queue.name + ' is open')
 		app.queueStatus = 'The queue is ready for use!'
-		q_test.bind(exchange,'*.routing.key')
+		q_test.bind(exchange,'test.routing.key')
 		q_test.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
 			console.log({'log':'the.routing.key','msg.message':msg.message})
-			insertData(app.devices,msg)
+			insertData(app.devices,msg.message)
+			io.sockets.on('connection',function(socket) {
+				console.log("Sockets.io is Connected!!")
+				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+				socket.on("my return event",function(data) {
+					console.log(data)
+				})	
+			})
+		})
+	})
+	q_ack = rabbitMqConnection.queue('ack-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The queue is ready for use!'
+		q_test.bind(exchange,'ack.routing.key')
+		q_test.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
+			console.log({'log':'ack.routing.key','msg.message':msg.message})
+			//insertData(app.devices,msg.message)
 			io.sockets.on('connection',function(socket) {
 				console.log("Sockets.io is Connected!!")
 				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
@@ -135,7 +150,6 @@ app.post('/newData',function(req,res) {
 		console.log('newData: result of publish (false means success) = ' + result);
 	});
 })
-
 	
 app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
@@ -252,13 +266,19 @@ app.get('/listRawJson', function(req,res) {
 
 //****************************Private methods************************************
 var insertData = function(db,data) {
+	console.log("insertData: data = " + data.protocol.messenger.on_ack.exchange)
 	db.insert({"data": {"message":data.message,"status":data.status}},function(err,body,header) {
 		if(err) {
 			console.log("err.insert = " + err.message)
 			return
 		}
 		console.log("you have inserted a message: ")
-		console.log(data.message)
+		console.log(data)
+		//publish back on the ack the message just inserted
+		var exchange = rabbitMqConnection.exchange(data.protocol.messenger.on_publish.exchange)
+		exchange.publish(data.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
+			console.log('insertData: result of publish (false means success) = ' + result);
+		})
 	})
 }
 

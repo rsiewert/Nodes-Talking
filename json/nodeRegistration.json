@@ -1,0 +1,26 @@
+{
+    "data": {
+		"node_id": "some id",
+		"timestamp":"",
+        "protocol": {
+            "acts_as": "server",
+            "rest": {
+                "domain": "somedomain.com",
+                "port": "20003",
+                "endpoint": "/theapp/endpoint"
+            },
+            "messenging": {
+				"on_publish" : {
+					"exchange": "theExchange",
+					"queue": "theQueue",
+					"routing_key": "theRoutingKey"
+				},
+				"on_ack": {
+					"exchange": "test-exchange",
+					"queue": "acq-queue",
+					"routing_key": "acq.routing.key"
+				}
+            }
+        }
+    }
+}
