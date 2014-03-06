@@ -39,7 +39,7 @@ var q_register
 var q_test
 
 //------------------make connection to rabbitmq, create exchange and queues(s)/binding(s), set status, subscribe to queue(s)
-rabbitMqConnection = amqp.createConnection({host:'localhost'})
+rabbitMqConnection = amqp.createConnection({host:"localhost"})
 
 rabbitMqConnection.addListener('error', function (e) {
 	throw e;
@@ -267,13 +267,13 @@ app.get('/listRawJson', function(req,res) {
 //****************************Private methods************************************
 var insertData = function(db,data) {
 	console.log("insertData: data = " + data.protocol.messenger.on_ack.exchange)
-	db.insert({"data": {"message":data.message,"status":data.status}},function(err,body,header) {
+	db.insert({"data": {"message":data,"status":data.status}},function(err,body,header) {
 		if(err) {
 			console.log("err.insert = " + err.message)
 			return
 		}
 		console.log("you have inserted a message: ")
-		console.log(data)
+		console.log(body)
 		//publish back on the ack the message just inserted
 		var exchange = rabbitMqConnection.exchange(data.protocol.messenger.on_publish.exchange)
 		exchange.publish(data.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {

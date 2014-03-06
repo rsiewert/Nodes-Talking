@@ -17,8 +17,8 @@
 				},
 				"on_ack": {
 					"exchange": "test-exchange",
-					"queue": "acq-queue",
-					"routing_key": "acq.routing.key"
+					"queue": "ack-queue",
+					"routing_key": "ack.routing.key"
 				}
             }
         }
