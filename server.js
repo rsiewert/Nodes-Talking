@@ -133,6 +133,7 @@ app.get('/message-service',function(req,res) {
 	 
 });
 
+//------this is just for testing purposes and is not designed to be used as a discovery mechanism
 app.post('/newReg',function(req,res) {
 	console.log("inside /newReg")
 	var data = req.body.data
@@ -141,6 +142,7 @@ app.post('/newReg',function(req,res) {
 		console.log('newReg: result of publish (false means success) = ' + result);
 	});
 })
+//------------------------------
 
 app.post('/newData',function(req,res) {
 	console.log("inside /newData")
