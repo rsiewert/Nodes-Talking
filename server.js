@@ -275,7 +275,7 @@ var insertData = function(db,data) {
 		console.log("you have inserted a message: ")
 		console.log(body)
 		//publish back on the ack the message just inserted
-		var exchange = rabbitMqConnection.exchange(data.protocol.messenger.on_publish.exchange)
+	    var exchange = rabbitMqConnection.exchange(data.protocol.messenger.on_publish.exchange,{'passive':'true'})
 		exchange.publish(data.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
 			console.log('insertData: result of publish (false means success) = ' + result);
 		})
