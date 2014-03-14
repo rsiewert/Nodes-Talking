@@ -6,6 +6,13 @@ public class Location {
 	double latitude = 0;
 	double longitude = 0;
 	double altitude = 0;
+	
+	public Location(double latitude, double longitude, double altitude) {
+		this.latitude = latitude;
+		this.longitude = longitude;
+		this.altitude = altitude;
+		
+	}
 	public double getLatitude() {
 		return latitude;
 	}

@@ -7,4 +7,5 @@ public class Server extends Node {
 	
 	ArrayList<ServiceTypes> services;
 	
+	private Server() {};
 }
