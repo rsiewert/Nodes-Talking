@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="/deviceServer"/>
+	<classpathentry kind="lib" path="/deviceServer/lib/json-simple-1.1.1.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="/deviceServer/lib"/>
+	<classpathentry kind="lib" path="/deviceServer/lib/gson-2.2.4.jar" sourcepath="/home/rbgodwin/git/node-rabbit-prototype/device/deviceServer/src/gson-2.2.4-sources.jar"/>
+	<classpathentry kind="lib" path="/usr/lib/eclipse/dropins/jdt/plugins/org.junit_4.8.2.v4_8_2_v20110321-1705/junit.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="http://www.junit.org/junit/javadoc/4.5"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="/usr/lib/eclipse/dropins/jdt/plugins/org.hamcrest.core_1.1.0.jar"/>
+	<classpathentry kind="lib" path="/home/rbgodwin/gitMaster/node-rabbit-prototype/deviceServerTest/lib/easymock-2.5.1.jar"/>
+	<classpathentry kind="lib" path="/home/rbgodwin/gitMaster/node-rabbit-prototype/deviceServerTest/lib/easymockclassextension-2.4.jar"/>
+	<classpathentry kind="lib" path="/home/rbgodwin/gitMaster/node-rabbit-prototype/deviceServerTest/lib/cglib-nodep-2.2.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
