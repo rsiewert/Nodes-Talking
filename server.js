@@ -63,7 +63,7 @@ rabbitMqConnection.on('ready',function() {
 		q_register.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
 			msg.message.timestamp = new Date().getTime()
 			console.log({'log':'the.routing.register','msg.message':msg.message})
-			insertData(app.register,msg.message)
+		    insertReg(app.register,msg.message, msg.message.node.nodeId)
 			io.sockets.on('connection',function(socket) {
 				console.log("Sockets.io is Connected!!")
 				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
@@ -279,6 +279,25 @@ var insertData = function(db,data) {
 		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
 				 {mandatory:true},function(result) {
 			console.log('insertData: result of publish (false means success) = ' + result);
+		})
+	})
+}
+
+
+var insertReg = function(db,data,id) {
+	console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
+    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
+		if(err) {
+			console.log("err.insert = " + err.message)
+			return
+		}
+		console.log("you have inserted a registration: ")
+		console.log(body)
+		//publish back on the ack the message just inserted
+	        var exchange = rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
+		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
+				 {mandatory:true},function(result) {
+			console.log('insertReg: result of publish (false means success) = ' + result);
 		})
 	})
 }
