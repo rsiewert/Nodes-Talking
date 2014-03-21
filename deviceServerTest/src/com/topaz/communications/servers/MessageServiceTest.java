@@ -7,7 +7,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.topaz.communications.handlers.MessageProtocolHandler;
 import com.topaz.communications.messages.Message;
-import com.topaz.communications.protocols.MessageProtocol;
+import com.topaz.communications.protocols.*;
 
 
 /**
@@ -37,22 +37,6 @@ public class MessageServiceTest {
 		MessageService result = new MessageService(host);
 
 		// add additional test code here
-		// An unexpected exception was thrown in user code while executing this test:
-		//    java.lang.SecurityException: Cannot write to files while generating test cases
-		//       at com.instantiations.assist.eclipse.junit.CodeProJUnitSecurityManager.checkWrite(CodeProJUnitSecurityManager.java:70)
-		//       at java.io.FileOutputStream.<init>(FileOutputStream.java:237)
-		//       at java.net.SocketOutputStream.<init>(SocketOutputStream.java:58)
-		//       at java.net.AbstractPlainSocketImpl.getOutputStream(AbstractPlainSocketImpl.java:411)
-		//       at java.net.Socket$3.run(Socket.java:865)
-		//       at java.security.AccessController.doPrivileged(Native Method)
-		//       at java.net.Socket.getOutputStream(Socket.java:862)
-		//       at com.rabbitmq.client.impl.SocketFrameHandler.<init>(SocketFrameHandler.java:54)
-		//       at com.rabbitmq.client.ConnectionFactory.createFrameHandler(ConnectionFactory.java:462)
-		//       at com.rabbitmq.client.ConnectionFactory.createFrameHandler(ConnectionFactory.java:447)
-		//       at com.rabbitmq.client.ConnectionFactory.newConnection(ConnectionFactory.java:504)
-		//       at com.rabbitmq.client.ConnectionFactory.newConnection(ConnectionFactory.java:533)
-		//       at com.topaz.communications.servers.MessageService.<init>(MessageService.java:79)
-		//       at com.topaz.communications.servers.MessageService.<init>(MessageService.java:93)
 		assertNotNull(result);
 	}
 
@@ -69,11 +53,12 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService(this.msHost);
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
-		MessageProtocol protocol = new MessageProtocol();
 		MessageProtocolHandler protocolHandler = new MessageProtocolHandler();
-
-		fixture.addProtocol(protocol, protocolHandler);
+		MessageProtocol mProtocol = new MessageProtocol();
+		mProtocol.setExchange("test Exchange");
+		protocolHandler.setMessageProtocol(mProtocol);
+		
+		fixture.addProtocolHandler(protocolHandler);
 
 	}
 
@@ -90,30 +75,10 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService(this.msHost);
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
 
 		fixture.close();
 
 		// add additional test code here
-	}
-
-	/**
-	 * Run the void close() method test.
-	 *
-	 * @throws Exception
-	 *
-	 * @generatedBy CodePro at 3/13/14 6:44 PM
-	 */
-	@Test
-	public void testClose_2()
-		throws Exception {
-		MessageService fixture = MessageService.getMessageService(this.msHost);
-		fixture.setChannel((Channel) null);
-		fixture.setConnection((Connection) null);
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
-
-		fixture.close();
-
 	}
 
 	/**
@@ -129,8 +94,7 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService(this.msHost);
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
-
+	
 		Channel result = fixture.getChannel();
 
 		// add additional test code here
@@ -153,8 +117,7 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService(this.msHost);
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
-
+	
 		Connection result = fixture.getConnection();
 
 		assertNotNull(result);
@@ -224,7 +187,6 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService();
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
 		String exchange = "";
 		String route = "";
 		Message msg = new Message();
@@ -245,7 +207,6 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService();
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
 		Channel channel = EasyMock.createMock(Channel.class);
 		// add mock object expectations here
 
@@ -273,7 +234,6 @@ public class MessageServiceTest {
 		MessageService fixture = MessageService.getMessageService();
 		fixture.setChannel(EasyMock.createNiceMock(Channel.class));
 		fixture.setConnection(EasyMock.createNiceMock(Connection.class));
-		fixture.addProtocol(new MessageProtocol(), new MessageProtocolHandler());
 		Connection connection = EasyMock.createMock(Connection.class);
 		// add mock object expectations here
 

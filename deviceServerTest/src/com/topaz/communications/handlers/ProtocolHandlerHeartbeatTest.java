@@ -16,29 +16,7 @@ import com.topaz.communications.protocols.Protocol;
  * @version $Revision: 1.0 $
  */
 public class ProtocolHandlerHeartbeatTest {
-	/**
-	 * Run the ProtocolHandlerHeartbeat(MessageService,HeartbeatMessage) constructor test.
-	 *
-	 * @throws Exception
-	 *
-	 * @generatedBy CodePro at 3/12/14 9:52 PM
-	 */
-	@Test
-	public void testProtocolHandlerHeartbeat_1()
-		throws Exception {
-		MessageService ms = MessageService.getMessageService();
-		HeartbeatMessage hb = new HeartbeatMessage("");
-
-		ProtocolHandlerHeartbeat result = new ProtocolHandlerHeartbeat(ms, hb);
-
-		// add additional test code here
-		// An unexpected exception was thrown in user code while executing this test:
-		//    java.io.IOException: Must insitialize with a port and IP
-		//       at com.topaz.communications.MessageService.getMessageService(MessageService.java:42)
-		assertNotNull(result);
-	}
-
-	/**
+		/**
 	 * Run the int getIntervalSec() method test.
 	 *
 	 * @throws Exception
@@ -65,13 +43,16 @@ public class ProtocolHandlerHeartbeatTest {
 	@Test
 	public void testRun_1()
 		throws Exception {
-		ProtocolHandlerHeartbeat fixture = new ProtocolHandlerHeartbeat(MessageService.getMessageService(), new HeartbeatMessage(""));
+		MessageProtocol messageProtocol = new MessageProtocol();
+		ProtocolHandlerHeartbeat fixture = new ProtocolHandlerHeartbeat(MessageService.getMessageService(), 
+				new HeartbeatMessage(""),messageProtocol);
+
 		fixture.protocol = new Protocol();
 		fixture.heartbeatInterval = new Integer(1);
 		fixture.channel = null;
-		MessageProtocol messageProtocol = new MessageProtocol();
 		messageProtocol.setRoutingKey("");
 		messageProtocol.setExchange("");
+
 		fixture.messageProtocol = messageProtocol;
 
 		// Create the thread for the handler function
@@ -95,11 +76,11 @@ public class ProtocolHandlerHeartbeatTest {
 	@Test
 	public void testSetHeartbeatStatus_1()
 		throws Exception {
-		ProtocolHandlerHeartbeat fixture = new ProtocolHandlerHeartbeat(MessageService.getMessageService(), new HeartbeatMessage(""));
+		ProtocolHandlerHeartbeat fixture = new ProtocolHandlerHeartbeat(MessageService.getMessageService(), 
+				new HeartbeatMessage(""),new MessageProtocol());
 		fixture.protocol = new Protocol();
 		fixture.heartbeatInterval = new Integer(1);
 		fixture.channel = null;
-		fixture.messageProtocol = new MessageProtocol();
 		com.topaz.nodes.Node.STATUS status = com.topaz.nodes.Node.STATUS.BLACK;
 
 		fixture.setHeartbeatStatus(status);

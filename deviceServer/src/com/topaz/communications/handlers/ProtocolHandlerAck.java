@@ -1,8 +1,6 @@
 /*  author: Randy Godwin */
 package com.topaz.communications.handlers;
-
-import java.io.IOException;
-
+import com.topaz.communications.protocols.*;
 
 import com.rabbitmq.client.QueueingConsumer;
 
@@ -12,34 +10,30 @@ import com.rabbitmq.client.QueueingConsumer;
 
 public class ProtocolHandlerAck extends MessageProtocolHandler {
 
-	public ProtocolHandlerAck() {
+	
+	public ProtocolHandlerAck(MessageProtocol mp) {
 
+		// Set the message protocol
+		this.setMessageProtocol(mp);
+		
+	
+		// Create our Queuing consumer
+		this.setQueueConsumer(new QueueingConsumer(this.getChannel()));;
+		
+	
+	}
+
+	public QueueingConsumer getQueueConsumer() {
+		return queueConsumer;
+	}
+
+	public void setQueueConsumer(QueueingConsumer queueConsumer) {
+		this.queueConsumer = queueConsumer;
 	}
 
 	@Override
 	public void run() {
 
-		// get the exchange and routing information
-		String exchange = this.getMessageProtocol().getExchange();
-		String routingKey = this.getMessageProtocol().getRoutingKey();
-		String queueName = this.getMessageProtocol().getQueue();
-
-		// Create our Queuing consumer
-		QueueingConsumer queueConsumer = new QueueingConsumer(this.getChannel());;
-		
-		// Set up the communications
-		try {
-			// Create our exchange
-			this.getChannel().exchangeDeclare(exchange, "topic");
-			// Add our queue 
-			this.getChannel().queueDeclare(queueName, true, false, false, null);
-			this.getChannel().queueBind(queueName, exchange, routingKey);
-			// Bind our consumer to the queue
-			this.getChannel().basicConsume(queueName, true, queueConsumer);
-
-		} catch (IOException e1) {
-			e1.printStackTrace();
-		}
 
 		// Setup the exchange and subscribe to the route we need to service
 		while (!Thread.interrupted()) {

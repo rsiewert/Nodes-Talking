@@ -28,6 +28,8 @@ public class MessageService {
 	private ArrayList<MessageProtocol> messageProtocols = 
 			new ArrayList<MessageProtocol>();
 
+	private ArrayList<String> exchangeNames = new ArrayList<String>();
+	
 	// Some of our messages will want to check if there is an ack in response 
 	private HashMap<Long, Message>  ackChecks = new HashMap<Long, Message>();
 	
@@ -112,15 +114,24 @@ public class MessageService {
 		for(MessageProtocol protocol: this.messageProtocols)
 		{
 			if(protocol.getManageExchange() == true) {
-				this.channel.exchangeDelete(protocol.getExchange());
+				if(this.exchangeNames.contains(protocol.getExchange())) {
+					System.out.println("Deleted Exchange" + protocol.getExchange());
+					this.channel.exchangeDelete(protocol.getExchange());
+					this.exchangeNames.remove(protocol.getExchange());
+				}
 			}
 			
 		}
 		// Close the channel and connection
 		if(channel != null)
+		{
 			channel.close();
-		if(connection != null)
+			channel = null;
+		}
+		if(connection != null) {
 			connection.close();
+			connection = null;
+		}
 		
 		// Set the singleton to NULL to make next use of the Service create a new MS
 		MessageService.singleMS = null;
@@ -141,7 +152,7 @@ public class MessageService {
 			this.addAckMessage(msg);
 		
 		channel.basicPublish(exchange, route, bp, msg.toJsonString().getBytes());
-		System.out.println("Sent:" + msg.toJsonString());	
+//		System.out.println("Sent:" + msg.toJsonString());	
 		 
 	}
 	
@@ -154,13 +165,36 @@ public class MessageService {
 	}
 	
 	// Create all the message exchanges and register 
-	public void addProtocol(MessageProtocol protocol,MessageProtocolHandler protocolHandler){
+	public void addProtocolHandler(MessageProtocolHandler protocolHandler){
 	
-		// Set the items the protocol handler needs for servicing the protocol
-		protocolHandler.setMessageProtocol(protocol);
 		
 		// Set the protocol handler's channel
 		protocolHandler.setChannel(this.getChannel());
+		
+		// Set up the exchange, queue etc for the protocol handler
+		String exchange = protocolHandler.getMessageProtocol().getExchange();
+		String routingKey = protocolHandler.getMessageProtocol().getRoutingKey();
+		String queueName = protocolHandler.getMessageProtocol().getQueue();
+
+		try {
+			// Create our exchange
+			this.getChannel().exchangeDeclare(exchange, "topic");
+			if(!this.exchangeNames.contains(exchange))
+				this.exchangeNames.add(exchange);
+			// Add our queue 
+			if(queueName != null) {
+				this.getChannel().queueDeclare(queueName, true, false, false, null);
+				this.getChannel().queueBind(queueName, exchange, routingKey);
+			}
+			
+			if(protocolHandler.getQueueConsumer() != null) {
+				// Bind our consumer to the queue
+				this.getChannel().basicConsume(queueName, true, protocolHandler.getQueueConsumer());
+			}
+		}
+		catch  (IOException e1) {
+			e1.printStackTrace();
+		}
 		
 		// Create the thread for the handler function
 		Thread handlerThread = new Thread(protocolHandler);
@@ -168,8 +202,8 @@ public class MessageService {
 		// Add the thread to our list of threads 
 		this.serviceThreads.add(handlerThread);
 	
-		// Add the Message protocol handler to our list of message protocol handlers
-		this.messageProtocols.add(protocol);
+		// Add the protocol the handler uses to our list
+		this.messageProtocols.add(protocolHandler.getMessageProtocol());
 		// Crank it up
 		handlerThread.start();
 

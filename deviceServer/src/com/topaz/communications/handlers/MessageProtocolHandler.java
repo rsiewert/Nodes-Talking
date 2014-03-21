@@ -1,6 +1,7 @@
 package com.topaz.communications.handlers;
 
 import com.rabbitmq.client.Channel;
+import com.rabbitmq.client.QueueingConsumer;
 import com.topaz.communications.protocols.MessageProtocol;
 
 public class MessageProtocolHandler extends ProtocolHandler {
@@ -11,7 +12,18 @@ public class MessageProtocolHandler extends ProtocolHandler {
 	// We have communications channel to get to our message server
 	Channel channel;
 	
+	// Can consume messages
+	QueueingConsumer queueConsumer=null;
 	
+	
+	public QueueingConsumer getQueueConsumer() {
+		return queueConsumer;
+	}
+
+	public void setQueueConsumer(QueueingConsumer queueConsumer) {
+		this.queueConsumer = queueConsumer;
+	}
+
 	@Override
 	public void run() {
 	

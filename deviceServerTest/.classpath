@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="/deviceServer"/>
-	<classpathentry kind="lib" path="/deviceServer/lib/json-simple-1.1.1.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="/deviceServer/lib"/>
 	<classpathentry kind="lib" path="/deviceServer/lib/gson-2.2.4.jar" sourcepath="/home/rbgodwin/git/node-rabbit-prototype/device/deviceServer/src/gson-2.2.4-sources.jar"/>

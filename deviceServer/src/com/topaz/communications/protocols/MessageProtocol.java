@@ -3,10 +3,11 @@ import com.topaz.communications.handlers.*;
 
 public class MessageProtocol extends Protocol {
 
-	String exchange;
+	String exchange = null;
+
 	//  Mark as transient since we do not want to have it serialized
-	transient String  queue;
-	String routing_key;
+	transient String  queue = null;
+	String routing_key = null;
 
 	// Each protocol has a handler for the protocol.  These handlers can either 
 	// service requests coming in (via messages or other protocols) or can themselves

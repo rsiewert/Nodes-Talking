@@ -18,7 +18,6 @@ import org.junit.runners.Suite;
 	ProtocolHandlerHeartbeatTest.class,
 	MessageProtocolHandlerTest.class,
 	ProtocolHandlerTest.class,
-	ProtocolHandlerAckTest.class,
 })
 public class TestAll {
 
