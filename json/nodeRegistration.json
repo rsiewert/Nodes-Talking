@@ -1,38 +1,48 @@
 {
-"data": {
-	"message": {
-		"protocol": {
-			"actsAs": "DEVICE",
-			"rest": {
-				"Mirror": {
-					"domain": "192.168.1.44",
-					"port": 3000,
-					"endpoint": "/json-mirror"
-				}
-			},
-			"messenger": {
-				"on_publish": {
-					"exchange": "deviceExchange.0xfa32da59",
-					"routing_key": "0xfa32da59.routing.on_publish",
-					"manageExchange": false
-				},
-				"on_ack": {
-					"exchange": "deviceExchange.0xfa32da59",
-					"routing_key": "0xfa32da59.routing.acks",
-					"manageExchange": true
-				},
-				"command_server": {
-					"exchange": "deviceExchange.0xfa32da59",
-					"routing_key": "0xfa32da59.routing.commands",
-					"manageExchange": false
-				}
-			}
-		},
-		"originTimestamp": "Mar 7, 2014 8:28:16 PM",
-		"nodeId": "0xfa32da59.gateway",
-		"seqId": 3,
-		"requestAck": true,
-		"timestamp": "1394209737275"
-	}
-}
+   "_id": "string",
+   "_rev": "1-743c7e86579227ab406b799f311f31b4",
+   "data": {
+       "message": {
+           "node": {
+               "actsAs": "enum": ["DEVICE", "SERVER"]
+               "nodeId": "string",
+               "location": {
+                   "latitude": { 
+		       "type": "float", 
+		       "minumum":0.0,
+		       "maximum":90.0
+		       }
+                   "longitude": {
+		       "type": "float", 
+		       "minumum":0.0,
+		       "maximum":360.0
+		       }
+                   "altitude": {
+ 		       "type": "float" 
+		       }
+               "status": "enum": ["GREEN","YELLOW","RED","BLACK"]
+               "protocol": {
+                   "rest": {
+                       ["name":"string" {
+                           "domain": "string",
+                           "port": "integer"
+                           "endpoint": "string"
+                       }]
+                   },
+                   "messenger": {
+                       ["name":"string" {
+                           "exchange": "string",
+                           "routing_key": "string",
+                           "manageExchange": "boolean"
+                       }]
+                   }
+               },
+               "description": "string"
+           },
+           "originTimestamp": "String",
+           "seqId": "integer",
+           "requestAck": "boolean",
+           "timestamp": "integer"
+       }
+   }
 }
