@@ -71,7 +71,7 @@ public class MessageService {
 	}
 	
 	// Constructor that connects to the message server 
-	private MessageService(String host, int port)  {
+	public MessageService(String host, int port)  {
 
 		ConnectionFactory factory = new ConnectionFactory();	
 		factory.setHost(host);
