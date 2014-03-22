@@ -30,11 +30,11 @@
                        }]
                    },
                    "messenger": {
-                       "name":"string" {
+                       ["name":"string" {
                            "exchange": "string",
                            "routing_key": "string",
                            "manageExchange": "boolean"
-                       }
+                       }]
                    }
                },
                "description": "string"
