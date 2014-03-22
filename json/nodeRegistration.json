@@ -1,26 +1,48 @@
 {
-    "data": {
-		"node_id": "some id",
-		"timestamp":"",
-        "protocol": {
-            "acts_as": "server",
-            "rest": {
-                "domain": "somedomain.com",
-                "port": "20003",
-                "endpoint": "/theapp/endpoint"
-            },
-            "messenging": {
-				"on_publish" : {
-					"exchange": "theExchange",
-					"queue": "theQueue",
-					"routing_key": "theRoutingKey"
-				},
-				"on_ack": {
-					"exchange": "test-exchange",
-					"queue": "ack-queue",
-					"routing_key": "ack.routing.key"
-				}
-            }
-        }
-    }
+   "_id": "string",
+   "_rev": "1-743c7e86579227ab406b799f311f31b4",
+   "data": {
+       "message": {
+           "node": {
+               "actsAs": "enum": ["DEVICE", "SERVER"]
+               "nodeId": "string",
+               "location": {
+                   "latitude": { 
+		       "type": "float", 
+		       "minumum":0.0,
+		       "maximum":90.0
+		       }
+                   "longitude": {
+		       "type": "float", 
+		       "minumum":0.0,
+		       "maximum":360.0
+		       }
+                   "altitude": {
+ 		       "type": "float" 
+		       }
+               "status": "enum": ["GREEN","YELLOW","RED","BLACK"]
+               "protocol": {
+                   "rest": {
+                       ["name":"string" {
+                           "domain": "string",
+                           "port": "integer"
+                           "endpoint": "string"
+                       }]
+                   },
+                   "messenger": {
+                       ["name":"string" {
+                           "exchange": "string",
+                           "routing_key": "string",
+                           "manageExchange": "boolean"
+                       }]
+                   }
+               },
+               "description": "string"
+           },
+           "originTimestamp": "String",
+           "seqId": "integer",
+           "requestAck": "boolean",
+           "timestamp": "integer"
+       }
+   }
 }
