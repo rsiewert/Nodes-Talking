@@ -1,26 +1,38 @@
 {
-    "data": {
-		"node_id": "some id",
-		"timestamp":"",
-        "protocol": {
-            "acts_as": "server",
-            "rest": {
-                "domain": "somedomain.com",
-                "port": "20003",
-                "endpoint": "/theapp/endpoint"
-            },
-            "messenging": {
-				"on_publish" : {
-					"exchange": "theExchange",
-					"queue": "theQueue",
-					"routing_key": "theRoutingKey"
+"data": {
+	"message": {
+		"protocol": {
+			"actsAs": "DEVICE",
+			"rest": {
+				"Mirror": {
+					"domain": "192.168.1.44",
+					"port": 3000,
+					"endpoint": "/json-mirror"
+				}
+			},
+			"messenger": {
+				"on_publish": {
+					"exchange": "deviceExchange.0xfa32da59",
+					"routing_key": "0xfa32da59.routing.on_publish",
+					"manageExchange": false
 				},
 				"on_ack": {
-					"exchange": "test-exchange",
-					"queue": "ack-queue",
-					"routing_key": "ack.routing.key"
+					"exchange": "deviceExchange.0xfa32da59",
+					"routing_key": "0xfa32da59.routing.acks",
+					"manageExchange": true
+				},
+				"command_server": {
+					"exchange": "deviceExchange.0xfa32da59",
+					"routing_key": "0xfa32da59.routing.commands",
+					"manageExchange": false
 				}
-            }
-        }
-    }
+			}
+		},
+		"originTimestamp": "Mar 7, 2014 8:28:16 PM",
+		"nodeId": "0xfa32da59.gateway",
+		"seqId": 3,
+		"requestAck": true,
+		"timestamp": "1394209737275"
+	}
+}
 }
