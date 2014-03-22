@@ -286,14 +286,14 @@ var insertData = function(db,data) {
 
 var insertReg = function(db,data,id) {
 	console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
-    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
+        db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
 		if(err) {
 			console.log("err.insert = " + err.message)
 			return
 		}
 		console.log("you have inserted a registration: ")
 		console.log(body)
-		//publish back on the ack the message just inserted
+		//publish back on the ack the registration received
 	        var exchange = rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
 		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
 				 {mandatory:true},function(result) {
