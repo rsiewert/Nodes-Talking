@@ -1,120 +1,130 @@
-var express = require('express'),
-	http = require('http'),
-	path = require('path'),
-	jade = require('jade'),
-	amqp = require('amqp'),
-	Shred = require('shred'),
-	nano = require('nano')('http://localhost:5984');
+var express = require('express')
+    ,http = require('http')
+    ,path = require('path')
+    ,jade = require('jade')
+    ,amqp = require('amqp')
+    ,Shred = require('shred')
+    ,nano = require('nano')('http://localhost:5984')
+    ,MongoClient = require('mongodb').MongoClient // Driver for connecting to MongoDB
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
-
-app.configure(function() {
-	app.set('port',process.env.PORT || 3000);
-	app.use(express.bodyParser());
-	//app.use(express.static(path.join(__dirname,'public')));
-	app.set('views',__dirname + '/views');
-	app.set('view engine','jade');
-	app.set('view options', { pretty: true });
-	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
-
-var server = http.createServer(app).listen(app.get('port'),function() {
-	console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");
-});
-
-//setup socket.io to listen to our app
-var io = require('socket.io').listen(server);
-
-console.log("The views path is: " + app.get('views'));
-
-app.connectionStatus 	= 'No server connection'
-app.exchangeStatus 		= 'No exchange established'
-app.queueStatus 		= 'No queue established'
-app.devices 			= nano.db.use('devices')
-app.register			= nano.db.use('register')
-
 var exchange
 var q_register
 var q_test
-
-//------------------make connection to rabbitmq, create exchange and queues(s)/binding(s), 
-//------------------set status, subscribe to queue(s)
-rabbitMqConnection = amqp.createConnection({host:"localhost"})
-
-rabbitMqConnection.addListener('error', function (e) {
-	throw e;
-})
-
-rabbitMqConnection.on('ready',function() {
-	app.connectionStatus = 'RabbitMQ is Connected';
-	console.log("RabbitMq started....")
-	
-	//-----------------create rabbit exchange----------------------
-	exchange = rabbitMqConnection.exchange('test-exchange',{},function(exchange) {
-		console.log('Exchange ' + exchange.name + ' is open')
-		app.exchangeStatus = 'An exchange has been established!'
-	})	
-
-	//----------------create rabbit queue(s)
-	q_register = rabbitMqConnection.queue('register-queue',function(queue) {
-		console.log('Queue ' + queue.name + ' is open')
-		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
-		queue.bind(exchange,'the.routing.register')
-		queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
-			msg.message.timestamp = new Date().toJSON()
-			console.log({'log':'the.routing.register','msg.message':msg.message})
-		    insertReg(app.register,msg.message, msg.message.node.nodeId)
-			io.sockets.on('connection',function(socket) {
-				console.log("Sockets.io is Connected!!")
-				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-				socket.on("my return event",function(data) {
-					console.log(data)
-				})	
-			})
-		})
-	})
-	q_test = rabbitMqConnection.queue('test-queue',function(queue) {
-		console.log('Queue ' + queue.name + ' is open')
-		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
-		queue.bind(exchange,'test.routing.key')
-		queue.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
-			console.log({'log':'the.routing.key','msg.message':msg.message})
-			insertData(app.devices,msg.message)
-			io.sockets.on('connection',function(socket) {
-				console.log("Sockets.io is Connected!!")
-				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-				socket.on("my return event",function(data) {
-					console.log(data)
-				})	
-			})
-		})
-	})
-	q_ack = rabbitMqConnection.queue('ack-queue',function(queue) {
-		console.log('Queue ' + queue.name + ' is open')
-		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
-		queue.bind(exchange,'ack.routing.key')
-		queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
-			console.log({'log':'ack.routing.key','msg.message':msg.message})
-			//insertData(app.devices,msg.message)
-			io.sockets.on('connection',function(socket) {
-				console.log("Sockets.io is Connected!!")
-				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-				socket.on("my return event",function(data) {
-					console.log(data)
-				})	
-			})
-		})
-	})
-})
+var q_ack
 
 app.shred = new Shred({logCurl:true})
+
+app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
+    "use strict";
+    if(err) throw err;
+    //app.db = this.db
+
+    app.configure(function() {
+    	app.set('port',process.env.PORT || 3000);
+    	app.use(express.bodyParser());
+    	//app.use(express.static(path.join(__dirname,'public')));
+    	app.set('views',__dirname + '/views');
+    	app.set('view engine','jade');
+    	app.set('view options', { pretty: true });
+    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    });
+
+    var server = http.createServer(app).listen(app.get('port'),function() {
+    	console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");
+    });
+
+    //setup socket.io to listen to our app
+    var io = require('socket.io').listen(server);
+
+    console.log("The views path is: " + app.get('views'));
+
+    app.connectionStatus 	= 'No server connection'
+    app.exchangeStatus 		= 'No exchange established'
+    app.queueStatus 		= 'No queue established'
+    app.devices 			= nano.db.use('devices')
+    app.register			= nano.db.use('register')
+
+
+    //------------------make connection to rabbitmq, create exchange and queues(s)/binding(s),
+    //------------------set status, subscribe to queue(s)
+    app.rabbitMqConnection = amqp.createConnection({host:"localhost"})
+
+    app.rabbitMqConnection.addListener('error', function (e) {
+        throw e;
+    })
+
+    app.rabbitMqConnection.on('ready',function() {
+        app.connectionStatus = 'RabbitMQ is Connected';
+        console.log("RabbitMq started....")
+
+        //-----------------create rabbit exchange----------------------
+        exchange = app.rabbitMqConnection.exchange('test-exchange',{},function(exchange) {
+            console.log('Exchange ' + exchange.name + ' is open')
+            app.exchangeStatus = 'An exchange has been established!'
+        })
+
+        //----------------create rabbit queue(s)
+        q_register = app.rabbitMqConnection.queue('register-queue',function(queue) {
+            console.log('Queue ' + queue.name + ' is open')
+            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            queue.bind(exchange,'the.routing.register')
+            queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
+                msg.message.timestamp = new Date().toJSON()
+                console.log({'log':'the.routing.register','msg.message':msg.message})
+                insertReg(app.register,msg.message, msg.message.node.nodeId)
+                io.sockets.on('connection',function(socket) {
+                    console.log("Sockets.io is Connected!!")
+                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+                    socket.on("my return event",function(data) {
+                        console.log(data)
+                    })
+                })
+            })
+        })
+        q_test = app.rabbitMqConnection.queue('test-queue',function(queue) {
+            console.log('Queue ' + queue.name + ' is open')
+            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            queue.bind(exchange,'test.routing.key')
+            queue.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
+                console.log({'log':'the.routing.key','msg.message':msg.message})
+                insertData(app.devices,msg.message)
+                io.sockets.on('connection',function(socket) {
+                    console.log("Sockets.io is Connected!!")
+                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+                    socket.on("my return event",function(data) {
+                        console.log(data)
+                    })
+                })
+            })
+        })
+        q_ack = app.rabbitMqConnection.queue('ack-queue',function(queue) {
+            console.log('Queue ' + queue.name + ' is open')
+            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            queue.bind(exchange,'ack.routing.key')
+            queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
+                console.log({'log':'ack.routing.key','msg.message':msg.message})
+                //insertData(app.devices,msg.message)
+                io.sockets.on('connection',function(socket) {
+                    console.log("Sockets.io is Connected!!")
+                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+                    socket.on("my return event",function(data) {
+                        console.log(data)
+                    })
+                })
+            })
+        })
+    })
+    console.log('Express server listening on port 3000');
+});
 //---------------------INITIALIZATION END---------------------------------
 
 //**********************************REST API'S***********************************
 app.get('/',function(req,res) {
 	console.log("inside get /");
-	
+
+    console.log("register = " + db.register.find())
 	res.render('index',
 		{
 			title:'Welcome to RabbitMQ and Node/Express',
@@ -287,7 +297,7 @@ var insertData = function(db,data) {
 		//do the ack/error processing
 		var options = {'passive':false}
 		options['passive'] = data.node.protocol.messenger.on_ack.manageExchange
-		var exchange = rabbitMqConnection.exchange(data.node.message.protocol.messenger.on_publish.exchange,options)
+		var exchange = app.rabbitMqConnection.exchange(data.node.message.protocol.messenger.on_publish.exchange,options)
 		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
 			console.log('insertData: result of publish (false means success) = ' + result);
 		})
@@ -305,7 +315,7 @@ var insertReg = function(db,data,id) {
 		console.log("you have inserted a registration: ")
 		console.log(body)
 		//publish back on the ack the registration received
-	    var exchange = rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
+	    var exchange = app.rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
 		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
 				 {mandatory:true},function(result) {
 			console.log('insertReg: result of publish (false means success) = ' + result);
