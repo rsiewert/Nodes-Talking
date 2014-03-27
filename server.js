@@ -5,6 +5,7 @@ var express = require('express')
     ,amqp = require('amqp')
     ,Shred = require('shred')
     ,nano = require('nano')('http://localhost:5984')
+    ,mongojs = require('mongojs')
     ,MongoClient = require('mongodb').MongoClient // Driver for connecting to MongoDB
 
 //-------------------INITIALIZATION BEGIN--------------------------
@@ -13,13 +14,12 @@ var exchange
 var q_register
 var q_test
 var q_ack
-
 app.shred = new Shred({logCurl:true})
+var mongoJSdb = mongojs('register');
 
-app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
+MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
     "use strict";
     if(err) throw err;
-    //app.db = this.db
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -46,7 +46,7 @@ app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err,
     app.devices 			= nano.db.use('devices')
     app.register			= nano.db.use('register')
 
-
+    //mydb = this.db;
     //------------------make connection to rabbitmq, create exchange and queues(s)/binding(s),
     //------------------set status, subscribe to queue(s)
     app.rabbitMqConnection = amqp.createConnection({host:"localhost"})
@@ -68,7 +68,7 @@ app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err,
         //----------------create rabbit queue(s)
         q_register = app.rabbitMqConnection.queue('register-queue',function(queue) {
             console.log('Queue ' + queue.name + ' is open')
-            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
             queue.bind(exchange,'the.routing.register')
             queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
                 msg.message.timestamp = new Date().toJSON()
@@ -85,7 +85,7 @@ app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err,
         })
         q_test = app.rabbitMqConnection.queue('test-queue',function(queue) {
             console.log('Queue ' + queue.name + ' is open')
-            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
             queue.bind(exchange,'test.routing.key')
             queue.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
                 console.log({'log':'the.routing.key','msg.message':msg.message})
@@ -101,7 +101,7 @@ app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err,
         })
         q_ack = app.rabbitMqConnection.queue('ack-queue',function(queue) {
             console.log('Queue ' + queue.name + ' is open')
-            app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
             queue.bind(exchange,'ack.routing.key')
             queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
                 console.log({'log':'ack.routing.key','msg.message':msg.message})
@@ -118,13 +118,21 @@ app.db = MongoClient.connect('mongodb://localhost:27017/register', function(err,
     })
     console.log('Express server listening on port 3000');
 });
-//---------------------INITIALIZATION END---------------------------------
+
 
 //**********************************REST API'S***********************************
 app.get('/',function(req,res) {
 	console.log("inside get /");
+    var register = mongoJSdb.collection('register');
 
-    console.log("register = " + db.register.find())
+    register.find().sort({name:1},function(err, docs) {
+        // docs is an array of all the documents in mycollection
+        for(var i=0;i<docs.length;i++)
+            console.log("doc = " + docs[i].name)
+    })
+
+    register.save({name:"Henry"})
+
 	res.render('index',
 		{
 			title:'Welcome to RabbitMQ and Node/Express',
@@ -132,6 +140,14 @@ app.get('/',function(req,res) {
 			exchangeStatus:app.exchangeStatus,
 			queueStatus:app.queueStatus
 		});
+})
+
+app.get('/devices/doc/:id',function(req,res) {
+    var devices = mongoJSdb.collection('devices')
+    devices.find({_id:id}),function(err,docs) {
+        for(var i=0;i<docs.length;i++)
+            console.log("doc = " + docs[i].name)
+    }
 })
 
 app.get('/message-service',function(req,res) {
@@ -396,6 +412,8 @@ var getDBContentsById = function(db,value,msgType,callback) {
 		}
 	})
 }
+
+//---------------------INITIALIZATION END---------------------------------
 
 
 /*

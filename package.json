@@ -11,6 +11,8 @@
 		"amqp":"*",
 		"jade":"*",
 		"nano":"*",
-		"socket.io":"*"
+		"socket.io":"*",
+        "mongodb":"*",
+        "mongojs":"*"
 	}
 }
