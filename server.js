@@ -65,7 +65,22 @@ rabbitMqConnection.on('ready',function() {
 			msg.message.timestamp = new Date().toJSON()
 			console.log({'log':'the.routing.register','msg.message':msg.message})
 		    insertReg(app.register,msg.message, msg.message.node.nodeId)
-			io.sockets.on('connection',function(socket) {
+		    
+		    // Pull out the node and if it is a device save it in the device database
+		    if(msg.message.node.actsAs == "DEVICE")
+	    		insertDevice(app.devices,msg.message, msg.message.node.nodeId)
+		
+		    //publish back on the ack the registration received if requested
+		    if(msg.message.requestAck == true) {
+			var exchange = rabbitMqConnection.exchange(msg.message.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
+			exchange.publish(msg.message.node.protocol.messenger.on_ack.routing_key,{message: msg.message},
+					 {mandatory:true},function(result) {
+					     console.log('insertReg: result of publish (false means success) = ' + result);
+					 })
+		    }
+
+		    
+		    io.sockets.on('connection',function(socket) {
 				console.log("Sockets.io is Connected!!")
 				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
 				socket.on("my return event",function(data) {
@@ -95,15 +110,14 @@ rabbitMqConnection.on('ready',function() {
 		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
 		queue.bind(exchange,'ack.routing.key')
 		queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
-			console.log({'log':'ack.routing.key','msg.message':msg.message})
-			//insertData(app.devices,msg.message)
-			io.sockets.on('connection',function(socket) {
-				console.log("Sockets.io is Connected!!")
-				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-				socket.on("my return event",function(data) {
-					console.log(data)
-				})	
-			})
+		    console.log({'log':'ack.routing.key','msg.message':msg.message})
+		    io.sockets.on('connection',function(socket) {
+			console.log("Sockets.io is Connected!!")
+			socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+			socket.on("my return event",function(data) {
+			    console.log(data)
+			})	
+		    })
 		})
 	})
 })
@@ -167,6 +181,23 @@ app.post('/json-mirror',function(req,res) {
 	res.json(newMessage);
 });
 
+// Returns a JSON response containing all devices in the device DB
+app.get('/getDevices',function(req,res) {
+    
+    var results = new Array()
+
+    // Fetch all the documents
+    app.devices.fetch({}, function ( err, docs) {
+	// Load up the device data from the rows as the response
+	docs.rows.forEach(function(row) {
+	    results.push(row.doc.device);
+	});
+	// Ship it back
+	res.json(results)
+    });
+});
+
+ 
 app.get('/couchDBList',function(req,res) {
 	//get the couchdb list via REST call
 ///*
@@ -296,22 +327,31 @@ var insertData = function(db,data) {
 
 
 var insertReg = function(db,data,id) {
-	console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
-        db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
-		if(err) {
-			console.log("err.insert = " + err.message)
-			return
-		}
-		console.log("you have inserted a registration: ")
-		console.log(body)
-		//publish back on the ack the registration received
-	    var exchange = rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
-		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
-				 {mandatory:true},function(result) {
-			console.log('insertReg: result of publish (false means success) = ' + result);
-		})
-	})
+    console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
+    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
+	if(err) {
+	    console.log("err.insert = " + err.message)
+	    return
+	}
+	console.log("you have inserted a registration: ")
+	console.log(body)
+    })
+
 }
+			
+
+var insertDevice = function(db,data,id) {
+    console.log("insertDevice: data = " + data)
+    db.insert({"device":data.node},id,function(err,body,header) {
+	if(err) {
+	    console.log("Error inserting a device = " + err.message)
+	    return
+	}
+	console.log("you have inserted a device: ")
+	
+    })
+}
+
 
 var getDBContents = function(db,type,callback) {
 	var params = {include_docs:true}
