@@ -13,7 +13,7 @@
 //
 // </SCRIPT>
 //
-function DevicesTalking()
+function DbModule()
 {
 // Implementation reference:
 
@@ -26,16 +26,16 @@ function DevicesTalking()
   return this;
 }
 
-DevicesTalking.prototype = {
+DbModule.prototype = {
 
     _SetImplementation: function(implementer)
     {
         this._impl = null;
-        if(implementor) this._impl = implementer;
+        if(implementer) this._impl = implementer;
     },
 
-    // EstablishImplementor - function that creates
-    // the Concrete Implementor and binds it to Abstraction.
+    // EstablishImplementer - function that creates
+    // the Concrete Implementer and binds it to DevicesTalking.
     // This is the very method to place your
     // browser/feature/object detection code.
     _EstablishImplementer: function(container)
@@ -47,7 +47,7 @@ DevicesTalking.prototype = {
             return new CouchDB();
 
         return null;
-  },
+    },
 
   // Functions "exported" by the DevicesTalking abstraction:
   //                                 __________________
@@ -56,36 +56,36 @@ DevicesTalking.prototype = {
     getAll : function()
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl && this._impl.FuncOne)
-            this._impl.FuncOne();     // Forward request to implementer
+        if(this._impl)
+            this._impl.getAll();     // Forward request to implementer
     },
 
     getByIds : function()
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl && this._impl.FuncOne)
-            this._impl.FuncOne();     // Forward request to implementer
+        if(this._impl)
+            this._impl.getByIds();     // Forward request to implementer
     },
 
     update : function()
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl && this._impl.FuncOne)
-            this._impl.FuncOne();     // Forward request to implementer
+        if(this._impl)
+            this._impl.update();     // Forward request to implementer
     },
 
     create : function()
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl && this._impl.FuncOne)
-            this._impl.FuncOne();     // Forward request to implementer
+        if(this._impl)
+            this._impl.create();     // Forward request to implementer
     },
 
     remove : function()
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl && this._impl.FuncOne)
-            this._impl.FuncOne();     // Forward request to implementer
+        if(this._impl)
+            this._impl.remove();     // Forward request to implementer
     }
 };
 
@@ -103,7 +103,12 @@ MongoDB.prototype = {
     getAll: function()
     {
       console.log("MongoDB.getAll")
+    },
+    getByIds: function()
+    {
+      console.log("MongoDB.getByIds")
     }
+
 
 }
 
@@ -114,9 +119,14 @@ function CouchDB()
 
 CouchDB.prototype = {
 
-  getAll: function()
-  {
-    console.log("CouchDB.getAll")
-  }
-
+    getAll: function()
+    {
+        console.log("CouchDB.getAll")
+    },
+    getByIds: function()
+    {
+        console.log("MongoDB.getByIds")
+    }
 }
+
+module.exports.dbmodule = new DbModule()
