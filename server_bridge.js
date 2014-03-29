@@ -2,18 +2,18 @@
  * Created by rsie on 3/27/2014.
  */
 
-// Abstraction - the object you usually create
+// DevicesTalking - the object you usually create
 //               in your "end-user" scripts:
 //
 // <SCRIPT type="text/javascript">
 
 //
-//    var abstr = new Abstraction();
+//    var dt = new DevicesTalking();
 //    ...
 //
 // </SCRIPT>
 //
-function Abstraction()
+function DevicesTalking()
 {
 // Implementation reference:
 
@@ -21,76 +21,102 @@ function Abstraction()
 
 // Setup procedure:
 
-  this._SetImplementation(this._EstablishImplementor('mongodb'));
+  this._SetImplementation(this._EstablishImplementer('mongodb'));
 
   return this;
 }
 
-Abstraction.prototype = {
+DevicesTalking.prototype = {
 
-  _SetImplementation: function(implementor)
-  {
-    this._impl = null;
-    if(implementor) this._impl = implementor;
+    _SetImplementation: function(implementer)
+    {
+        this._impl = null;
+        if(implementor) this._impl = implementer;
+    },
+
+    // EstablishImplementor - function that creates
+    // the Concrete Implementor and binds it to Abstraction.
+    // This is the very method to place your
+    // browser/feature/object detection code.
+    _EstablishImplementer: function(container)
+    {
+        if(container === 'mongodb')
+            return new MongoDB();
+
+        else if(container === 'couchdb')
+            return new CouchDB();
+
+        return null;
   },
 
-  // EstablishImplementor - function that creates
-  // the Concrete Implementor and binds it to Abstraction.
-  // This is the very method to place your
-  // browser/feature/object detection code.
-  _EstablishImplementor: function(container)
-  {
-    if(container === 'mongodb')
-      return new ImplementationOne();
+  // Functions "exported" by the DevicesTalking abstraction:
+  //                                 __________________
+  //________________________________/   Client API     \___________________________________
 
-    else if(container === 'couchdb')
-      return new ImplementationTwo();
+    getAll : function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl && this._impl.FuncOne)
+            this._impl.FuncOne();     // Forward request to implementer
+    },
 
-    // ...
+    getByIds : function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl && this._impl.FuncOne)
+            this._impl.FuncOne();     // Forward request to implementer
+    },
 
-    return null;
-  },
+    update : function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl && this._impl.FuncOne)
+            this._impl.FuncOne();     // Forward request to implementer
+    },
 
-  // Function "exported" by the Abstraction:
-  FuncOne: function()
-  {
-    // Check if any implementor is bound and has the required method:
-    if(this._impl && this._impl.FuncOne)
-       this._impl.FuncOne();     // Forward request to implementor
-  }
+    create : function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl && this._impl.FuncOne)
+            this._impl.FuncOne();     // Forward request to implementer
+    },
+
+    remove : function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl && this._impl.FuncOne)
+            this._impl.FuncOne();     // Forward request to implementer
+    }
 };
 
-// ...
+// This is the first in the set of concrete implementers:
+//                             ___________________________
+//____________________________/     Implementations       \__________________________
 
-// This is the first in the set of concrete implementors:
-function ImplementationOne()
+function MongoDB()
 {
-// ...
 }
 
-ImplementationOne.prototype = {
+MongoDB.prototype = {
 
-  // This "public" function is directly called by Abstraction:
-  FuncOne: function()
+  // This "public" function is directly called by DevicesTalking:
+    getAll: function()
+    {
+      console.log("MongoDB.getAll")
+    }
+
+}
+
+// This is the second implementer:
+function CouchDB()
+{
+}
+
+CouchDB.prototype = {
+
+  getAll: function()
   {
-    // ...
+    console.log("CouchDB.getAll")
   }
 
-// ...
-}
-
-// This is the second implementor:
-function ImplementationTwo()
-{
-// ...
-}
-
-ImplementationTwo.prototype = {
-
-  FuncOne: function()
-  {
-    // ...
-  }
-
-// ...
 }
