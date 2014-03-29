@@ -124,7 +124,7 @@ public class Node {
 		this.status = builder.status;
 	}
 
-	protected Node() {}
+	public Node() {}
 	
 	// Accessor Functions
 	public String getNodeId() {
