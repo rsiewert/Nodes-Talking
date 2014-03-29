@@ -46,6 +46,6 @@ public class Device extends Node {
 		this.controls = builder.controls;
 	}
 	
-	protected Device() {}
+	public Device() {}
 
 }
