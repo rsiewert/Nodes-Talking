@@ -6,7 +6,6 @@ var express = require('express')
     ,Shred = require('shred')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
-    ,MongoClient = require('mongodb').MongoClient // Driver for connecting to MongoDB
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -16,10 +15,6 @@ var q_test
 var q_ack
 app.shred = new Shred({logCurl:true})
 var mongoJSdb = mongojs('register');
-
-MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
-    "use strict";
-    if(err) throw err;
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -43,10 +38,7 @@ MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
     app.connectionStatus 	= 'No server connection'
     app.exchangeStatus 		= 'No exchange established'
     app.queueStatus 		= 'No queue established'
-    app.devices 			= nano.db.use('devices')
-    app.register			= nano.db.use('register')
 
-    //mydb = this.db;
     //------------------make connection to rabbitmq, create exchange and queues(s)/binding(s),
     //------------------set status, subscribe to queue(s)
     app.rabbitMqConnection = amqp.createConnection({host:"localhost"})
@@ -117,7 +109,7 @@ MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
         })
     })
     console.log('Express server listening on port 3000');
-});
+
 
 
 //**********************************REST API'S***********************************
@@ -131,7 +123,7 @@ app.get('/',function(req,res) {
             console.log("doc = " + docs[i].name)
     })
 
-    register.save({name:"Henry"})
+//    register.save({name:"Henry"})
 
 	res.render('index',
 		{
