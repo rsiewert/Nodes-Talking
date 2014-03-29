@@ -1,30 +1,3 @@
-/*
-var app = require('express')()
-  , server = require('http').createServer(app)
-  , io = require('socket.io').listen(server);
-
-server.listen(3000);
-
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-io.sockets.on('connection', function (socket) {
-	console.log("socket connected....");
-	socket.emit('news', { hello: 'world' });
-	
-	socket.on('my other event', function (data) {
-		console.log(data);
-	});
-
-	socket.on('my test event', function (data) {
-		console.log(data);
-	});
-
-});
-});
-*/
-
-
-
 var express = require('express'),
 	http = require('http'),
 	path = require('path'),
@@ -44,7 +17,6 @@ app.configure(function() {
 	app.set('view engine','jade');
 	app.set('view options', { pretty: true });
 	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-
 });
 
 var server = http.createServer(app).listen(app.get('port'),function() {
@@ -56,42 +28,100 @@ var io = require('socket.io').listen(server);
 
 console.log("The views path is: " + app.get('views'));
 
-app.connectionStatus 	= 'No server connection';
-app.exchangeStatus 		= 'No exchange established';
-app.queueStatus 		= 'No queue established';
-app.devices 			= nano.db.use('devices');
+app.connectionStatus 	= 'No server connection'
+app.exchangeStatus 		= 'No exchange established'
+app.queueStatus 		= 'No queue established'
+app.devices 			= nano.db.use('devices')
+app.register			= nano.db.use('register')
 
+var exchange
+var q_register
+var q_test
 
-//------------------make connection to rabbitmq, create exchange and queue, set status
-app.rabbitMqConnection = amqp.createConnection({host:'localhost'});
-app.rabbitMqConnection.on('ready',function() {
+//------------------make connection to rabbitmq, create exchange and queues(s)/binding(s), 
+//------------------set status, subscribe to queue(s)
+rabbitMqConnection = amqp.createConnection({host:"localhost"})
+
+rabbitMqConnection.addListener('error', function (e) {
+	throw e;
+})
+
+rabbitMqConnection.on('ready',function() {
 	app.connectionStatus = 'RabbitMQ is Connected';
+	console.log("RabbitMq started....")
+	
 	//-----------------create rabbit exchange----------------------
-	app.e = app.rabbitMqConnection.exchange('test-exchange',{confirm:true},function(exchange) {
-		console.log('Exchange ' + exchange.name + ' is open');
+	exchange = rabbitMqConnection.exchange('test-exchange',{},function(exchange) {
+		console.log('Exchange ' + exchange.name + ' is open')
 		app.exchangeStatus = 'An exchange has been established!'
-		//----------------create rabbit queue and bind to exchange--------
-		app.q = app.rabbitMqConnection.queue('test-queue',{},function(queue) {
-			console.log('Queue ' + queue.name + ' is open');
-			app.queueStatus = 'The queue is ready for use!';
-			queue.bind(app.e,'*.routing.*')
+	})	
 
-			//this needs to be abstracted out
-			queue.subscribe('the.routing.one',function(msg,headers,deliveryInfo) {
-				console.log({'log':'1','msg.message':msg.message})
-				insertData(app.devices,msg)
-				io.sockets.on('connection',function(socket) {
-					console.log("Sockets.io is Connected!!")
-					socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-					socket.on("my return event",function(data) {
-						console.log(data)
-					})	
-				})
+	//----------------create rabbit queue(s)
+	q_register = rabbitMqConnection.queue('register-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+		queue.bind(exchange,'the.routing.register')
+		queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
+			msg.message.timestamp = new Date().toJSON()
+			console.log({'log':'the.routing.register','msg.message':msg.message})
+		    insertReg(app.register,msg.message, msg.message.node.nodeId)
+		    
+		    // Pull out the node and if it is a device save it in the device database
+		    if(msg.message.node.actsAs == "DEVICE")
+	    		insertDevice(app.devices,msg.message, msg.message.node.nodeId)
+		
+		    //publish back on the ack the registration received if requested
+		    if(msg.message.requestAck == true) {
+			var exchange = rabbitMqConnection.exchange(msg.message.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
+			exchange.publish(msg.message.node.protocol.messenger.on_ack.routing_key,{message: msg.message},
+					 {mandatory:true},function(result) {
+					     console.log('insertReg: result of publish (false means success) = ' + result);
+					 })
+		    }
+
+		    
+		    io.sockets.on('connection',function(socket) {
+				console.log("Sockets.io is Connected!!")
+				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+				socket.on("my return event",function(data) {
+					console.log(data)
+				})	
 			})
-			return queue
+		})
+	})
+	q_test = rabbitMqConnection.queue('test-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+		queue.bind(exchange,'test.routing.key')
+		queue.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
+			console.log({'log':'the.routing.key','msg.message':msg.message})
+			insertData(app.devices,msg.message)
+			io.sockets.on('connection',function(socket) {
+				console.log("Sockets.io is Connected!!")
+				socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+				socket.on("my return event",function(data) {
+					console.log(data)
+				})	
+			})
+		})
+	})
+	q_ack = rabbitMqConnection.queue('ack-queue',function(queue) {
+		console.log('Queue ' + queue.name + ' is open')
+		app.queueStatus = 'The ' + queue.name + 'queue is ready for use!'
+		queue.bind(exchange,'ack.routing.key')
+		queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
+		    console.log({'log':'ack.routing.key','msg.message':msg.message})
+		    io.sockets.on('connection',function(socket) {
+			console.log("Sockets.io is Connected!!")
+			socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
+			socket.on("my return event",function(data) {
+			    console.log(data)
+			})	
+		    })
 		})
 	})
 })
+
 app.shred = new Shred({logCurl:true})
 //---------------------INITIALIZATION END---------------------------------
 
@@ -116,25 +146,33 @@ app.get('/message-service',function(req,res) {
 	     	sentMessage: ''
 	   });
 	 
-});
+})
+
+app.post('/newReg',function(req,res) {
+	console.log("inside /newReg")
+	var data = req.body.data
+	console.log("new Reg = " + data)
+	exchange.publish('the.routing.register', {message:data,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newReg: result of publish (false means success) = ' + result);
+	})
+})
 
 app.post('/newData',function(req,res) {
 	console.log("inside /newData")
 	var data = req.body.data
 	console.log("new Data = " + data)
-	app.e.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
-		console.log('result of publish (false means success) = ' + result);
-	});
+	exchange.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newData: result of publish (false means success) = ' + result);
+	})
 })
-
 	
 app.post('/newMessage',function(req,res) {
 	console.log('Inside /newMessage');
 	var newMessage = req.body.data;
 	console.log('newMessage = ' + newMessage);
-	app.e.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
-		console.log('result of publish (false means success) = ' + result);
-	});
+	exchange.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
+		console.log('newMessage: result of publish (false means success) = ' + result);
+	})
 	res.redirect('/message-service');
 });
 
@@ -143,11 +181,28 @@ app.post('/json-mirror',function(req,res) {
 	res.json(newMessage);
 });
 
+// Returns a JSON response containing all devices in the device DB
+app.get('/getDevices',function(req,res) {
+    
+    var results = new Array()
+
+    // Fetch all the documents
+    app.devices.fetch({}, function ( err, docs) {
+	// Load up the device data from the rows as the response
+	docs.rows.forEach(function(row) {
+	    results.push(row.doc.device);
+	});
+	// Ship it back
+	res.json(results)
+    });
+});
+
+ 
 app.get('/couchDBList',function(req,res) {
 	//get the couchdb list via REST call
 ///*
 	var req = app.shred.get({
-		url: "http://localhost:5984/devices/_design/listDB/_view/listDB",
+		url: "http://localhost:5984/devices/_changes",//_design/listDB/_view/listDB",
 		headers: {
 			"Accept": "application/json",
 			"Content-Type": "application/json"
@@ -183,7 +238,7 @@ app.get('/listDB/:type',function(req,res) {
 			console.log("type = " + req.params.type)
 			res.render('index',
 			{
-				title:'Listing CouchDB Documents',
+				title:'Listing CouchDB Documents By Type',
 				connectionStatus:app.connectionStatus,
 				exchangeStatus:app.exchangeStatus,
 				queueStatus:app.queueStatus,
@@ -211,6 +266,23 @@ app.get('/listDB',function(req,res) {
 	})
 })
 
+app.get('/listRegisterDB',function(req,res) {
+
+	getDBContents(app.register,"raw",function(err,results) {
+		if(err) {
+			console.log("error in listRawJson")
+		} else {
+			res.render('index',
+			{
+				title:'Listing CouchDB Register Documents',
+				connectionStatus:app.connectionStatus,
+				exchangeStatus:app.exchangeStatus,
+				queueStatus:app.queueStatus,
+				"results":results.data
+			})
+		}
+	})
+})
 app.get('/listRawJson', function(req,res) {
 
 	getDBContents(app.devices,"raw",function(err,results) {
@@ -221,20 +293,65 @@ app.get('/listRawJson', function(req,res) {
 		}
 	})
 })
+
+app.get('/getDbByView', function(req,res) {
+	console.log('Inside getDbByView')
+	getDBContentsByView(app.register,'listDB','listDB',function(err,results) {
+		//console.log(results)
+	})
+})
 //****************************END OF REST APIs***********************************
 
 
 //****************************Private methods************************************
+
 var insertData = function(db,data) {
-	db.insert({"data": {"message":data.message,"status":data.status}},function(err,body,header) {
+	console.log("insertData: data = " + data.node.protocol.messenger.on_ack.exchange)
+	db.insert({"data": {"message":data,"status":data.status}},function(err,body,header) {
 		if(err) {
 			console.log("err.insert = " + err.message)
 			return
 		}
-		console.log("you have inserted a message")
+		console.log("you have inserted a message: ")
 		console.log(body)
+		//publish back on the ack exchange the message just inserted...might want to revise in the future to have rabbit
+		//do the ack/error processing
+		var options = {'passive':false}
+		options['passive'] = data.node.protocol.messenger.on_ack.manageExchange
+		var exchange = rabbitMqConnection.exchange(data.node.message.protocol.messenger.on_publish.exchange,options)
+		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
+			console.log('insertData: result of publish (false means success) = ' + result);
+		})
 	})
 }
+
+
+var insertReg = function(db,data,id) {
+    console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
+    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
+	if(err) {
+	    console.log("err.insert = " + err.message)
+	    return
+	}
+	console.log("you have inserted a registration: ")
+	console.log(body)
+    })
+
+}
+			
+
+var insertDevice = function(db,data,id) {
+    console.log("insertDevice: data = " + data)
+    db.insert({"device":data.node},id,function(err,body,header) {
+	if(err) {
+	    console.log("Error inserting a device = " + err.message)
+	    return
+	}
+	console.log("you have inserted a device: ")
+	
+    })
+}
+
 
 var getDBContents = function(db,type,callback) {
 	var params = {include_docs:true}
@@ -245,7 +362,7 @@ var getDBContents = function(db,type,callback) {
 			body.rows.forEach(function(doc) {
 				console.log(doc)
 				if(type == 'raw') {
-					results.push(doc)
+					results.push(doc.doc.data.message)
 				} else {
 					if(doc.doc.message != undefined || doc.doc.data != undefined) {
 						if(doc.doc.message == undefined) {
@@ -266,6 +383,22 @@ var getDBContents = function(db,type,callback) {
 			callback({'status':err.message},[])
 		}
 		callback(0,results)
+	})
+}
+
+var getDBContentsByView = function(db,id,view,callback) {
+	
+	db.view('_design/'+view, view, function(err, body) {
+		var results = new Array()
+		if (!err) {
+			body.rows.forEach(function(doc) {
+				console.log(doc.value)
+				results.push(doc.value)
+			})
+			callback(0,results)
+		} else {
+			callback(err,0)
+		}
 	})
 }
 
