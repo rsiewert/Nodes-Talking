@@ -326,32 +326,57 @@ var insertData = function(db,data) {
 }
 
 
-var insertReg = function(db,data,id) {
-    console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
-    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
-	if(err) {
-	    console.log("err.insert = " + err.message)
-	    return
-	}
-	console.log("you have inserted a registration: ")
-	console.log(body)
-    })
-
-}
-			
 
 var insertDevice = function(db,data,id) {
-    console.log("insertDevice: data = " + data)
-    db.insert({"device":data.node},id,function(err,body,header) {
+    console.log("insertDevice: id = " + id)
+
+    // Check if we have a previous device entry. If so then use the correct rev id
+    db.get(id,  function(err, body,currentRev) {
+	rev = null
+
+	// If we found the device then save its rev
+	if(!err) {
+	   rev = body._rev
+	}
+
+	// Insert with the correct rev id
+	db.insert({_rev:rev,"device":data.node},id,function(err,body,header) {
 	if(err) {
 	    console.log("Error inserting a device = " + err.message)
-	    return
+	    console.log({"device":data.node})
 	}
-	console.log("you have inserted a device: ")
+	});
+    });
+	   
+    console.log("you have inserted a device: ")
 	
-    })
 }
 
+
+var insertReg = function(db,data,id) {
+    console.log("insertReg: id = " + id)
+
+    // Check if we have a previous registration entry. If so then use the correct rev id
+    db.get(id,  function(err, body,currentRev) {
+	rev = null
+
+	// If we found the device then save its rev
+	if(!err) {
+	   rev = body._rev
+	}
+
+	// Insert with the correct rev id
+	db.insert({_rev:rev,"registration":data},id,function(err,body,header) {
+	if(err) {
+	    console.log("Error inserting a registration = " + err.message)
+	    console.log({"registration":data})
+	}
+	});
+    });
+	   
+    console.log("you have inserted a device: ")
+	
+}
 
 var getDBContents = function(db,type,callback) {
 	var params = {include_docs:true}
