@@ -11,6 +11,7 @@
 		"amqp":"*",
 		"jade":"*",
 		"nano":"*",
-		"socket.io":"*"
+		"socket.io":"*",
+		"shred":"*"
 	}
 }
