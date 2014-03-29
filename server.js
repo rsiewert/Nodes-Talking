@@ -6,6 +6,7 @@ var express = require('express')
     ,Shred = require('shred')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
+    ,DbModule = require('./dbmodule')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -15,6 +16,9 @@ var q_test
 var q_ack
 app.shred = new Shred({logCurl:true})
 var mongoJSdb = mongojs('register');
+
+var mydb = new DbModule('mongodb')
+mydb.connect()
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -114,24 +118,18 @@ var mongoJSdb = mongojs('register');
 
 //**********************************REST API'S***********************************
 app.get('/',function(req,res) {
-	console.log("inside get /");
-    var register = mongoJSdb.collection('register');
+    console.log("inside get /");
 
-    register.find().sort({name:1},function(err, docs) {
-        // docs is an array of all the documents in mycollection
-        for(var i=0;i<docs.length;i++)
-            console.log("doc = " + docs[i].name)
-    })
+    //this is now using the DbModule
+    mydb.getAll()
 
-//    register.save({name:"Henry"})
-
-	res.render('index',
-		{
-			title:'Welcome to RabbitMQ and Node/Express',
-			connectionStatus:app.connectionStatus,
-			exchangeStatus:app.exchangeStatus,
-			queueStatus:app.queueStatus
-		});
+    res.render('index',
+        {
+            title:'Welcome to RabbitMQ and Node/Express',
+            connectionStatus:app.connectionStatus,
+            exchangeStatus:app.exchangeStatus,
+            queueStatus:app.queueStatus
+        });
 })
 
 app.get('/devices/doc/:id',function(req,res) {

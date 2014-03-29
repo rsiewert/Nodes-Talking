@@ -1,19 +1,17 @@
-/**
- * Created by rsie on 3/27/2014.
- */
+var mongojs = require('mongojs')
 
-// DevicesTalking - the object you usually create
+// DbModule - the object you usually create
 //               in your "end-user" scripts:
 //
 // <SCRIPT type="text/javascript">
 
 //
-//    var dt = new DevicesTalking();
+//    var db = new DbModule();
 //    ...
 //
 // </SCRIPT>
 //
-function DbModule()
+function DbModule(dbType)
 {
 // Implementation reference:
 
@@ -21,7 +19,7 @@ function DbModule()
 
 // Setup procedure:
 
-  this._SetImplementation(this._EstablishImplementer('mongodb'));
+  this._SetImplementation(this._EstablishImplementer(dbType));
 
   return this;
 }
@@ -31,11 +29,12 @@ DbModule.prototype = {
     _SetImplementation: function(implementer)
     {
         this._impl = null;
-        if(implementer) this._impl = implementer;
+        if(implementer)
+            this._impl = implementer;
     },
 
     // EstablishImplementer - function that creates
-    // the Concrete Implementer and binds it to DevicesTalking.
+    // the Concrete Implementer and binds it to DbModule.
     // This is the very method to place your
     // browser/feature/object detection code.
     _EstablishImplementer: function(container)
@@ -49,9 +48,15 @@ DbModule.prototype = {
         return null;
     },
 
-  // Functions "exported" by the DevicesTalking abstraction:
+  // Functions "exported" by the DbModule abstraction:
   //                                 __________________
   //________________________________/   Client API     \___________________________________
+    connect: function()
+    {
+        // Check if any implementor is bound and has the required method:
+        if(this._impl)
+            this._impl.connect();     // Forward request to implementer
+    },
 
     getAll : function()
     {
@@ -95,21 +100,29 @@ DbModule.prototype = {
 
 function MongoDB()
 {
+    this._mongoJSDb  = null
 }
 
 MongoDB.prototype = {
-
   // This "public" function is directly called by DevicesTalking:
     getAll: function()
     {
-      console.log("MongoDB.getAll")
+        var register = this._mongoJSDb.collection('register');
+
+        register.find().sort({name:1},function(err, docs) {
+            // docs is an array of all the documents in mycollection
+            for(var i=0;i<docs.length;i++)
+                console.log("doc = " + docs[i].name)
+        })
+        console.log("MongoDB.getAll")
     },
     getByIds: function()
     {
-      console.log("MongoDB.getByIds")
+        console.log("MongoDB.getByIds")
+    },
+    connect: function() {
+        this._mongoJSDb = mongojs('register');
     }
-
-
 }
 
 // This is the second implementer:
@@ -129,4 +142,4 @@ CouchDB.prototype = {
     }
 }
 
-module.exports.dbmodule = new DbModule()
+module.exports = DbModule
