@@ -6,7 +6,8 @@ var express = require('express')
     ,Shred = require('shred')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
-    ,DbModule = require('./dbmodule')
+    ,DbModule = require('./db/dbmodule')
+    ,RabbitMQ = require('./rabbit/rabbitmq')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -19,6 +20,8 @@ var mongoJSdb = mongojs('register');
 
 var mydb = new DbModule('mongodb')
 mydb.connect('register')
+var rabbit = new RabbitMQ()
+rabbit.setConnection({host:'localhost'})
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);

@@ -115,7 +115,7 @@ MongoDB.prototype = {
         coll.find().sort({name:1},function(err, docs) {
             // docs is an array of all the documents in mycollection
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i].name)
+                console.log("doc = " + docs[i]._id + " name = " + docs[i].name)
         })
         console.log("MongoDB.getAll")
     },
@@ -125,7 +125,7 @@ MongoDB.prototype = {
         var coll = this._mongodb.collection(collection)
         coll.find({_id:id}),function(err,docs) {
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i].name)
+                console.log("doc = " + docs[i])
         }
         console.log("MongoDB.getByIds")
     },
