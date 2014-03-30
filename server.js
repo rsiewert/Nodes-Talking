@@ -18,7 +18,7 @@ app.shred = new Shred({logCurl:true})
 var mongoJSdb = mongojs('register');
 
 var mydb = new DbModule('mongodb')
-mydb.connect()
+mydb.connect('register')
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -121,7 +121,7 @@ app.get('/',function(req,res) {
     console.log("inside get /");
 
     //this is now using the DbModule
-    mydb.getAll()
+    mydb.getAll('register')
 
     res.render('index',
         {
@@ -133,11 +133,6 @@ app.get('/',function(req,res) {
 })
 
 app.get('/devices/doc/:id',function(req,res) {
-    var devices = mongoJSdb.collection('devices')
-    devices.find({_id:id}),function(err,docs) {
-        for(var i=0;i<docs.length;i++)
-            console.log("doc = " + docs[i].name)
-    }
 })
 
 app.get('/message-service',function(req,res) {

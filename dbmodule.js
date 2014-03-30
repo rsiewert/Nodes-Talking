@@ -51,42 +51,44 @@ DbModule.prototype = {
   // Functions "exported" by the DbModule abstraction:
   //                                 __________________
   //________________________________/   Client API     \___________________________________
-    connect: function()
+    connect: function(collection)
     {
         // Check if any implementor is bound and has the required method:
-        if(this._impl)
-            this._impl.connect();     // Forward request to implementer
+        if(this._impl) {
+            this._impl.connect(collection);     // Forward request to implementer
+            return true
+        }
+        else
+            return false
     },
-
-    getAll : function()
+    getAll : function(collection)
     {
-        // Check if any implementor is bound and has the required method:
+        // Check if any implementor is bound
         if(this._impl)
-            this._impl.getAll();     // Forward request to implementer
+            this._impl.getAll(collection);     // Forward request to implementer
     },
-
-    getByIds : function()
+    getByIds : function(collection,ids)
     {
-        // Check if any implementor is bound and has the required method:
+        // Check if any implementor is bound
         if(this._impl)
-            this._impl.getByIds();     // Forward request to implementer
+            this._impl.getByIds(err,ids);     // Forward request to implementer
     },
-
-    update : function()
+    update : function(collection,doc)
     {
-        // Check if any implementor is bound and has the required method:
+        // Check if any implementor is bound
         if(this._impl)
-            this._impl.update();     // Forward request to implementer
+            this._impl.update(doc);     // Forward request to implementer
     },
-
     create : function()
     {
-        // Check if any implementor is bound and has the required method:
-        if(this._impl)
-            this._impl.create();     // Forward request to implementer
+        // Check if any implementor is bound
+        if(this._impl) {
+            var result = this._impl.create();     // Forward request to implementer
+            return result
+        }
+        return null
     },
-
-    remove : function()
+    remove : function(collection,id)
     {
         // Check if any implementor is bound and has the required method:
         if(this._impl)
@@ -98,45 +100,58 @@ DbModule.prototype = {
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
+//this is the first implementer
 function MongoDB()
 {
-    this._mongoJSDb  = null
+    this._mongodb  = null
 }
 
 MongoDB.prototype = {
-  // This "public" function is directly called by DevicesTalking:
-    getAll: function()
-    {
-        var register = this._mongoJSDb.collection('register');
 
-        register.find().sort({name:1},function(err, docs) {
+    getAll: function(collection)
+    {
+        var coll = this._mongodb.collection(collection);
+
+        coll.find().sort({name:1},function(err, docs) {
             // docs is an array of all the documents in mycollection
             for(var i=0;i<docs.length;i++)
                 console.log("doc = " + docs[i].name)
         })
         console.log("MongoDB.getAll")
     },
-    getByIds: function()
+    getByIds: function(collection,ids)
     {
+        console.log("MongoDB: create method")
+        var coll = this._mongodb.collection(collection)
+        coll.find({_id:id}),function(err,docs) {
+            for(var i=0;i<docs.length;i++)
+                console.log("doc = " + docs[i].name)
+        }
         console.log("MongoDB.getByIds")
     },
-    connect: function() {
-        this._mongoJSDb = mongojs('register');
+    connect: function(collection) {
+        this._mongodb = mongojs(collection);
+    },
+    remove: function(collection,id) {
+        console.log("MongoDB: remove method")
+    },
+    create: function(collection) {
     }
 }
 
 // This is the second implementer:
 function CouchDB()
 {
+    this._couchdb = null
 }
 
 CouchDB.prototype = {
 
-    getAll: function()
+    getAll: function(collection)
     {
         console.log("CouchDB.getAll")
     },
-    getByIds: function()
+    getByIds: function(collection,ids)
     {
         console.log("MongoDB.getByIds")
     }
