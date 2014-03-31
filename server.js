@@ -64,6 +64,7 @@ rabbitMqConnection.on('ready',function() {
 		queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
 			msg.message.timestamp = new Date().toJSON()
 			console.log({'log':'the.routing.register','msg.message':msg.message})
+		    // Add the registration to the registration db
 		    insertReg(app.register,msg.message, msg.message.node.nodeId)
 		    
 		    // Pull out the node and if it is a device save it in the device database
@@ -327,29 +328,46 @@ var insertData = function(db,data) {
 
 
 var insertReg = function(db,data,id) {
-    console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
-    db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
-	if(err) {
-	    console.log("err.insert = " + err.message)
-	    return
+    // Check if a registration  entry exists . If so then replace it
+    db.get(id, function(err,body) {
+	
+	var document = {"data": {"message":data}}
+
+	if(!err) {
+	    document._rev = body._rev
 	}
-	console.log("you have inserted a registration: ")
-	console.log(body)
-    })
+	
+	// Insert the registration
+	db.insert(document, id, function(err,body,header) {
+	    if(err) {
+		console.log("Error inserting a registration = " + err.message)
+		return
+	    }
+	});
+    });
 
 }
 			
 
 var insertDevice = function(db,data,id) {
-    console.log("insertDevice: data = " + data)
-    db.insert({"device":data.node},id,function(err,body,header) {
-	if(err) {
-	    console.log("Error inserting a device = " + err.message)
-	    return
-	}
-	console.log("you have inserted a device: ")
+
+    // Check if a device entry exists . If so then replace it
+    db.get(id, function(err,body) {
 	
-    })
+	var document = {device:data.node}
+	if(!err) {
+	    document._rev = body._rev
+	}
+	
+	// Insert the device 
+	db.insert(document, id, function(err,body,header) {
+	    if(err) {
+		console.log("Error inserting a device = " + err.message)
+		console.log({"device":data.node})
+		return
+	    }
+	});
+    });
 }
 
 
