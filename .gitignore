@@ -10,6 +10,9 @@
 .metadata/
 .project/
 
+#intelliJ related
+.idea
+
 # Package Files #
 *.jar
 *.war
