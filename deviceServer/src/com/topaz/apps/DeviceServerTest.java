@@ -11,17 +11,20 @@ public class DeviceServerTest {
 
 	private final static String EXCHANGE_NAME = "test-exchange";
 	private final static String ROUTE = "the.routing.register";
+	//private final static String SERVER = "thespacetimecontinuum.com";
 	private final static String SERVER = "localhost";
-	
+		
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) throws java.io.IOException {
 
+//		MessageService ms = new MessageService(SERVER,PORT);
 		MessageService ms = new MessageService(SERVER);
+			
 		
 		// Add 1K devices to the database and start heartbeats for each
-		for (int i = 0x55590000; i < 0x55590400; i++) {
+		for (int i = 0x5590000, j=0; i < 0x55900a0; i++,j++) {
 
 			// A unique number for the device. Mimic a MAC address
 			String deviceNum = Integer.toString(i, 16);
@@ -30,10 +33,10 @@ public class DeviceServerTest {
 			String exchange = "deviceExchange.0x" + deviceNum;
 
 			// Create the device and add it to the registration
-			Device testDevice = Device.builder().status(Node.STATUS.YELLOW)
+			Device testDevice = Device.builder().status(j%10 == 0 ? Node.STATUS.YELLOW:Node.STATUS.GREEN)
 					.nodeId("0x" + deviceNum + ".gateway")
-					.description("Test Device").actsAs(Node.ActsAs.DEVICE)
-					.location(new Location(40.12, 200.34, 300.45)).build();
+					.description("Test Device " + j).actsAs(Node.ActsAs.DEVICE)
+					.location(new Location(40.12 + j, 200.34 + j, 300.45 + j)).build();
 
 			Registration regMessage = new Registration();
 			regMessage.setRegisteringNode(testDevice);
