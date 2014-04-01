@@ -20,7 +20,7 @@ public class DeviceDetailFragment extends Fragment {
 	 * The fragment argument representing the item ID that this fragment
 	 * represents.
 	 */
-	public static final String ARG_ITEM_ID = "item_id";
+	public static final String ARG_ITEM_ID = "device_id";
 
 	/**
 	 * The device content this fragment is presenting.
@@ -55,7 +55,7 @@ public class DeviceDetailFragment extends Fragment {
 		View rootView = inflater.inflate(R.layout.fragment_device_detail,
 				container, false);
 
-		// Show the device content as text in a TextView.
+		// Show the device content.
 		if (mDevice != null) {
 			((TextView) rootView.findViewById(R.id.device_detail))
 					.setText(mDevice.getDescription());

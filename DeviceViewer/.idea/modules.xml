@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/DeviceViewer.iml" filepath="$PROJECT_DIR$/DeviceViewer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../HelloWorld/HelloWorld.iml" filepath="$PROJECT_DIR$/../HelloWorld/HelloWorld.iml" />
     </modules>
   </component>
 </project>

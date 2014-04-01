@@ -83,6 +83,7 @@ public class DeviceListFragment extends ListFragment {
 				android.R.id.text1, deviceContent.DEVICES));
 	}
 
+
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
