@@ -1,4 +1,6 @@
 var mongojs = require('mongojs')
+    ,nano = require('nano')('http://localhost:5984');
+
 
 // DbModule - the object you usually create
 //               in your "end-user" scripts:
@@ -57,8 +59,7 @@ DbModule.prototype = {
         if(this._impl) {
             this._impl.connect(collection);     // Forward request to implementer
             return true
-        }
-        else
+        } else
             return false
     },
     getAll : function(collection)
@@ -96,7 +97,7 @@ DbModule.prototype = {
     }
 };
 
-// This is the first in the set of concrete implementers:
+// This is the set of concrete implementers:
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
@@ -155,6 +156,14 @@ CouchDB.prototype = {
     {
         console.log("CouchDB.getByIds")
     }
+}
+
+// This is the set of private objects:
+//                             ___________________________
+//____________________________/     Private Objects       \__________________________
+
+var getSomething = function() {
+
 }
 
 module.exports = DbModule

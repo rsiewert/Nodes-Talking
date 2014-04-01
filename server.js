@@ -6,8 +6,8 @@ var express = require('express')
     ,Shred = require('shred')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
-    ,DbModule = require('./db/dbmodule')
-    ,RabbitMQ = require('./rabbit/rabbitmq')
+    ,Db = require('./db/db')
+    ,MsgServerModule = require('./msgServer/msgserver')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -16,16 +16,16 @@ var q_register
 var q_test
 var q_ack
 app.shred = new Shred({logCurl:true})
-var mongoJSdb = mongojs('register');
 
-var mydb = new DbModule('mongodb')
+//startup db
+var mydb = new Db('mongodb')
 mydb.connect('register')
-var rabbit = new RabbitMQ()
-rabbit.connect('amqp://localhost')
-rabbit.receiveMessage()
-rabbit.sendMessage("Hello Cruel World")
 
-//rabbit.createExchanges(['test-exchange','register-exchange'])
+//start up msg server
+var msgServer = new MsgServerModule('amqpnode')
+msgServer.connect('amqp://localhost')
+msgServer.receiveMessage()
+msgServer.sendMessage({msg: "Hello Cruel World"})
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
