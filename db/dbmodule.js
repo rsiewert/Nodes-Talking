@@ -153,7 +153,7 @@ CouchDB.prototype = {
     },
     getByIds: function(collection,ids)
     {
-        console.log("MongoDB.getByIds")
+        console.log("CouchDB.getByIds")
     }
 }
 
