@@ -83,11 +83,14 @@ MsgServerModule.prototype = {
     }
 }
 
-// This is the set of concrete implementers:
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
-//this is the first implementer
+
+
+//                                  ___________________________
+//_________________________________/          Amqp             \__________________________
+
 function Amqp() {
     this._amqp = null
 }
@@ -113,7 +116,9 @@ Amqp.prototype = {
     }
 }
 
-//this is the second implementer
+//                                  ___________________________
+//_________________________________/         AmqpNode          \__________________________
+
 function AmqpNode() {
     this._amqpNode = null
 }
@@ -166,7 +171,6 @@ AmqpNode.prototype = {
     }
 }
 
-// This is the set of private objects:
 //                             ___________________________
 //____________________________/     Private Objects       \__________________________
 
