@@ -95,13 +95,15 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.remove();     // Forward request to implementer
     }
-};
+}
 
-// This is the set of concrete implementers:
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
-//this is the first implementer
+
+//                                  ___________________________
+//_________________________________/          MongoDB          \__________________________
+
 function MongoDB()
 {
     this._mongodb  = null
@@ -140,7 +142,10 @@ MongoDB.prototype = {
     }
 }
 
-// This is the second implementer:
+
+//                                  ___________________________
+//_________________________________/          CouchDB          \__________________________
+
 function CouchDB()
 {
     this._couchdb = null
