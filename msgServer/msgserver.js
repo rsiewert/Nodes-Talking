@@ -157,7 +157,9 @@ AmqpNode.prototype = {
 
             ok = ok.then(function(_qok) {
               return ch.consume('hello', function(msg) {
-                console.log(" [x] Received '%s'", msg.content)
+                  var struct = JSON.parse(msg.content)
+                  console.log("msg = " + struct.msg)
+                console.log(" [x] Received '%s'",struct.msg)
               }, {noAck: true});
             });
 
