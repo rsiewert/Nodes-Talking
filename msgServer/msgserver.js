@@ -7,6 +7,9 @@ var amqp = require('amqp')
     ,ampq   = require('amqp')
     ,when = require('when');
 
+//                                 _______________________________
+//________________________________/    Client Side Abstraction    \___________________________________
+
 function MsgServerModule(msgServerType) {
 
 // Implementation reference:

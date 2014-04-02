@@ -1,18 +1,9 @@
 var mongojs = require('mongojs')
     ,nano = require('nano')('http://localhost:5984');
 
+//                                 _______________________________
+//________________________________/    Client Side Abstraction    \___________________________________
 
-// DbModule - the object you usually create
-//               in your "end-user" scripts:
-//
-// <SCRIPT type="text/javascript">
-
-//
-//    var db = new DbModule();
-//    ...
-//
-// </SCRIPT>
-//
 function DbModule(dbType)
 {
 // Implementation reference:
