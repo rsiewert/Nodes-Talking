@@ -131,7 +131,6 @@ AmqpNode.prototype = {
     },
     sendMessage: function(msg) {
         this._amqpNode.then(function(conn) {
-            //this._connection = conn
             return when(conn.createChannel().then(function(ch) {
                 var q = 'hello';
                 //var msg = 'Hello World!';
@@ -139,8 +138,8 @@ AmqpNode.prototype = {
                 var ok = ch.assertQueue(q, {durable: false});
 
                 return ok.then(function(_qok) {
-                    ch.sendToQueue(q, new Buffer(msg),{'Content-Type': 'application/json'});
-                    console.log(" [x] Sent '%s'", msg);
+                    ch.sendToQueue(q, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'});
+                    console.log(" [x] Sent '%s'", JSON.stringify(msg));
                     return ch.close();
                 });
             })).ensure(function() { /*conn.close();*/ });
@@ -155,7 +154,7 @@ AmqpNode.prototype = {
 
             ok = ok.then(function(_qok) {
               return ch.consume('hello', function(msg) {
-                console.log(" [x] Received '%s'", JSON.stringify(msg.toString()));
+                console.log(" [x] Received '%s'", msg.content)
               }, {noAck: true});
             });
 

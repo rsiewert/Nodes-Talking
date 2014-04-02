@@ -26,6 +26,7 @@ var msgServer = new MsgServerModule('amqpnode')
 msgServer.connect('amqp://localhost')
 msgServer.receiveMessage()
 msgServer.sendMessage({msg: "Hello Cruel World"})
+msgServer.sendMessage({msg: 'This will make it...'})
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
