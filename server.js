@@ -7,7 +7,7 @@ var express = require('express')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
     ,Db = require('./db/db')
-    ,MsgServerModule = require('./msgServer/msgserver')
+    ,MsgServer = require('./msgServer/msgserver')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -22,7 +22,7 @@ var mydb = new Db('mongodb')
 mydb.connect('register')
 
 //start up msg server
-var msgServer = new MsgServerModule('amqpnode')
+var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
 msgServer.receiveMessage()
 msgServer.sendMessage({msg: "Hello Cruel World"})
