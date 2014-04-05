@@ -40,138 +40,66 @@ module.exports = exports = function(app, db) {
 
     app.post('/newReg',function(req,res) {
         console.log("inside /newReg")
-        var data = req.body.data
-        console.log("new Reg = " + data)
-        exchange.publish('the.routing.register', {message:data,status:"I am Ok"},{mandatory:true},function(result) {
-            console.log('newReg: result of publish (false means success) = ' + result);
-        })
     })
 
     app.post('/newData',function(req,res) {
         console.log("inside /newData")
-        var data = req.body.data
-        console.log("new Data = " + data)
-        exchange.publish('*.routing.key', {message: data,status:"I am Ok"},{mandatory:true},function(result) {
-            console.log('newData: result of publish (false means success) = ' + result);
-        })
     })
 
     app.post('/newMessage',function(req,res) {
         console.log('Inside /newMessage');
-        var newMessage = req.body.data;
-        console.log('newMessage = ' + newMessage);
-        exchange.publish('*.routing.key', {message: newMessage,status:"I am Ok"},{mandatory:true},function(result) {
-            console.log('newMessage: result of publish (false means success) = ' + result);
-        })
-        res.redirect('/message-service');
     });
 
-    //app.post('/json-mirror',function(req,res) {
-    //	var newMessage = req.body.data;
-    //	res.json(newMessage);
-    //});
+    app.post('/json-mirror',function(req,res) {
+//    	var newMessage = req.body.data;
+//    	res.json(newMessage);
+    });
 
     app.get('/couchDBList',function(req,res) {
-        //get the couchdb list via REST call
-        ///*
-        var req = app.shred.get({
-            url: "http://localhost:5984/devices/_changes",//_design/listDB/_view/listDB",
-            headers: {
-                "Accept": "application/json",
-                "Content-Type": "application/json"
-            },
-            on: {
-                // You can use response codes as events
-                200: function(response) {
-                    // Shred will automatically JSON-decode response bodies that have a
-                    // JSON Content-Type
-                    console.log(response.content.data);
-                    res.json(response.content.data)
-                },
-                // Any other response means something's wrong
-                response: function(response) {
-                    console.log("Houston, we have a problem...");
-                }
-            }
-        })
-        //	*/
-        //res.render("")
+//        //get the couchdb list via REST call
+//        ///*
+//        var req = app.shred.get({
+//            url: "http://localhost:5984/devices/_changes",//_design/listDB/_view/listDB",
+//            headers: {
+//                "Accept": "application/json",
+//                "Content-Type": "application/json"
+//            },
+//            on: {
+//                // You can use response codes as events
+//                200: function(response) {
+//                    // Shred will automatically JSON-decode response bodies that have a
+//                    // JSON Content-Type
+//                    console.log(response.content.data);
+//                    res.json(response.content.data)
+//                },
+//                // Any other response means something's wrong
+//                response: function(response) {
+//                    console.log("Houston, we have a problem...");
+//                }
+//            }
+//        })
+//        //	*/
+//        //res.render("")
     })
 
     app.get('/register',function(req,res) {
         console.log("Here in register: req ip = " + req.ip)
-        res.send('Caller = ' + req.get('Host') + "\nreq ip = " + req.ip)
     })
 
     app.get('/listDB/:type',function(req,res) {
-        getDBContentsById(app.devices,req.params.type,'other',function(err,results) {
-            if(err) {
-                console.log("error in /listDB/:type")
-            } else {
-                console.log("type = " + req.params.type)
-                res.render('index',
-                    {
-                        title:'Listing CouchDB Documents By Type',
-                        connectionStatus:app.connectionStatus,
-                        exchangeStatus:app.exchangeStatus,
-                        queueStatus:app.queueStatus,
-                        "results":results
-                    })
-            }
-        })
     })
 
     app.get('/listDB',function(req,res) {
-
-        getDBContents(app.devices,"other",function(err,results) {
-            if(err) {
-                console.log("error in listRawJson")
-            } else {
-                res.render('index',
-                    {
-                        title:'Listing CouchDB Documents',
-                        connectionStatus:app.connectionStatus,
-                        exchangeStatus:app.exchangeStatus,
-                        queueStatus:app.queueStatus,
-                        "results":results
-                    })
-            }
-        })
     })
 
     app.get('/listRegisterDB',function(req,res) {
-
-        getDBContents(app.register,"raw",function(err,results) {
-            if(err) {
-                console.log("error in listRawJson")
-            } else {
-                res.render('index',
-                    {
-                        title:'Listing CouchDB Register Documents',
-                        connectionStatus:app.connectionStatus,
-                        exchangeStatus:app.exchangeStatus,
-                        queueStatus:app.queueStatus,
-                        "results":results.data
-                    })
-            }
-        })
     })
-    app.get('/listRawJson', function(req,res) {
 
-        getDBContents(app.devices,"raw",function(err,results) {
-            if(err) {
-                console.log("error in listRawJson")
-            } else {
-                res.json({"results":results})
-            }
-        })
+    app.get('/listRawJson', function(req,res) {
     })
 
     app.get('/getDbByView', function(req,res) {
         console.log('Inside getDbByView')
-        getDBContentsByView(app.register,'listDB','listDB',function(err,results) {
-            //console.log(results)
-        })
     })
 
 
