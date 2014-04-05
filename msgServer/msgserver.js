@@ -5,7 +5,8 @@
 var amqp = require('amqp')
     ,amqpNode = require('amqplib')
     ,ampq   = require('amqp')
-    ,when = require('when');
+    ,when = require('when')
+    ,all = when.all;
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -58,17 +59,16 @@ MsgServerModule.prototype = {
         } else
             return false
     },
-    sendMessage: function(msg) {
+    sendMessage: function(msg,exchangeName,routingKey) {
         if(this._impl) {
-            this._impl.sendMessage(msg)
+            this._impl.sendMessage(msg,exchangeName,routingKey)
             return true
         } else
             return false
     },
-
-    receiveMessage: function() {
+    receiveMessage: function(exchangeName,routingKey) {
         if(this._impl) {
-            this._impl.receiveMessage()
+            this._impl.receiveMessage(exchangeName,routingKey)
             return true
         } else
             return false
@@ -87,33 +87,7 @@ MsgServerModule.prototype = {
 }
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
-//                                  ___________________________
-//_________________________________/          Amqp             \__________________________
 
-function Amqp() {
-    this._amqp = null
-}
-
-Amqp.prototype = {
-    createQueue: function() {
-                //----------------create amqp queue(s)
-//        queueNames.forEach(queueName,function () {
-//            this._connection.queue(queueName,function(queue) {
-//                console.log('Queue ' + queue.name + ' is open')
-//                qStatus = 'The ' + queue.name + ' is ready for use!'
-//                queue.bind(this._exchange,queueName.routingKey)
-//                queue.subscribe(queueName.routingKey,function(msg,headers,deliveryInfo) {
-//                    msg.message.timestamp = new Date().toJSON()
-//                    console.log({'log':'the.routing.register','msg.message':msg.message})
-//                    //insertReg(app.register,msg.message, msg.message.node.nodeId)
-//                })
-//            })
-//        })
-    },
-    createExchange: function() {
-        console.log("amqp: createExchange")
-    }
-}
 //                                  ___________________________
 //_________________________________/         AmqpNode          \__________________________
 
@@ -129,45 +103,73 @@ AmqpNode.prototype = {
                 return connection
             })
     },
-    createExchange: function() {
-        console.log("Amqp.node: createExchange")
-    },
-    sendMessage: function(msg) {
+    sendMessage: function(msg,exchangeName,routingKey) {
         this._amqpNode.then(function(conn) {
             return when(conn.createChannel().then(function(ch) {
-                var q = 'hello';
-                //var msg = 'Hello World!';
 
-                var ok = ch.assertQueue(q, {durable: false});
+                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true});
 
-                return ok.then(function(_qok) {
-                    ch.sendToQueue(q, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'});
+                return ok.then(function() {
+                    ch.publish(exchangeName, routingKey, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'});
                     console.log(" [x] Sent '%s'", JSON.stringify(msg));
                     return ch.close();
                 });
             })).ensure(function() { /*conn.close();*/ });
         }).then(null, console.warn);
     },
-    receiveMessage: function() {
+    receiveMessage: function(exchangeName,key) {
         this._amqpNode.then(function(conn) {
-          process.once('SIGINT', function() { conn.close(); });
-          return conn.createChannel().then(function(ch) {
+            process.once('SIGINT', function() { conn.close(); });
+            return conn.createChannel().then(function(ch) {
 
-            var ok = ch.assertQueue('hello', {durable: false});
+                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true});
 
-            ok = ok.then(function(_qok) {
-              return ch.consume('hello', function(msg) {
-                  var struct = JSON.parse(msg.content)
-                  console.log("msg = " + struct.msg)
-                console.log(" [x] Received '%s'",struct.msg)
-              }, {noAck: true});
+                ok = ok.then(function() {
+                    return ch.assertQueue('', {exclusive: true});
+                });
+
+                ok = ok.then(function(qok) {
+                    var queue = qok.queue;
+                    return all(key.map(function(rk) {
+                        ch.bindQueue(queue, exchangeName, rk);
+                    })).then(function() { return queue; });
+                });
+
+                ok = ok.then(function(queue) {
+                    return ch.consume(queue, rMsg, {noAck: true});
+                });
+
+                return ok.then(function() {
+                    console.log(' [*] Waiting for messages. To exit press CTRL+C');
+                });
+
+                function rMsg(msg) {
+                    var struct = JSON.parse(msg.content)
+                    console.log(" [x] %s:'%s'",
+                        msg.fields.routingKey,
+                        struct.msg);
+                }
             });
-
-            return ok.then(function(_consumeOk) {
-              console.log(' [*] Waiting for messages. To exit press CTRL+C');
-            });
-          });
         }).then(null, console.warn);
+    }
+}
+
+//                                  ___________________________
+//_________________________________/          Amqp             \__________________________
+
+function Amqp() {
+    this._amqp = null
+}
+
+Amqp.prototype = {
+    createQueue: function() {
+        console.log("Amqp: createQueue")
+    },
+    createExchange: function() {
+        console.log("Amqp: createExchange")
+    },
+    receiveMessage: function() {
+        console.log("Amqp: receiveMessage")
     }
 }
 

@@ -24,9 +24,10 @@ mydb.connect('register')
 //start up msg server
 var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
-msgServer.receiveMessage()
-msgServer.sendMessage({msg: "Hello Cruel World"})
-msgServer.sendMessage({msg: 'This will make it...'})
+msgServer.receiveMessage("myexchange",["my.routing.key"])
+
+msgServer.sendMessage({msg: "Hello Cruel World"},"myexchange","my.routing.key")
+msgServer.sendMessage({msg: 'This will make it...'},'myexchange','my.routing.key')
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -309,6 +310,8 @@ var insertData = function(db,data) {
 		var exchange = app.rabbitMqConnection.exchange(data.node.message.protocol.messenger.on_publish.exchange,options)
 		exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
 			console.log('insertData: result of publish (false means success) = ' + result);
+
+            //TODO: this might be the place to clean up the just created exchange?
 		})
 	})
 }
