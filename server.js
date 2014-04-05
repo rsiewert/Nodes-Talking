@@ -7,7 +7,7 @@ var express = require('express')
     ,nano = require('nano')('http://localhost:5984')
     ,mongojs = require('mongojs')
     ,Db = require('./db/db')
-    ,MsgServer = require('./msgServer/msgserver')
+    ,MsgServer = require('./msgServer/msgserver');
 
 //-------------------INITIALIZATION BEGIN--------------------------
 var app = express();
@@ -21,13 +21,10 @@ app.shred = new Shred({logCurl:true})
 var mydb = new Db('mongodb')
 mydb.connect('register')
 
-//start up msg server
+//start up msg server and sit on an exchange and routing key
 var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
 msgServer.receiveMessage("myexchange",["my.routing.key"])
-
-msgServer.sendMessage({msg: "Hello Cruel World"},"myexchange","my.routing.key")
-msgServer.sendMessage({msg: 'This will make it...'},'myexchange','my.routing.key')
 
     app.configure(function() {
     	app.set('port',process.env.PORT || 3000);
@@ -35,8 +32,8 @@ msgServer.sendMessage({msg: 'This will make it...'},'myexchange','my.routing.key
     	//app.use(express.static(path.join(__dirname,'public')));
     	app.set('views',__dirname + '/views');
     	app.set('view engine','jade');
-    	app.set('view options', { pretty: true });
-    	app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+    	//app.set('view options', { "pretty": true });
+    	//app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
     });
 
     var server = http.createServer(app).listen(app.get('port'),function() {
@@ -131,6 +128,8 @@ app.get('/',function(req,res) {
 
     //this is now using the DbModule
     mydb.getAll('register')
+    msgServer.sendMessage({msg: "Hello Cruel World"},"myexchange","my.routing.key")
+    msgServer.sendMessage({msg: 'This will make it...'},'myexchange','my.routing.key')
 
     res.render('index',
         {
