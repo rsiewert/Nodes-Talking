@@ -1,7 +1,6 @@
 var express     = require('express')
     ,http       = require('http')
     ,jade       = require('jade')
-    ,amqp       = require('amqp')
     ,Shred      = require('shred')
     ,Db         = require('./db/db')
     ,routes     = require('./routes') // Routes for the application
@@ -20,7 +19,6 @@ var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
 msgServer.receiveMessage("myexchange",["my.routing.key"])
 
-
 app.configure(function() {
     app.set('port',process.env.PORT || 3000);
     app.use(express.bodyParser());
@@ -30,7 +28,6 @@ app.configure(function() {
     app.set('view options', { "pretty": true });
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
-
 
 // Application routes
 routes(app, db);
