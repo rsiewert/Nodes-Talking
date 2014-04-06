@@ -26,6 +26,9 @@ module.exports = function(app, db, msgServer) {
     });
 
     app.get('/devices/doc/:id',function(req,res) {
+        console.log("inside routes: get id...")
+        console.log("req.id = " + req.params.id)
+        db.getById('register',req.params.id)
     })
 
     app.get('/message-service',function(req,res) {

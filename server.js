@@ -41,6 +41,3 @@ var io = require('socket.io').listen(server);
 
 console.log("The views path is: " + app.get('views'));
 
-app.connectionStatus 	= 'No server connection'
-app.exchangeStatus 		= 'No exchange established'
-app.queueStatus 		= 'No queue established'
