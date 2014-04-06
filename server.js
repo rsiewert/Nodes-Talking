@@ -30,7 +30,7 @@ app.configure(function() {
 });
 
 // Application routes
-routes(app, db);
+routes(app, db, msgServer);
 
 var server = http.createServer(app).listen(app.get('port'),function() {
     console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");

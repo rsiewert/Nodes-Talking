@@ -1,15 +1,15 @@
 /**
  * Created by rsie on 4/5/2014.
  */
-module.exports = exports = function(app, db) {
+module.exports = function(app, db, msgServer) {
 
     app.get('/', function (req, res) {
         console.log("inside get /");
 
         //this is now using the DbModule
         db.getAll('register')
-        //msgServer.sendMessage({msg: "Hello Cruel World"}, "myexchange", "my.routing.key")
-        //msgServer.sendMessage({msg: 'This will make it...'}, 'myexchange', 'my.routing.key')
+        msgServer.sendMessage({msg: "Hello Cruel World"}, "myexchange", "my.routing.key")
+        msgServer.sendMessage({msg: 'This will make it...'}, 'myexchange', 'my.routing.key')
 
         res.render('index',
             {
