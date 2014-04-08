@@ -3,13 +3,19 @@
  */
 module.exports = function(app, db, msgServer) {
 
+    // Rest Endpoints defined by the Routes abstraction:
+    //                                 __________________
+    //________________________________/   Client API     \___________________________________
+
+    // Gets:
+    //                                     __________________
+    //____________________________________/   GET API        \___________________________________
+
     app.get('/', function (req, res) {
         console.log("inside get /");
 
         //this is now using the DbModule
         db.getAll('register')
-        msgServer.sendMessage({msg: "Hello Cruel World"}, "myexchange", "my.routing.key")
-        msgServer.sendMessage({msg: 'This will make it...'}, 'myexchange', 'my.routing.key')
 
         res.render('index',
             {
@@ -19,6 +25,19 @@ module.exports = function(app, db, msgServer) {
                 queueStatus: app.queueStatus
             });
     });
+
+    // Posts:
+    //                                     __________________
+    //____________________________________/   POST API       \___________________________________
+
+    app.post('/register',function(req,res) {
+        console.log("Here in register")
+        //is this an existing registration?
+        console.log("Device Id: " + req.body.data.message)
+        msgServer.sendMessage({msg: "Hello Cruel World"}, "register", "register.rk.newreg")
+        msgServer.sendMessage({msg: 'This will make it...'}, "register", "register.rk.newreg")
+        res.send("Ok")
+    })
 
     app.post('/json-mirror',function(req,res) {
         var newMessage = req.body.data;
@@ -31,15 +50,12 @@ module.exports = function(app, db, msgServer) {
         db.getById('register',req.params.id)
     })
 
-    app.get('/message-service',function(req,res) {
-        console.log('inside get message-service');
-        res.render('message-service',
-            {
-                title:'Welcome to the messaging service',
-                sentMessage: ''
-            });
 
-    })
+    // Puts:
+    //                                     __________________
+    //____________________________________/   PUT API        \___________________________________
+
+//-------------------------------------------------------------------
 
     app.post('/newReg',function(req,res) {
         console.log("inside /newReg")
@@ -57,6 +73,16 @@ module.exports = function(app, db, msgServer) {
 //    	var newMessage = req.body.data;
 //    	res.json(newMessage);
     });
+
+    app.get('/message-service',function(req,res) {
+        console.log('inside get message-service');
+        res.render('message-service',
+            {
+                title:'Welcome to the messaging service',
+                sentMessage: ''
+            });
+
+    })
 
     app.get('/couchDBList',function(req,res) {
 //        //get the couchdb list via REST call
@@ -85,9 +111,6 @@ module.exports = function(app, db, msgServer) {
 //        //res.render("")
     })
 
-    app.get('/register',function(req,res) {
-        console.log("Here in register: req ip = " + req.ip)
-    })
 
     app.get('/listDB/:type',function(req,res) {
     })
@@ -104,6 +127,17 @@ module.exports = function(app, db, msgServer) {
     app.get('/getDbByView', function(req,res) {
         console.log('Inside getDbByView')
     })
+
+    // Deletes:
+    //                                     __________________
+    //____________________________________/   DELETE API     \___________________________________
+
+
+
+
+
+
+
 
 
 //****************************Private methods************************************

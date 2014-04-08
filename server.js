@@ -17,7 +17,7 @@ db.connect('register')
 //start up msg server and sit on an exchange and routing key
 var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
-msgServer.receiveMessage("myexchange",["my.routing.key"])
+msgServer.receiveMessage("register",["register.rk.*"])
 
 app.configure(function() {
     app.set('port',process.env.PORT || 3000);
