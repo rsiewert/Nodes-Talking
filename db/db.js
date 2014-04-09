@@ -71,6 +71,11 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.getByIds(collection,ids);     // Forward request to implementer
     },
+    getNodeByType: function(collection,type)
+    {
+        if(this._impl)
+            this._impl.getNodeByType(collection,type)
+    },
     update : function(collection,doc)
     {
         // Check if any implementor is bound
@@ -132,19 +137,32 @@ MongoDB.prototype = {
         })
         console.log("MongoDB.getById")
     },
+
+    getNodeByType: function(collection,type) {
+        console.log("MongoDB: getNodeByType")
+        var coll = this._mongodb.collection(collection)
+        coll.find({type:type},function(err,docs) {
+            console.log("docs.length = " +docs.length)
+            for(var i=0;i<docs.length;i++)
+                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
+        })
+        console.log("MongoDB.getById")
+    },
+
     getByIds: function(collection,ids)
-    //should return an array of json objects that match the ids
     {
-//        console.log("MongoDB: getByIds method")
-//        var coll = this._mongodb.collection(collection)
-//        console.log("getByIds: ids = " + ids)
-//        console.log("coll = " + collection)
-//        coll.find({_id:this._mongodb.ObjectId(ids)},function(err,docs) {
-//            console.log("docs.length = " +docs.length)
-//            for(var i=0;i<docs.length;i++)
-//                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
-//        })
-//        console.log("MongoDB.getByIds")
+        //should return an array of json objects that match the ids
+        console.log("MongoDB: getByIds method")
+        var coll = this._mongodb.collection(collection)
+        console.log("getByIds: ids = " + ids)
+        console.log("coll = " + collection)
+
+        coll.find({_id:this._mongodb.ObjectId(ids)},function(err,docs) {
+            console.log("docs.length = " +docs.length)
+            for(var i=0;i<docs.length;i++)
+                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
+        })
+        console.log("MongoDB.getByIds")
     },
     connect: function(collection) {
         this._mongodb = mongojs(collection);

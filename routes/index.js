@@ -3,11 +3,11 @@
  */
 module.exports = function(app, db, msgServer) {
 
-    // Rest Endpoints defined by the Routes abstraction:
+    // REST: Endpoints defined by the Routes abstraction:
     //                                 __________________
     //________________________________/   Client API     \___________________________________
 
-    // Gets:
+    // GETs:
     //                                     __________________
     //____________________________________/   GET API        \___________________________________
 
@@ -26,7 +26,7 @@ module.exports = function(app, db, msgServer) {
             });
     });
 
-    // Posts:
+    // POSTs:
     //                                     __________________
     //____________________________________/   POST API       \___________________________________
 
@@ -42,7 +42,7 @@ module.exports = function(app, db, msgServer) {
     app.post('/json-mirror',function(req,res) {
         var newMessage = req.body.data;
         res.json(newMessage);
-    });
+    })
 
     app.get('/devices/doc/:id',function(req,res) {
         console.log("inside routes: get id...")
@@ -50,12 +50,17 @@ module.exports = function(app, db, msgServer) {
         db.getById('register',req.params.id)
     })
 
+    app.get('/devices/docs/:nodeType',function(req,res) {
+        console.log("inside routes: get by node type...")
+        console.log("node type = " + req.params.nodeType)
+        db.getNodeByType('register',req.params.nodeType)
+        res.send("Ok")
+    })
 
-    // Puts:
+
+    // PUTs:
     //                                     __________________
     //____________________________________/   PUT API        \___________________________________
-
-//-------------------------------------------------------------------
 
     app.post('/newReg',function(req,res) {
         console.log("inside /newReg")
