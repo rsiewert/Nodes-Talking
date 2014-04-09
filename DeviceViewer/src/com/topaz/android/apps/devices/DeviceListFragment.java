@@ -10,21 +10,9 @@ import android.widget.ListView;
 import com.topaz.android.apps.devices.device.DeviceContent;
 import com.topaz.nodes.Device;
 
-/**
- * A list fragment representing a list of Devices. This fragment also supports
- * tablet devices by allowing list items to be given an 'activated' state upon
- * selection. This helps indicate which item is currently being viewed in a
- * {@link DeviceDetailFragment}.
- * <p>
- * Activities containing this fragment MUST implement the {@link Callbacks}
- * interface.
- */
+
 public class DeviceListFragment extends ListFragment {
 
-	/**
-	 * The serialization (saved instance state) Bundle key representing the
-	 * activated item position. Only used on tablets.
-	 */
 	private static final String STATE_ACTIVATED_POSITION = "activated_position";
 
 	/**
@@ -60,10 +48,7 @@ public class DeviceListFragment extends ListFragment {
 		}
 	};
 
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
+
 	public DeviceListFragment() {
 	}
 

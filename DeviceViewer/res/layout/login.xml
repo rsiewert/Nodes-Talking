@@ -15,7 +15,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Topaz"
-                android:id="@+id/textView" android:layout_weight="0.13"
+                android:layout_weight="0.13"
                 android:textStyle="italic" android:textColor="#000000" android:textSize="40dp"/>
         <EditText
               android:layout_width="fill_parent"
@@ -23,15 +23,23 @@
               android:singleLine="false" android:selectAllOnFocus="false" android:hint="user" android:padding="5dp"
               android:width="2dp" android:layout_marginBottom="40dp" android:background="#ffffff"
               android:layout_marginLeft="40dp" android:layout_marginRight="40dp"
-              android:layout_marginTop="20dp" android:focusableInTouchMode="true"/>
+              android:id="@+id/user_name"
+              android:layout_marginTop="20dp" android:focusableInTouchMode="true" />
             <!--  Password Label -->
         <EditText
               android:layout_width="fill_parent"
               android:layout_height="wrap_content"
               android:singleLine="false"
-              android:password="true" android:hint="password" android:width="2dp" android:background="#ffffff"
-              android:layout_weight="0.05" android:layout_marginLeft="40dp" android:layout_marginRight="40dp"
-              android:layout_marginTop="20dp" android:layout_marginBottom="40dp"/>
+              android:password="true"
+              android:hint="password"
+              android:width="2dp"
+              android:background="#ffffff"
+              android:layout_weight="0.05"
+              android:layout_marginLeft="40dp"
+              android:layout_marginRight="40dp"
+              android:id="@+id/user_password"
+              android:layout_marginTop="20dp"
+              android:layout_marginBottom="40dp"/>
              <!-- Login button -->
         <Button
               android:id="@+id/btnLogin"

@@ -9,15 +9,11 @@ import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.topaz.nodes.Device;
 
-/**
- * Helper class for providing sample content for user interfaces created by
- * Android template wizards.
- * <p>
- */
+
 public class DeviceContent {
 
 	/**
-	 * An array of sample (Device) items.
+	 * Device items.
 	 */
 	public List<Device> DEVICES = new ArrayList<Device>();
 

@@ -2,6 +2,9 @@
 *.class
 *.classpath
 
+#Ignore some generated directories
+gen/
+out/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -10,7 +13,12 @@
 .metadata/
 .project/
 
+<<<<<<< HEAD
 #intelliJ related
+=======
+#intellij related
+*.iml
+>>>>>>> affb911f419957d07b0d29657ed7e8e1fd11f1a0
 .idea
 
 # Package Files #

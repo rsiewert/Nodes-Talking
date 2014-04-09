@@ -21,15 +21,24 @@ public class LoginActivity extends Activity {
 
     }
 
-    /** Called when the user clicks login button */
+    /**
+     * Called when the user clicks login button
+     */
     public void loginClicked(View view) {
         System.out.println("Clicked the Login");
 
-        Intent intent = new Intent(this, DeviceListActivity.class);
-//        EditText editText = (EditText) findViewById(R.id.);
-//        String text = editText.getText().toString();
-//        intent.putExtra(this.USER,text);
-        startActivity(intent);
-    }
+        EditText editUserText = (EditText) findViewById(R.id.user_name);
+        EditText editPassWordText = (EditText) findViewById(R.id.user_password);
+        String user = editUserText.getText().toString();
+        String password = editPassWordText.getText().toString();
 
+        // Only allow guest guest in at this time.  TODO: Tie this into login to the system
+        if (user.equals("guest") && password.equals("guest")) {
+            Intent intent = new Intent(this, DeviceListActivity.class);
+            startActivity(intent);
+        } else {
+            editUserText.setText(null);
+            editPassWordText.setText(null);
+        }
+    }
 }
