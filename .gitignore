@@ -13,12 +13,8 @@ out/
 .metadata/
 .project/
 
-<<<<<<< HEAD
 #intelliJ related
-=======
-#intellij related
 *.iml
->>>>>>> affb911f419957d07b0d29657ed7e8e1fd11f1a0
 .idea
 
 # Package Files #
