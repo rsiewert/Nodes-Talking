@@ -40,8 +40,8 @@ module.exports = function(app, db, msgServer) {
     })
 
     app.post('/json-mirror',function(req,res) {
-        var newMessage = req.body.data;
-        res.json(newMessage);
+        var newMessage = req.body.data
+        res.json(newMessage)
     })
 
     app.get('/devices/doc/:id',function(req,res) {
@@ -85,7 +85,7 @@ module.exports = function(app, db, msgServer) {
             {
                 title:'Welcome to the messaging service',
                 sentMessage: ''
-            });
+            })
 
     })
 
