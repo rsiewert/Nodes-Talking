@@ -66,15 +66,19 @@ MsgServerModule.prototype = {
         } else
             return false
     },
-    receiveMessage: function(exchangeName,routingKey) {
+    receiveMessage: function(exchangeName,q,routingKey) {
         if(this._impl) {
-            this._impl.receiveMessage(exchangeName,routingKey)
+            this._impl.receiveMessage(exchangeName,q,routingKey)
             return true
         } else
             return false
     },
     createExchanges:  function(exchangeNames) {
-
+        if(this._impl) {
+            this._impl.createExchanges(exchangeNames)
+            return true
+        } else
+            return false
     },
     createQueues: function(queueNames) {
     },
@@ -103,6 +107,17 @@ AmqpNode.prototype = {
                 return connection
             })
     },
+    createExchanges: function(exchangesNames) {
+        this._amqpNode.then(function(conn) {
+            return when(conn.createChannel().then(function(ch) {
+                for(var exchange in exchangesNames) {
+                    var ok = ch.assertExchange(exchange, 'topic', {durable:true})
+                    ch.publish(exchange, 'i.am.up', new Buffer(JSON.stringify({"data": {"message":"i am here"}}),{'Content-Type': 'application/json'}))
+                    console.log(" [x] Sent on exchange '%s'", JSON.stringify({"data": {"message":"i am here"}}));
+                }
+            })).ensure(function() { /*conn.close()*/})
+        }).then(null, console.warn)
+    },
     sendMessage: function(msg,exchangeName,routingKey) {
         this._amqpNode.then(function(conn) {
             return when(conn.createChannel().then(function(ch) {
@@ -117,7 +132,7 @@ AmqpNode.prototype = {
             })).ensure(function() { /*conn.close();*/ });
         }).then(null, console.warn);
     },
-    receiveMessage: function(exchangeName,key) {
+    receiveMessage: function(exchangeName,q,key) {
         this._amqpNode.then(function(conn) {
             process.once('SIGINT', function() { conn.close(); });
             return conn.createChannel().then(function(ch) {
@@ -125,7 +140,7 @@ AmqpNode.prototype = {
                 var ok = ch.assertExchange(exchangeName, 'topic', {durable: true});
 
                 ok = ok.then(function() {
-                    return ch.assertQueue('', {exclusive: true});
+                    return ch.assertQueue(q, {exclusive: true});
                 });
 
                 ok = ok.then(function(qok) {

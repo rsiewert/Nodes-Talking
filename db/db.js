@@ -86,8 +86,7 @@ DbModule.prototype = {
     {
         // Check if any implementor is bound
         if(this._impl) {
-            var result = this._impl.create();     // Forward request to implementer
-            return result
+            return this._impl.create();     // Forward request to implementer
         }
         return null
     },
@@ -137,7 +136,6 @@ MongoDB.prototype = {
         })
         console.log("MongoDB.getById")
     },
-
     getNodeByType: function(collection,type) {
         console.log("MongoDB: getNodeByType")
         var coll = this._mongodb.collection(collection)
@@ -148,7 +146,6 @@ MongoDB.prototype = {
         })
         console.log("MongoDB.getById")
     },
-
     getByIds: function(collection,ids)
     {
         //should return an array of json objects that match the ids
@@ -173,7 +170,6 @@ MongoDB.prototype = {
     create: function(collection) {
     }
 }
-
 
 //                                  ___________________________
 //_________________________________/          CouchDB          \__________________________
