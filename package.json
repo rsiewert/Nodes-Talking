@@ -13,6 +13,13 @@
 		"nano":"*",
 		"socket.io":"*",
         "mongodb":"*",
-        "mongojs":"*"
+        "mongojs":"*",
+        "jasmine-node":"*",
+        "cookiejar":"*",
+        "datejs":"*",
+        "shred":"*",
+        "when":"*",
+        "amqplib":"*",
+        "frisby":"*"
 	}
 }

@@ -33,10 +33,10 @@ module.exports = function(app, db, msgServer) {
     app.post('/register',function(req,res) {
         console.log("Here in register")
         //is this an existing registration?
-        console.log("Device Id: " + req.body.data.message.id)
+        console.log("Device Id: " + req.body.data)
         msgServer.sendMessage({msg: "Hello Cruel World"}, "register", "register.rk.newreg")
         msgServer.sendMessage({msg: 'This will make it...'}, "register", "register.rk.newreg")
-        res.send("Ok")
+        res.json({"result":"Ok"})
     })
 
     app.post('/json-mirror',function(req,res) {
