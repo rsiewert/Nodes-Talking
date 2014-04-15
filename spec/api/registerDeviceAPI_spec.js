@@ -6,8 +6,8 @@ var frisby = require('frisby');
 
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
-        "data" : {
-            "message": {"id":"629"}
+        data : {
+            message: {id:"629"}
         }
     }, {json:true})
     .expectStatus(200)
