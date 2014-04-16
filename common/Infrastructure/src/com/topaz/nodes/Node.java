@@ -185,6 +185,4 @@ public class Node {
 
 		protocol.addMessageProtocol(name, messP);
 	}
-
-	
 }

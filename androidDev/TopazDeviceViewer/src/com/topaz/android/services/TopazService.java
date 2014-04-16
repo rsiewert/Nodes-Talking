@@ -71,8 +71,8 @@ public class TopazService extends Service {
             int count=0;
                 for(Device d : this.DEVICE_MAP.values())
                 {
-                    if(count == this.DEVICE_MAP.size()) {
-                        this.DEVICE_MAP.remove(d);
+                    if(count == this.DEVICE_MAP.size()-1) {
+                        this.DEVICE_MAP.remove(d.getNodeId());
                     }
                     count++;
                 }
