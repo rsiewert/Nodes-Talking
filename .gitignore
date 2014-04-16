@@ -13,7 +13,7 @@ out/
 .metadata/
 .project/
 
-#intellij related
+#intelliJ related
 *.iml
 .idea
 
