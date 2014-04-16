@@ -8,20 +8,25 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.*;
 
-public class DeviceBriefFragment extends ListFragment {
+public class DeviceBriefFragment extends ListFragment
+    {
+
     OnDeviceSelectedListener mCallback;
 
     static final String APP = "DeviceBriefFragment";
     // The container Activity must implement this interface so the frag can deliver messages
 
-    public interface OnDeviceSelectedListener {
+    // Source of our device data
+    DeviceContent mDeviceContent = null;
 
+    // An adapter for the device brief data
+    BaseAdapter mBriefAdapter;
+
+    public interface OnDeviceSelectedListener {
         /** Called by DeviceBriefFragment when a list item is selected */
         public void onDeviceSelected(int position);
-
     }
 
     @Override
@@ -30,9 +35,13 @@ public class DeviceBriefFragment extends ListFragment {
 
         Log.d(APP, "onCreate Entered:");
 
+        this.mDeviceContent = DeviceContent.getInstance(this.getActivity());
+
+        this.mBriefAdapter = new ArrayAdapter<String>(getActivity(),
+                android.R.layout.simple_list_item_activated_1,mDeviceContent.getBriefs());
+
         // Create an array adapter for the list view, using the Devices headlines array
-        setListAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_activated_1,
-                Devices.Briefs));
+        setListAdapter(this.mBriefAdapter);
     }
 
     @Override
@@ -99,5 +108,38 @@ public class DeviceBriefFragment extends ListFragment {
         Log.d(APP, "onDestroy Entered:");
     }
 
+    // Callback for when the DeviceData is changed
+    public void onDeviceDataChanged()
+    {
+        Log.d(APP, "onDeviceDataChanged:");
+        this.mBriefAdapter.notifyDataSetChanged();
+
+    }
+
+
+    // Adapter for the underlying Device Data
+    public class DeviceBriefAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return 0;
+        }
+
+
+        @Override
+        public Object getItem(int i) {
+            return null;
+        }
+
+        @Override
+        public long getItemId(int i) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int i, View view, ViewGroup viewGroup) {
+            return null;
+        }
+    }
 
 }

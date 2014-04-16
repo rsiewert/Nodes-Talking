@@ -11,16 +11,21 @@ public class DeviceServerTest {
 
 	private final static String EXCHANGE_NAME = "test-exchange";
 	private final static String ROUTE = "the.routing.register";
-	private final static String SERVER = "localhost";
-	
-	/**
+//	private final static String SERVER = "localhost";
+
+    private final static String SERVER = "thespacetimecontinuum.com";
+
+
+    /**
 	 * @param args
 	 */
 	public static void main(String[] args) throws java.io.IOException {
 
-		MessageService ms = new MessageService(SERVER);
-		
-		// Add 1K devices to the database and start heartbeats for each
+	//	MessageService ms = new MessageService(SERVER);
+
+        MessageService ms = new MessageService(SERVER,20005);
+
+        // Add 1K devices to the database and start heartbeats for each
 		for (int i = 0x55590000; i < 0x55590400; i++) {
 
 			// A unique number for the device. Mimic a MAC address

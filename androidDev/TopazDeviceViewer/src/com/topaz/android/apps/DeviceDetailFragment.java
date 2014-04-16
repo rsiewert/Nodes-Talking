@@ -15,41 +15,24 @@
  */
 package com.topaz.android.apps;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
+import com.topaz.nodes.Device;
 
 public class DeviceDetailFragment extends Fragment {
-    int mCurrentPosition = 0;
 
+    int mCurrentPosition = 0;
     static final String APP = "DeviceDetailFragment";
 
+    DeviceContent mDeviceContent = null;
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
-        Bundle savedInstanceState) {
-        super.onCreateView(inflater, container, savedInstanceState);
-        Log.d(APP, "onCreateView Entered:");
-
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.device_detail, container, false);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-
-        Log.d(APP, "onStart Entered:");
-
-        this.updateDeviceDetailView(getCurrentPosition());
-
-    }
-
+    //<editor-fold desc="Get-sets">
     // Return the position being displayed by the fragment
     public int getCurrentPosition(){
 
@@ -61,8 +44,9 @@ public class DeviceDetailFragment extends Fragment {
 
         mCurrentPosition = position;
     }
+    //</editor-fold>
 
-
+    //<editor-fold desc="Life Cycle">
     @Override
     public void onPause() {
         super.onPause();
@@ -85,9 +69,36 @@ public class DeviceDetailFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        this.mDeviceContent = DeviceContent.getInstance(this.getActivity());
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         Log.d(APP, "onDestroy Entered:");
+    }
+    //</editor-fold>
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, 
+        Bundle savedInstanceState) {
+        super.onCreateView(inflater, container, savedInstanceState);
+        Log.d(APP, "onCreateView Entered:");
+
+        // Inflate the layout for this fragment
+        return inflater.inflate(R.layout.device_detail, container, false);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+
+        Log.d(APP, "onStart Entered:");
+        this.updateDeviceDetailView(getCurrentPosition());
+
     }
 
     public void updateDeviceDetailView(int position) {
@@ -100,11 +111,24 @@ public class DeviceDetailFragment extends Fragment {
         {
             Log.d(APP, "updateDeviceDetailView Error in retrieving deviceDetail:");
             return;
-
         }
-        deviceDetail.setText(Devices.Details[this.getCurrentPosition()]);
 
+        Log.d(APP, "updateDeviceDetailView position:"+ position);
+        if(this.mDeviceContent.getDetails().size() != 0) {
+           deviceDetail.setText(this.mDeviceContent.getDetails().get(position));
+        }
     }
 
+    // Callback method to update view when underlying device data changes
+    public void onDeviceChange(){
 
+        this.updateDeviceDetailView(this.mCurrentPosition);
+    }
+
+    public void onDeviceDataChanged() {
+
+        Log.d(APP, "onDeviceDataChanged: Entered");
+        updateDeviceDetailView(this.getCurrentPosition());
+
+    }
 }
