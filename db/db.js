@@ -32,11 +32,12 @@ DbModule.prototype = {
     // browser/feature/object detection code.
     _EstablishImplementer: function(container)
     {
-        if(container === 'mongodb')
-            return new MongoDB();
-
+        if(container === 'mongojs_db')
+            return new MongoJS_DB()
+        else if(container === 'mongodb')
+            return new MongoDB()
         else if(container === 'couchdb')
-            return new CouchDB();
+            return new CouchDB()
 
         return null;
     },
@@ -44,6 +45,11 @@ DbModule.prototype = {
   // Functions "exported" by the DbModule abstraction:
   //                                 __________________
   //________________________________/   Client API     \___________________________________
+    initialize: function(db) {
+        if(this._impl) {
+            this._impl.initialize(db)
+        }
+    },
     connect: function(collection)
     {
         // Check if any implementor is bound and has the required method:
@@ -53,11 +59,11 @@ DbModule.prototype = {
         } else
             return false
     },
-    getAll : function(collection)
+    getAll : function(collection,callback)
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getAll(collection);     // Forward request to implementer
+            this._impl.getAll(collection,callback);     // Forward request to implementer
     },
     getById : function(collection,id)
     {
@@ -75,6 +81,11 @@ DbModule.prototype = {
     {
         if(this._impl)
             this._impl.getNodeByType(collection,type)
+    },
+    save :  function(collection,doc)
+    {
+        if(this._impl)
+            this._impl.save(collection,doc)
     },
     update : function(collection,doc)
     {
@@ -101,9 +112,8 @@ DbModule.prototype = {
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
-
 //                                  ___________________________
-//_________________________________/          MongoDB          \__________________________
+//_________________________________/       Raw MongoDB         \__________________________
 
 function MongoDB()
 {
@@ -112,62 +122,100 @@ function MongoDB()
 
 MongoDB.prototype = {
 
+    initialize: function(db) {
+        this._mongodb = db
+    },
+    connect: function(collection) {
+        var coll = this._mongodb.collection(collection)
+    },
+    getAll: function(collection,callback) {
+        var coll = this._mongodb.collection(collection)
+        callback(coll.find())
+    },
+    save: function(collection,doc) {
+        console.log("In Save Method")
+        var coll = this._mongodb.collection(collection)
+        coll.save(doc,function(err,document) {
+            console.log("doing the write thing")
+        })
+    }
+}
+//                                  ___________________________
+//_________________________________/          MongoJS_DB       \__________________________
+
+function MongoJS_DB()
+{
+    this._mongojs_db  = null
+}
+
+MongoJS_DB.prototype = {
+
+    connect: function(collection) {
+        this._mongojs_db = mongojs(collection);
+        console.log("MongoDB.connect")
+    },
     getAll: function(collection)
     {
-        var coll = this._mongodb.collection(collection);
+        var coll = this._mongojs_db.collection(collection);
 
         coll.find().sort({name:1},function(err, docs) {
             // docs is an array of all the documents in mycollection
             for(var i=0;i<docs.length;i++)
                 console.log("doc = " + docs[i]._id + " name = " + docs[i].name)
         })
-        console.log("MongoDB.getAll")
+        console.log("MongoJS_DB.getAll")
     },
     getById: function(collection,id)
     {
         console.log("MongoDB: getById method")
-        var coll = this._mongodb.collection(collection)
+        var coll = this._mongojs_db.collection(collection)
         console.log("getById: id = " + id)
         console.log("coll = " + collection)
-        coll.find({_id:this._mongodb.ObjectId(id)},function(err,docs) {
+        coll.find({_id:this._mongojs_db.ObjectId(id)},function(err,docs) {
             console.log("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
                 console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoDB.getById")
+        console.log("MongoJS_DB.getById")
     },
     getNodeByType: function(collection,type) {
         console.log("MongoDB: getNodeByType")
-        var coll = this._mongodb.collection(collection)
+        var coll = this._mongojs_db.collection(collection)
         coll.find({type:type},function(err,docs) {
             console.log("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
                 console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoDB.getById")
+        console.log("MongoJS_DB.getNodeByType")
     },
     getByIds: function(collection,ids)
     {
         //should return an array of json objects that match the ids
         console.log("MongoDB: getByIds method")
-        var coll = this._mongodb.collection(collection)
+        var coll = this._mongojs_db.collection(collection)
         console.log("getByIds: ids = " + ids)
         console.log("coll = " + collection)
 
-        coll.find({_id:this._mongodb.ObjectId(ids)},function(err,docs) {
+        coll.find({_id:this._mongojs_db.ObjectId(ids)},function(err,docs) {
             console.log("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
                 console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoDB.getByIds")
-    },
-    connect: function(collection) {
-        this._mongodb = mongojs(collection);
+        console.log("MongoJS_DB.getByIds")
     },
     remove: function(collection,id) {
-        console.log("MongoDB: remove method")
+        console.log("MongoJS_DB.remove")
     },
     create: function(collection) {
+        console.log("MongoJS_DB.create")
+    },
+    save: function(collection,doc) {
+        var coll = this._mongojs_db.collection(collection)
+        coll.save(doc,{"myname":"Leon Siewert"},function(err,document) {
+            if(err)
+                throw err
+            console.log("Saved: doc = " + JSON.stringify(document))
+        })
     }
 }
 

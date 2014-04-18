@@ -3,6 +3,7 @@
  */
 module.exports = function(app, db, msgServer) {
 
+
     // REST: Endpoints defined by the Routes abstraction:
     //                                 __________________
     //________________________________/   Client API     \___________________________________
@@ -28,18 +29,25 @@ module.exports = function(app, db, msgServer) {
     //____________________________________/   POST API       \___________________________________
 
     app.post('/register',function(req,res) {
-        console.log("Here in register, req.body = " + req.body.data)
-        //is this an existing registration?
-        //console.log("Device Id: " + req.body.data)
-        //console.log("" + req.body.say())
-        msgServer.sendMessage(req.body.data, "register", "register.rk.newreg")
-        res.json({"result":"Ok"})
+
+        //this rest api needs to save this registration to the db
+        //db.save('register',req.body.data)
+        db.save('register',req.body.data)
+        res.json({"result": "Ok"})
     })
 
     app.post('/json-mirror',function(req,res) {
-        var newMessage = req.body.data
-        res.json(newMessage)
+        res.json({"result": req.body.data})
     })
+
+    app.get('/getAll/:collection',function(req,res) {
+        db.getAll(req.params.collection,function(docs) {
+            console.log('getAll docs : ' + docs)
+            res.json(docs)
+        })
+    })
+
+//tests are good up to here... 0000000000000000000000000000000000000000000
 
     app.get('/devices/doc/:id',function(req,res) {
         console.log("inside routes: get id...")

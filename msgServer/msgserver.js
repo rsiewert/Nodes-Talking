@@ -122,47 +122,47 @@ AmqpNode.prototype = {
         this._amqpNode.then(function(conn) {
             return when(conn.createChannel().then(function(ch) {
 
-                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true});
+                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true})
 
                 return ok.then(function() {
-                    ch.publish(exchangeName, routingKey, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'});
+                    ch.publish(exchangeName, routingKey, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'})
                     console.log(" [x] Sent '%s'", JSON.stringify(msg))
                     return ch.close()
-                });
-            })).ensure(function() { /*conn.close();*/ });
-        }).then(null, console.warn);
+                })
+            })).ensure(function() { /*conn.close();*/ })
+        }).then(null, console.warn)
     },
     receiveMessage: function(exchangeName,q,key) {
         this._amqpNode.then(function(conn) {
-            process.once('SIGINT', function() { conn.close(); });
+            process.once('SIGINT', function() { conn.close(); })
             return conn.createChannel().then(function(ch) {
 
-                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true});
+                var ok = ch.assertExchange(exchangeName, 'topic', {durable: true})
 
                 ok = ok.then(function() {
-                    return ch.assertQueue(q, {exclusive: true});
+                    return ch.assertQueue(q, {exclusive: true})
                 });
 
                 ok = ok.then(function(qok) {
-                    var queue = qok.queue;
+                    var queue = qok.queue
                     return all(key.map(function(rk) {
-                        ch.bindQueue(queue, exchangeName, rk);
-                    })).then(function() { return queue; });
+                        ch.bindQueue(queue, exchangeName, rk)
+                    })).then(function() { return queue; })
                 });
 
                 ok = ok.then(function(queue) {
-                    return ch.consume(queue, rMsg, {noAck: true});
+                    return ch.consume(queue, rMsg, {noAck: true})
                 });
 
                 return ok.then(function() {
-                    console.log(' [*] Waiting for messages. To exit press CTRL+C');
+                    console.log(' [*] Waiting for messages. To exit press CTRL+C')
                 });
 
                 function rMsg(msg) {
                     console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content.toString())
                 }
             });
-        }).then(null, console.warn);
+        }).then(null, console.warn)
     }
 }
 
