@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="infrastructure" default="all">
+  
+  
+  <property file="build.properties"/>
+  <!-- Uncomment the following property if no tests compilation is needed -->
+  <!-- 
+  <property name="skip.tests" value="true"/>
+   -->
+  
+  <!-- Compiler options -->
+  
+  <property name="compiler.debug" value="on"/>
+  <property name="compiler.generate.no.warnings" value="off"/>
+  <property name="compiler.args" value=""/>
+  <property name="compiler.max.memory" value="700m"/>
+  <patternset id="ignored.files">
+    <exclude name="**/CVS/**"/>
+    <exclude name="**/SCCS/**"/>
+    <exclude name="**/RCS/**"/>
+    <exclude name="**/rcs/**"/>
+    <exclude name="**/.DS_Store/**"/>
+    <exclude name="**/.svn/**"/>
+    <exclude name="**/.pyc/**"/>
+    <exclude name="**/.pyo/**"/>
+    <exclude name="**/*.pyc/**"/>
+    <exclude name="**/*.pyo/**"/>
+    <exclude name="**/.git/**"/>
+    <exclude name="**/*.hprof/**"/>
+    <exclude name="**/_svn/**"/>
+    <exclude name="**/.hg/**"/>
+    <exclude name="**/*.lib/**"/>
+    <exclude name="**/*~/**"/>
+    <exclude name="**/__pycache__/**"/>
+    <exclude name="**/.bundle/**"/>
+    <exclude name="**/*.rbc/**"/>
+  </patternset>
+  <patternset id="library.patterns">
+    <include name="*.zip"/>
+    <include name="*.apk"/>
+    <include name="*.war"/>
+    <include name="*.egg"/>
+    <include name="*.ear"/>
+    <include name="*.ane"/>
+    <include name="*.swc"/>
+    <include name="*.jar"/>
+  </patternset>
+  <patternset id="compiler.resources">
+    <exclude name="**/?*.java"/>
+    <exclude name="**/?*.form"/>
+    <exclude name="**/?*.class"/>
+    <exclude name="**/?*.groovy"/>
+    <exclude name="**/?*.scala"/>
+    <exclude name="**/?*.flex"/>
+    <exclude name="**/?*.kt"/>
+    <exclude name="**/?*.clj"/>
+  </patternset>
+  
+  <!-- JDK definitions -->
+  
+  <property name="jdk.bin.1.7" value="${jdk.home.1.7}/bin"/>
+  <path id="jdk.classpath.1.7">
+    <fileset dir="${jdk.home.1.7}">
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/charsets.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/rt.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/compilefontconfig.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/resources.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/jce.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/javazic.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/rhino.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/jsse.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/management-agent.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/zipfs.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/java-atk-wrapper.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/pulse-java.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/sunjce_provider.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/sunpkcs11.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/dnsns.jar"/>
+      <include name="../java-1.7.0-openjdk-amd64/jre/lib/ext/localedata.jar"/>
+    </fileset>
+  </path>
+  
+  <property name="project.jdk.home" value=""/>
+  <property name="project.jdk.bin" value=""/>
+  <property name="project.jdk.classpath" value=""/>
+  
+  
+  <!-- Project Libraries -->
+  
+  <path id="library.lib.classpath">
+    <pathelement location="${basedir}/Infrastructure/lib/gson-2.2.4.jar"/>
+    <pathelement location="${basedir}/Infrastructure/lib/rabbitmq-client.jar"/>
+  </path>
+  
+  <!-- Modules -->
+  
+  
+  <!-- Module Infrastructure -->
+  
+  <dirname property="module.infrastructure.basedir" file="${ant.file}"/>
+  
+  
+  <property name="module.jdk.home.infrastructure" value="${jdk.home.1.7}"/>
+  <property name="module.jdk.bin.infrastructure" value="${jdk.bin.1.7}"/>
+  <property name="module.jdk.classpath.infrastructure" value="jdk.classpath.1.7"/>
+  
+  <property name="compiler.args.infrastructure" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  
+  <property name="infrastructure.output.dir" value="${module.infrastructure.basedir}/out/production/Infrastructure"/>
+  <property name="infrastructure.testoutput.dir" value="${module.infrastructure.basedir}/out/test/Infrastructure"/>
+  
+  <path id="infrastructure.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="infrastructure.module.production.classpath">
+    <path refid="${module.jdk.classpath.infrastructure}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="infrastructure.runtime.production.module.classpath">
+    <pathelement location="${infrastructure.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="infrastructure.module.classpath">
+    <path refid="${module.jdk.classpath.infrastructure}"/>
+    <pathelement location="${infrastructure.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  <path id="infrastructure.runtime.module.classpath">
+    <pathelement location="${infrastructure.testoutput.dir}"/>
+    <pathelement location="${infrastructure.output.dir}"/>
+    <path refid="library.lib.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.infrastructure">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.infrastructure">
+    <patternset refid="excluded.from.module.infrastructure"/>
+  </patternset>
+  
+  <path id="infrastructure.module.sourcepath">
+    <dirset dir="${module.infrastructure.basedir}/Infrastructure">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.infrastructure" depends="compile.module.infrastructure.production,compile.module.infrastructure.tests" description="Compile module Infrastructure"/>
+  
+  <target name="compile.module.infrastructure.production" description="Compile module Infrastructure; production classes">
+    <mkdir dir="${infrastructure.output.dir}"/>
+    <javac destdir="${infrastructure.output.dir}" debug="${compiler.debug}" nowarn="${compiler.generate.no.warnings}" memorymaximumsize="${compiler.max.memory}" fork="true" executable="${module.jdk.bin.infrastructure}/javac">
+      <compilerarg line="${compiler.args.infrastructure}"/>
+      <bootclasspath refid="infrastructure.module.bootclasspath"/>
+      <classpath refid="infrastructure.module.production.classpath"/>
+      <src refid="infrastructure.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.infrastructure"/>
+    </javac>
+    
+    <copy todir="${infrastructure.output.dir}">
+      <fileset dir="${module.infrastructure.basedir}/Infrastructure/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.infrastructure.tests" depends="compile.module.infrastructure.production" description="compile module Infrastructure; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.infrastructure" description="cleanup module">
+    <delete dir="${infrastructure.output.dir}"/>
+    <delete dir="${infrastructure.testoutput.dir}"/>
+  </target>
+  
+  <target name="init" description="Build initialization">
+    <!-- Perform any build initialization in this target -->
+  </target>
+  
+  <target name="clean" depends="clean.module.infrastructure, clean.artifact.infrastructure:jar" description="cleanup all"/>
+  
+  <target name="build.modules" depends="init, clean, compile.module.infrastructure" description="build all modules"/>
+  
+  <target name="init.artifacts">
+    <property name="artifacts.temp.dir" value="${basedir}/__artifacts_temp"/>
+    <property name="artifact.output.infrastructure:jar" value="${basedir}/Infrastructure/lib"/>
+    <mkdir dir="${artifacts.temp.dir}"/>
+    <property name="temp.jar.path.Infrastructure.jar" value="${artifacts.temp.dir}/Infrastructure.jar"/>
+  </target>
+  
+  <target name="clean.artifact.infrastructure:jar" description="clean Infrastructure:jar artifact output">
+    <delete dir="${artifact.output.infrastructure:jar}"/>
+  </target>
+  
+  <target name="artifact.infrastructure:jar" depends="init.artifacts, compile.module.infrastructure" description="Build &#39;Infrastructure:jar&#39; artifact">
+    <mkdir dir="${artifact.output.infrastructure:jar}"/>
+    <jar destfile="${temp.jar.path.Infrastructure.jar}" duplicate="preserve" filesetmanifest="mergewithoutmain">
+      <zipfileset dir="${infrastructure.output.dir}"/>
+    </jar>
+    <copy file="${temp.jar.path.Infrastructure.jar}" tofile="${artifact.output.infrastructure:jar}/Infrastructure.jar"/>
+    <copy file="${basedir}/Infrastructure/lib/gson-2.2.4.jar" tofile="${artifact.output.infrastructure:jar}/gson-2.2.4.jar"/>
+    <copy file="${basedir}/Infrastructure/lib/rabbitmq-client.jar" tofile="${artifact.output.infrastructure:jar}/rabbitmq-client.jar"/>
+  </target>
+  
+  <target name="build.all.artifacts" depends="artifact.infrastructure:jar" description="Build all artifacts">
+    
+    <!-- Delete temporary files -->
+    <delete dir="${artifacts.temp.dir}"/>
+  </target>
+  
+  <target name="all" depends="build.modules, build.all.artifacts" description="build all"/>
+</project>
