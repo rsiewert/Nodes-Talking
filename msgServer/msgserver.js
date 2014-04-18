@@ -126,8 +126,8 @@ AmqpNode.prototype = {
 
                 return ok.then(function() {
                     ch.publish(exchangeName, routingKey, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'});
-                    console.log(" [x] Sent '%s'", JSON.stringify(msg));
-                    return ch.close();
+                    console.log(" [x] Sent '%s'", JSON.stringify(msg))
+                    return ch.close()
                 });
             })).ensure(function() { /*conn.close();*/ });
         }).then(null, console.warn);
@@ -159,10 +159,7 @@ AmqpNode.prototype = {
                 });
 
                 function rMsg(msg) {
-                    var struct = JSON.parse(msg.content)
-                    console.log(" [x] %s:'%s'",
-                        msg.fields.routingKey,
-                        struct.msg);
+                    console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content.toString())
                 }
             });
         }).then(null, console.warn);

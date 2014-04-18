@@ -31,10 +31,11 @@ module.exports = function(app, db, msgServer) {
     //____________________________________/   POST API       \___________________________________
 
     app.post('/register',function(req,res) {
-        console.log("Here in register")
+        console.log("Here in register, req.body = " + req.body.data)
         //is this an existing registration?
-        console.log("Device Id: " + req.body.data)
-        msgServer.sendMessage({msg: "Hello Cruel World"}, "register", "register.rk.newreg")
+        //console.log("Device Id: " + req.body.data)
+        //console.log("" + req.body.say())
+        msgServer.sendMessage(req.body.data, "register", "register.rk.newreg")
         msgServer.sendMessage({msg: 'This will make it...'}, "register", "register.rk.newreg")
         res.json({"result":"Ok"})
     })
