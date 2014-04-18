@@ -5,8 +5,6 @@
 var frisby = require('frisby')
     ,fs = require('fs');
 
-
-
 var theData = fs.readFileSync('./json/register.json','utf8')
 
 frisby.create('Register Device')
@@ -24,9 +22,5 @@ frisby.create('Register Device')
         result: 'Ok'
     })
 .toss()
-
-function processData() {
-    console.log(theData)
-}
 
 

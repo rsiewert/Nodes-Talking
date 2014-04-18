@@ -19,10 +19,7 @@ module.exports = function(app, db, msgServer) {
 
         res.render('index',
             {
-                title: 'Welcome to RabbitMQ and Node/Express',
-                connectionStatus: app.connectionStatus,
-                exchangeStatus: app.exchangeStatus,
-                queueStatus: app.queueStatus
+                title: 'Welcome to a NodesTalking Server: ' + app.connectionStatus
             });
     });
 
@@ -36,7 +33,6 @@ module.exports = function(app, db, msgServer) {
         //console.log("Device Id: " + req.body.data)
         //console.log("" + req.body.say())
         msgServer.sendMessage(req.body.data, "register", "register.rk.newreg")
-        msgServer.sendMessage({msg: 'This will make it...'}, "register", "register.rk.newreg")
         res.json({"result":"Ok"})
     })
 
