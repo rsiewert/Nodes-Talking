@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.*;
 
 import java.io.FileDescriptor;
+import java.io.IOException;
 import java.util.*;
 
 import android.util.Log;
@@ -11,7 +12,7 @@ import com.google.gson.Gson;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.AsyncHttpResponseHandler;
 import com.topaz.nodes.Device;
-
+import com.topaz.communications.servers.MessageService;
 
 /**
  * Created by rbgodwin on 4/7/14.
@@ -26,6 +27,11 @@ public class TopazService extends Service {
     // Message "whats"
     public final static int DEVICE_CHANGED = 1;
 
+    // Server
+    static String host = "54.186.125.132";
+
+    MessageService topazMessageService = null;
+
     //</editor-fold>
 
     //<editor-fold desc="Properties">
@@ -39,6 +45,9 @@ public class TopazService extends Service {
      * A map of devices, by ID.
      */
     public Map<String, Device> DEVICE_MAP = new TreeMap<String, Device>();
+
+    private String DeviceMessageThread ="Device Message Service";
+
     //</editor-fold>
 
     //<editor-fold desc="Private Methods">
@@ -47,6 +56,18 @@ public class TopazService extends Service {
         DEVICE_MAP.put(device.getNodeId(), device);
     }
 
+
+    private void handleDeviceMessages() {
+
+        try {
+            topazMessageService = MessageService.getMessageService(this.host);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(APP, "Started Topaz Message Service");
+
+    }
     private void monitorDevices() {
 
         Device firstDevice = null;
@@ -88,7 +109,6 @@ public class TopazService extends Service {
     }
 
     private void notifyAllMessengers() {
-
 
         for(Messenger mess : this.mMessengers)
         {
@@ -158,6 +178,8 @@ public class TopazService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(APP, "onCreate:entered");
+/*
+        // Start a Device monitor thread
         Thread monitorThread = new Thread(new Runnable() {
             public void run() {
                 monitorDevices();
@@ -166,8 +188,17 @@ public class TopazService extends Service {
 
         monitorThread.setName(this.MonitorThreadName);
         monitorThread.start();
+*/
+        // Set up to handle message communications with Devices
 
+        Thread deviceMessageThread = new Thread(new Runnable() {
+            public void run() {
+                handleDeviceMessages();
+            }
+        });
 
+        deviceMessageThread.setName(this.DeviceMessageThread);
+        deviceMessageThread.start();
 
     }
     //</editor-fold>

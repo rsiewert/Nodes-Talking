@@ -22,6 +22,7 @@ public class DeviceServerTest {
 	public static void main(String[] args) throws java.io.IOException {
 
 		MessageService ms = new MessageService(SERVER);
+        int count = 0;
 
     //    MessageService ms = new MessageService(SERVER,20005);
 
@@ -37,8 +38,8 @@ public class DeviceServerTest {
 			// Create the device and add it to the registration
 			Device testDevice = Device.builder().status(Node.STATUS.YELLOW)
 					.nodeId("0x" + deviceNum + ".gateway")
-					.description("Test Device").actsAs(Node.ActsAs.DEVICE)
-					.location(new Location(40.12, 200.34, 300.45)).build();
+					.description("Test Device " + count++).actsAs(Node.ActsAs.DEVICE)
+					.location(new Location(count%90, count%360, count)).build();
 
 			Registration regMessage = new Registration();
 			regMessage.setRegisteringNode(testDevice);
@@ -109,13 +110,14 @@ public class DeviceServerTest {
 		
 		}
 
-		System.out.println("Completed Registration");
+		System.out.println("Completed Registration. Sending Heartbeats");
+        while (true)
 		try {
-			Thread.sleep(5000);
+			Thread.sleep(50000);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+            ms.close();
 		}
 
-		ms.close();
 	}
 }

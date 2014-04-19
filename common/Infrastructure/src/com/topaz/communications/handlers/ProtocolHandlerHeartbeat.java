@@ -40,6 +40,7 @@ public class ProtocolHandlerHeartbeat extends MessageProtocolHandler {
 
 	@Override
 	public void run() {
+    int count=0;
 
 		// get the exchange and routing information
 		String exchange = this.getMessageProtocol().getExchange();
@@ -50,7 +51,9 @@ public class ProtocolHandlerHeartbeat extends MessageProtocolHandler {
 			try {
 				ms.sendMessage(exchange, routingKey, this.heartbeat);
 				Thread.sleep(1000 * this.heartbeatInterval);
-
+                if(++count %100 == 0)
+                    System.out.println(this.heartbeat.getNodeId() + " Sent "+ count + " heartbeats on exchange: " +
+                    exchange + " routingKey: " + routingKey);
 			} catch (InterruptedException e) {
 				break;
 			} catch (IOException e) {
