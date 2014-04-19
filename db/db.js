@@ -132,6 +132,13 @@ MongoDB.prototype = {
         var coll = this._mongodb.collection(collection)
         callback(coll.find())
     },
+    getById: function(collection,Id) {
+        var coll = this._mongodb.collection(collection)
+        coll.find(
+            {id: { $eq: Id}},
+            {name: 1}
+        )
+    },
     save: function(collection,doc) {
         console.log("In Save Method")
         var coll = this._mongodb.collection(collection)

@@ -29,9 +29,7 @@ module.exports = function(app, db, msgServer) {
     //____________________________________/   POST API       \___________________________________
 
     app.post('/register',function(req,res) {
-
         //this rest api needs to save this registration to the db
-        //db.save('register',req.body.data)
         db.save('register',req.body.data)
         res.json({"result": "Ok"})
     })
@@ -47,13 +45,17 @@ module.exports = function(app, db, msgServer) {
         })
     })
 
+    app.get('/getById/:collection/:id',function(req,res) {
+        var coll = req.params.collection
+        var id = req.params.id
+        console.log("getById: id: %s",id)
+        console.log("getById: coll: %s",coll)
+        db.getById(coll,id)
+        res.json({result: "Ok"})
+    })
+
 //tests are good up to here... 0000000000000000000000000000000000000000000
 
-    app.get('/devices/doc/:id',function(req,res) {
-        console.log("inside routes: get id...")
-        console.log("req.id = " + req.params.id)
-        db.getById('register',req.params.id)
-    })
 
     app.get('/devices/docs/:nodeType',function(req,res) {
         console.log("inside routes: get by node type...")
