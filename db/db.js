@@ -65,11 +65,11 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.getAll(collection,callback);     // Forward request to implementer
     },
-    getById : function(collection,id)
+    getById : function(collection,id,callback)
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getById(collection,id);     // Forward request to implementer
+            this._impl.getById(collection,id,callback);     // Forward request to implementer
     },
     getByIds : function(collection,ids)
     {
@@ -82,7 +82,7 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.getNodeByType(collection,type)
     },
-    save :  function(collection,doc)
+    save : function(collection,doc)
     {
         if(this._impl)
             this._impl.save(collection,doc)
@@ -132,18 +132,25 @@ MongoDB.prototype = {
         var coll = this._mongodb.collection(collection)
         callback(coll.find())
     },
-    getById: function(collection,Id) {
+    getById: function(collection,Id,callback) {
         var coll = this._mongodb.collection(collection)
-        coll.find(
-            {id: { $eq: Id}},
-            {name: 1}
+        var myCursor = coll.find(
+            {"message.nodeId":Id}
         )
+        if(myCursor) {
+            myCursor.each(function(err,doc) {
+                if(err) throw err
+                console.log("doc: " + JSON.stringify(doc))
+            })
+        }
+        callback(null,"yes")
     },
+
     save: function(collection,doc) {
         console.log("In Save Method")
         var coll = this._mongodb.collection(collection)
         coll.save(doc,function(err,document) {
-            console.log("doing the write thing")
+            console.log("wrote this doc: " + JSON.stringify(document))
         })
     }
 }

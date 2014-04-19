@@ -50,8 +50,9 @@ module.exports = function(app, db, msgServer) {
         var id = req.params.id
         console.log("getById: id: %s",id)
         console.log("getById: coll: %s",coll)
-        db.getById(coll,id)
-        res.json({result: "Ok"})
+        db.getById(coll,id,function(err,doc) {
+            res.json({result: "Ok"})
+        })
     })
 
 //tests are good up to here... 0000000000000000000000000000000000000000000

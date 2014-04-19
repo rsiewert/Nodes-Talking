@@ -1,25 +1,25 @@
 {
-	"name":"initial-test-node-over-rabbitmq",
-	"version":"0.0.1",
-	"description": "really nice nodejs app",
-	"scripts": 
-		{
-			"start": "node server"
-		},
-	"dependencies": {
-		"express":"*",
-		"amqp":"*",
-		"jade":"*",
-		"nano":"*",
-		"socket.io":"*",
-        "mongodb":"*",
-        "mongojs":"*",
-        "jasmine-node":"*",
-        "cookiejar":"*",
-        "datejs":"*",
-        "shred":"*",
-        "when":"*",
-        "amqplib":"*",
-        "frisby":"*"
-	}
+  "name": "initial-test-node-over-rabbitmq",
+  "version": "0.0.1",
+  "description": "really nice nodejs app",
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "express": "*",
+    "amqp": "*",
+    "jade": "*",
+    "nano": "*",
+    "socket.io": "*",
+    "mongodb": "*",
+    "mongojs": "*",
+    "jasmine-node": "*",
+    "cookiejar": "*",
+    "datejs": "*",
+    "shred": "*",
+    "when": "*",
+    "amqplib": "*",
+    "frisby": "*",
+    "mongoose": "~3.8.8"
+  }
 }
