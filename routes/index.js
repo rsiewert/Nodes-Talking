@@ -39,8 +39,14 @@ module.exports = function(app, db, msgServer) {
     })
 
     app.get('/getAll/:collection',function(req,res) {
-        db.getAll(req.params.collection,function(docs) {
-            console.log('getAll docs : ' + docs)
+        db.getAll(req.params.collection,function(err,docs) {
+            if(err)
+                throw err
+            console.log("Count = " + docs.length)
+            for(var i=0;i<docs.length;i++) {
+                console.log("doc = " + JSON.stringify(docs[i]))
+            }
+            //console.log('getAll docs : ' + docs)
             res.json(docs)
         })
     })
@@ -48,10 +54,12 @@ module.exports = function(app, db, msgServer) {
     app.get('/getById/:collection/:id',function(req,res) {
         var coll = req.params.collection
         var id = req.params.id
-        console.log("getById: id: %s",id)
-        console.log("getById: coll: %s",coll)
+        console.log("\ngetById: id: %s",id)
+        console.log("\ngetById: coll: %s",coll)
         db.getById(coll,id,function(err,doc) {
-            res.json({result: "Ok"})
+            console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
+            console.log("\nresult = " + doc.message.nodeId)
+            res.json({Id:doc.message.nodeId})
         })
     })
 

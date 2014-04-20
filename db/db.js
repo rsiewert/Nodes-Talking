@@ -130,22 +130,21 @@ MongoDB.prototype = {
     },
     getAll: function(collection,callback) {
         var coll = this._mongodb.collection(collection)
-        callback(coll.find())
+        coll.find().toArray(function(err,docs) {
+            if(err)
+                callback(err,null)
+            callback(null,docs)
+        })
     },
     getById: function(collection,Id,callback) {
         var coll = this._mongodb.collection(collection)
-        var myCursor = coll.find(
-            {"message.nodeId":Id}
-        )
-        if(myCursor) {
-            myCursor.each(function(err,doc) {
-                if(err) throw err
-                console.log("doc: " + JSON.stringify(doc))
-            })
-        }
-        callback(null,"yes")
-    },
-
+        coll.findOne({"message.nodeId":Id},function(err,document) {
+            if(err)
+                callback(err,null)
+            console.log("Db: document = " + JSON.stringify(document))
+            callback(null,document)
+         })
+     },
     save: function(collection,doc) {
         console.log("In Save Method")
         var coll = this._mongodb.collection(collection)
