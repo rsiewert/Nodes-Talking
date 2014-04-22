@@ -1,0 +1,53 @@
+{
+   "data": {
+       "_id":"",
+       "message": {
+           "node": {
+               "actsAs": "",
+               "nodeId": "",
+               "location": {
+                   "latitude": "",
+                   "longitude": "",
+                   "altitude": ""
+               },
+               "status": "",
+               "protocol": {
+                   "rest": {
+                       "Mirror": {
+                           "domain": "",
+                           "port": "",
+                           "endpoint": "/json-mirror"
+                       }
+                   },
+                   "messenger": {
+                       "on_publish": {
+                           "exchange": "",
+                           "routing_key": "routing.on_publish",
+                           "manageExchange": true
+                       },
+                       "heartbeat": {
+                           "exchange": "",
+                           "routing_key": "routing.heartbeat",
+                           "manageExchange": true
+                       },
+                       "on_ack": {
+                           "exchange": "",
+                           "routing_key": "routing.acks",
+                           "manageExchange": true
+                       },
+                       "command_server": {
+                           "exchange": "",
+                           "routing_key": "routing.commands",
+                           "manageExchange": false
+                       }
+                   }
+               },
+               "description": ""
+           },
+           "originTimestamp": "",
+           "seqId": "",
+           "requestAck": true,
+           "timestamp": ""
+       }
+   }
+}

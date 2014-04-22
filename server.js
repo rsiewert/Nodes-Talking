@@ -15,7 +15,7 @@ MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
     var app = express();
     app.shred = new Shred({logCurl: true})
 
-//startup db
+//startup native mongodb driver
     var theDb = new Db('mongodb')
     theDb.initialize(db)
     theDb.connect('register')

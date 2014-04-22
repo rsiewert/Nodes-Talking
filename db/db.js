@@ -1,5 +1,6 @@
 var mongojs = require('mongojs')
-    ,nano = require('nano')('http://localhost:5984');
+    ,nano = require('nano')('http://localhost:5984')
+    ,mongoose = require('mongoose');
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -34,6 +35,8 @@ DbModule.prototype = {
     {
         if(container === 'mongojs_db')
             return new MongoJS_DB()
+        else if(container === 'mongoose')
+            return new Mongoose()
         else if(container === 'mongodb')
             return new MongoDB()
         else if(container === 'couchdb')
@@ -112,8 +115,36 @@ DbModule.prototype = {
 //                             ___________________________
 //____________________________/     Implementations       \__________________________
 
+//                                  ________________________
+//_________________________________/       Mongoose         \__________________________
+
+function Mongoose()
+{
+    this._mongoose = null
+}
+
+Mongoose.prototype = {
+    connect: function(collection) {
+        var uri = 'mongodb://localhost/' + collection
+        this._mongoose = mongoose.connect(uri, function(err,res) {
+            if (err) {
+              console.log ('ERROR connecting to: ' + uri + '. ' + err);
+              return null
+            } else {
+              console.log ('Succeeded connected to: ' + uri);
+              return this._mongoose
+            }
+        })
+    },
+    getAll: function(collection,callback) {
+    },
+    getById: function(collection,Id,callback) {
+
+    }
+
+}
 //                                  ___________________________
-//_________________________________/       Raw MongoDB         \__________________________
+//_________________________________/       Native MongoDB      \__________________________
 
 function MongoDB()
 {
@@ -122,6 +153,8 @@ function MongoDB()
 
 MongoDB.prototype = {
 
+    //Native MongoDB has the db connection object in its callback(giving the db connection at the app level) so we need to just pass
+    //that to this initialize function. All the other interfaces allow the db to be connected from anywhere in the code hierarchy
     initialize: function(db) {
         this._mongodb = db
     },
