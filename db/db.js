@@ -104,9 +104,9 @@ DbModule.prototype = {
         }
         return null
     },
-    createDomain: function(coll,obj) {
+    createModel: function(coll,obj) {
         if(this._impl) {
-            return this._impl.createDomain(coll, obj)
+            return this._impl.createModel(coll, obj)
         }
         return null
     },
@@ -148,14 +148,14 @@ Mongoose.prototype = {
     getById: function (collection, Id, callback) {
 
     },
-    createDomain: function (collection, schema) {
+    createModel: function (collection, schema) {
         //create the schema
-        console.log("createDomain: coll = " + collection)
-        console.log("createDomain: schema = " + schema)
+        console.log("createModel: coll = " + collection)
+        console.log("createModel: schema = " + schema)
         var userSchema = this._mongoose.Schema(schema)
-        console.log("createDomain: userSchema = " + userSchema)
+        console.log("createModel: userSchema = " + userSchema)
         var res = this._mongoose.model(collection, userSchema)
-        console.log("createDomain: res = " + res)
+        console.log("createModel: res = " + res)
         return res
     },
     save: function (collection, doc) {
