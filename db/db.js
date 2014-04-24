@@ -104,11 +104,17 @@ DbModule.prototype = {
         }
         return null
     },
+    createDomain: function(coll,obj) {
+        if(this._impl) {
+            return this._impl.createDomain(coll, obj)
+        }
+        return null
+    },
     remove : function(collection,id)
     {
         // Check if any implementor is bound and has the required method:
         if(this._impl)
-            this._impl.remove();     // Forward request to implementer
+            this._impl.remove(collection,id);     // Forward request to implementer
     }
 }
 
@@ -124,24 +130,43 @@ function Mongoose()
 }
 
 Mongoose.prototype = {
-    connect: function(collection) {
+    connect: function (collection) {
         var uri = 'mongodb://localhost/' + collection
-        this._mongoose = mongoose.connect(uri, function(err,res) {
+        this._mongoose = mongoose.connect(uri, function (err, res) {
             if (err) {
-              console.log ('ERROR connecting to: ' + uri + '. ' + err);
-              return null
+                console.log('ERROR connecting to: ' + uri + '. ' + err);
+                return null
             } else {
-              console.log ('Succeeded connected to: ' + uri);
-              return this._mongoose
+                console.log('Succeeded connected to: ' + uri);
+
+                return this._mongoose
             }
         })
     },
-    getAll: function(collection,callback) {
+    getAll: function (collection, callback) {
     },
-    getById: function(collection,Id,callback) {
+    getById: function (collection, Id, callback) {
 
+    },
+    createDomain: function (collection, schema) {
+        //create the schema
+        console.log("createDomain: coll = " + collection)
+        console.log("createDomain: schema = " + schema)
+        var userSchema = this._mongoose.Schema(schema)
+        console.log("createDomain: userSchema = " + userSchema)
+        var res = this._mongoose.model(collection, userSchema)
+        console.log("createDomain: res = " + res)
+        return res
+    },
+    save: function (collection, doc) {
+        console.log("model doc = " + doc)
+        if (doc != undefined) {
+            doc.save(function (err) {
+                if (err)
+                    console.log("err in the save")
+            })
+        }
     }
-
 }
 //                                  ___________________________
 //_________________________________/       Native MongoDB      \__________________________
