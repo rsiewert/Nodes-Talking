@@ -62,6 +62,11 @@ DbModule.prototype = {
         } else
             return false
     },
+    close: function() {
+        if(this._impl) {
+            this._impl.close()
+        }
+    },
     getAll : function(collection,callback)
     {
         // Check if any implementor is bound
@@ -163,9 +168,14 @@ Mongoose.prototype = {
         if (doc != undefined) {
             doc.save(function (err) {
                 if (err)
-                    console.log("err in the save")
+                    console.log("err in the save: " + err.message)
             })
         }
+    },
+    close: function() {
+        this._mongoose.disconnect(function() {
+            console.log("Disconnected...")
+        })
     }
 }
 //                                  ___________________________
@@ -196,7 +206,7 @@ MongoDB.prototype = {
     },
     getById: function(collection,Id,callback) {
         var coll = this._mongodb.collection(collection)
-        coll.findOne({"message.nodeId":Id},function(err,document) {
+        coll.findOne({"nodeId":Id},function(err,document) {
             if(err)
                 callback(err,null)
             console.log("Db: document = " + JSON.stringify(document))

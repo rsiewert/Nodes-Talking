@@ -10,19 +10,24 @@ describe("Initialize the db to allow other tests to run", function() {
     var config = JSON.parse(boot)
     var theData = fs.readFileSync('./json/register.json','utf8')
     var json = JSON.parse(theData)
+    console.log("collection = " + config.register)
     json.nodeId = config.nodeId
-    //json.myId = "0.23dkdjdj"
 
     console.log("json = " + json.nodeId)
-
-    MongoClient.connect('mongodb://localhost:27017/'+config.collection, function(err, db) {
-        var coll = db.collection(config.collection)
-        //coll.remove({data: {nodeId:json.nodeId}})
-        coll.remove({data:{nodeId:json.nodeId}})
-        console.log("json = " + JSON.stringify(json))
-        coll.save(json,function(err,document) {
-            console.log("wrote this doc: " + JSON.stringify(document))
-            db.close()
+    it("should connect to mongodb using native driver and save a document needed for getById test",function() {
+        MongoClient.connect('mongodb://localhost:27017/'+config.register, function(err, db) {
+            if(err) throw err
+            db.createCollection(config.register,function(err,collection) {
+                collection.remove({"nodeId":json.nodeId},function(err,removed) {
+                    console.log("removed: " + removed)
+                })
+                //console.log("json = " + JSON.stringify(json))
+                collection.save(json,function(err,document) {
+                    console.log("wrote this doc: " + JSON.stringify(document))
+                    db.close()
+                })
+            })
+            expect(json.nodeId).toEqual('register')
         })
     })
 })

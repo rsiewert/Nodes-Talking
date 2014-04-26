@@ -1,15 +1,20 @@
 var Db = require('../../db/db')
+    ,fs = require('fs');
 
-describe("Connect/save to mongoDB via Mongoose", function() {
+var boot = fs.readFileSync('./json/bootstrap.json','utf8')
+var config = JSON.parse(boot)
+var result = {}
+
+describe("Connect/save to mongoDB via Mongoose -- create a schema object and persist to the db", function() {
     var mongoose = undefined
     mongoose = new Db('mongoose')
-    mongoose.connect('mongoose_test')
-    it("should return true if connection was successful", function() {
+    console.log("collection = " + config.collection)
+    mongoose.connect(config.collection)
+    it("should assert not undefined if connection was successful", function () {
         //start mongoose ORM
         expect(mongoose).not.toBe(undefined)
     })
-
-    it("should create a schema on the mongoose_test collection", function() {
+    it("should create a schema on the " + config.collection + " collection", function () {
         var schema = {
             name: {
                 first: String,
@@ -17,22 +22,21 @@ describe("Connect/save to mongoDB via Mongoose", function() {
             },
             age: { type: Number, min: 0}
         }
-        var domainObj = mongoose.createModel('test_coll',schema)
+        var domainObj = mongoose.createModel(config.collection, schema)
         console.log("domainObj: " + domainObj)
-        var obj = new domainObj({name: {first:"Leon",last:"Siewert"},
-                                age:63
-        })
+        var obj = new domainObj({name: {first: "Leon", last: "Siewert"}, age: 63})
         console.log("obj = " + obj)
-        mongoose.save(null,obj)
-       // console.log("find: " + (JSON.stringify(domainObj.find({name:"Leon"}))))
-        domainObj.find({"name.first":"Leon","name.last":"Siewert"},function(err,docs) {
+        mongoose.save(null, obj)
+        // console.log("find: " + (JSON.stringify(domainObj.find({name:"Leon"}))))
+        domainObj.find({"name.first": "Leon", "name.last": "Siewert"}, function (err, docs) {
             console.log("len = " + docs.length)
-            if(docs.length <= 0) console.log("uh-oh")
-            else {
-            docs.forEach(function(doc) {
-                //console.log("inside each")
+            docs.forEach(function (doc) {
                 console.log("doc: " + JSON.stringify(doc))
-            })}
+                result = doc.name
+                console.log("result = " + result)
+            })
+            mongoose.close()
+            expect(result).toEqual({last: 'Siewert', first: 'Leon'})
         })
     })
 })

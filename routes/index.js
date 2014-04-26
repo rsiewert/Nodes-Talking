@@ -8,7 +8,7 @@ module.exports = function(app, db, msgServer) {
     //                                 __________________
     //________________________________/   Client API     \___________________________________
 
-    // GETs:
+    // GET:
     //                                     __________________
     //____________________________________/   GET API        \___________________________________
 
@@ -23,20 +23,6 @@ module.exports = function(app, db, msgServer) {
                 title: 'Welcome to a NodesTalking Server: ' + app.connectionStatus
             });
     });
-
-    // POSTs:
-    //                                     __________________
-    //____________________________________/   POST API       \___________________________________
-
-    app.post('/register',function(req,res) {
-        //this rest api needs to save this registration to the db
-        db.save('register',req.body.data)
-        res.json({"result": "Ok"})
-    })
-
-    app.post('/json-mirror',function(req,res) {
-        res.json({"result": req.body.data})
-    })
 
     app.get('/getAll/:collection',function(req,res) {
         db.getAll(req.params.collection,function(err,docs) {
@@ -58,10 +44,25 @@ module.exports = function(app, db, msgServer) {
         console.log("\ngetById: coll: %s",coll)
         db.getById(coll,id,function(err,doc) {
             console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
-            console.log("\nresult = " + doc.message.nodeId)
-            res.json({Id:doc.message.nodeId})
+            console.log("\nresult = " + doc.nodeId)
+            res.json({Id:doc.nodeId})
         })
     })
+
+    // POST:
+    //                                     __________________
+    //____________________________________/   POST API       \___________________________________
+
+    app.post('/register',function(req,res) {
+        //this rest api needs to save this registration to the db
+        db.save('register',req.body.data)
+        res.json({"result": "Ok"})
+    })
+
+    app.post('/json-mirror',function(req,res) {
+        res.json({"result": req.body.data})
+    })
+
 
 //tests are good up to here... 0000000000000000000000000000000000000000000
 
@@ -74,7 +75,7 @@ module.exports = function(app, db, msgServer) {
     })
 
 
-    // PUTs:
+    // PUT:
     //                                     __________________
     //____________________________________/   PUT API        \___________________________________
 
