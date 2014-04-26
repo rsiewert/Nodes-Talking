@@ -115,6 +115,12 @@ public class DeviceDetailFragment extends Fragment {
 
         Log.d(APP, "updateDeviceDetailView position:"+ position);
         if(this.mDeviceContent.getDetails().size() != 0) {
+            //Check if our current position has been deleted
+            if(position >= this.mDeviceContent.getDetails().size())
+            {
+                position = this.mDeviceContent.getDetails().size()-1;
+                this.setCurrentPosition(position);
+            }
            deviceDetail.setText(this.mDeviceContent.getDetails().get(position));
         }
     }

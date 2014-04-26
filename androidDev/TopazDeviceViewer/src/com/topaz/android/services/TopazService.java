@@ -65,7 +65,8 @@ public class TopazService extends Service {
             e.printStackTrace();
         }
 
-        Log.d(APP, "Started Topaz Message Service");
+        Log.d(APP, "Started Topaz Message Service:" +
+                this.topazMessageService.getConnection().getServerProperties());
 
     }
     private void monitorDevices() {
@@ -178,7 +179,8 @@ public class TopazService extends Service {
     public void onCreate() {
         super.onCreate();
         Log.d(APP, "onCreate:entered");
-/*
+
+
         // Start a Device monitor thread
         Thread monitorThread = new Thread(new Runnable() {
             public void run() {
@@ -188,7 +190,7 @@ public class TopazService extends Service {
 
         monitorThread.setName(this.MonitorThreadName);
         monitorThread.start();
-*/
+
         // Set up to handle message communications with Devices
 
         Thread deviceMessageThread = new Thread(new Runnable() {

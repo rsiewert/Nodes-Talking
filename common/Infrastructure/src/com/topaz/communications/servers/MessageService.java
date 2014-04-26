@@ -152,7 +152,7 @@ public class MessageService {
 			this.addAckMessage(msg);
 		
 		channel.basicPublish(exchange, route, bp, msg.toJsonString().getBytes());
-//		System.out.println("Sent:" + msg.toJsonString());	
+		System.out.println("Sent:" + msg.toJsonString());
 		 
 	}
 	
@@ -187,7 +187,7 @@ public class MessageService {
 				this.getChannel().queueBind(queueName, exchange, routingKey);
 			}
 			
-			if(protocolHandler.getQueueConsumer() != null) {
+			if(protocolHandler.getQueueConsumer() != null && queueName != null) {
 				// Bind our consumer to the queue
 				this.getChannel().basicConsume(queueName, true, protocolHandler.getQueueConsumer());
 			}

@@ -27,7 +27,7 @@ public class DeviceServerTest {
     //    MessageService ms = new MessageService(SERVER,20005);
 
         // Add 1K devices to the database and start heartbeats for each
-		for (int i = 0x55590000; i < 0x55590400; i++) {
+		for (int i = 0x55590000; i < 0x55590002; i++) {
 
 			// A unique number for the device. Mimic a MAC address
 			String deviceNum = Integer.toString(i, 16);
@@ -71,15 +71,13 @@ public class DeviceServerTest {
 			messOP.setManageExchange(true);
 			testDevice.addMessageProtocol("on_publish", messOP);
 
-			
 			// Create a protocol for the heart-beat message 
 			MessageProtocol messHB = new MessageProtocol(); 
 			messHB.setExchange(exchange);
 			messHB.setRoutingKey("routing.heartbeat");
 			messHB.setManageExchange(true);
 			testDevice.addMessageProtocol("heartbeat", messHB);
-			  
-			
+
 			// Create a protocol for ACKS from MQ Servers
 			MessageProtocol messA = new MessageProtocol();
 			messA.setExchange(exchange);
@@ -94,19 +92,19 @@ public class DeviceServerTest {
 
 			// Notify the MessageService of the new protocol and a protocol
 			// server
-			ms.addProtocolHandler(new ProtocolHandlerAck(messA));
+			ms.addProtocolHandler(new ProtocolHandlerAck(ms,testDevice,messA));
 
-			// Request and ACK for the registration
+			// Request an ACK for the registration
 			regMessage.setRequestAck(true);
 	
 			ms.sendMessage(EXCHANGE_NAME, ROUTE, regMessage);
 
+            //Create a control protocol handler for the device and register it with the ms
+            ms.addProtocolHandler(new ControlProtocolHandler(ms, testDevice, messP));
+
 			// Start the heart beat  
-			HeartbeatMessage hb = new HeartbeatMessage(exchange);
-			hb.setStatus(Node.STATUS.GREEN);
-			
 			// Notify the MessageService of the new protocol and a protocol server
-			ms.addProtocolHandler( new ProtocolHandlerHeartbeat(ms,hb,messHB));
+//			ms.addProtocolHandler( new ProtocolHandlerHeartbeat(ms,testDevice,messHB));
 		
 		}
 

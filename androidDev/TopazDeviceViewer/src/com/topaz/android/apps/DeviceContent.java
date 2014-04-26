@@ -13,6 +13,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.widget.Toast;
 import com.topaz.android.services.TopazService;
+import com.topaz.apps.DeviceServerTest;
 import com.topaz.nodes.Device;
 
 import javax.security.auth.callback.Callback;
@@ -56,7 +57,7 @@ public class DeviceContent {
     TopazService mTopazService = null;
 
     // A context for communicating with the Device Service
-    Context context = null;
+    private Context context = null;
 
     // A message handler to receive notifications of changes to items of interest
     private Handler mHandler = new Handler()
@@ -184,6 +185,11 @@ public class DeviceContent {
 	private  DeviceContent(Activity activity) {
 
         Log.d(APP,"DeviceContent Constructor: Entered with activity:" + activity);
+
+        // Unbind our service connection if previously bound
+        if(mActivity != null && this.context != null)
+            this.context.unbindService(mConnection);
+
         // Check if the activity implements the required callback interface
         OnDeviceDataChangedListener mDeviceChangedListener;
 
@@ -197,9 +203,9 @@ public class DeviceContent {
         // Place the activity in our collection of activities to be notified
         this.changedCallbacks.add(mDeviceChangedListener);
 
-        // Save our context
-        this.context = activity;
 
+        // Save our context
+        this.context = activity.getApplicationContext();
 
 
         // Create an intent to crank up the TopazServer that interacts with the

@@ -1,6 +1,9 @@
 package com.topaz.nodes;
+import com.topaz.communications.apis.Api;
 import com.topaz.utils.*;
 import com.topaz.communications.protocols.*;
+
+import java.util.ArrayList;
 
 public class Node {
 
@@ -20,25 +23,30 @@ public class Node {
 	 */
 	public enum STATUS { GREEN, YELLOW, RED, BLACK };
 
-	// Role of the node.
-	private ActsAs actsAs;
 
-	
 	// Each node has a unique nodeid
 	private String nodeId;
-	
-	// A node has a physical location.
+
+
+    // A node has a description
+    private String description;
+
+    // Role of the node.
+    private ActsAs actsAs;
+
+    // The high level status of a node.
+    private STATUS status;
+
+    // A node has a physical location.
 	private Location location;
-	
-	// The high level status of a node.
-	private STATUS status;
-	
+
+    //. A node has a group of  APIs.
+    ArrayList<Api> api = new ArrayList<Api>();
+
 	// A node has a protocol spec that describes how it can 
 	// interact with other nodes and clients
 	private ProtocolSpec protocol = new ProtocolSpec();
-	
-	// A node has a description
-	private String description;
+
 	
 	// Builder class for construction of a Node 
 	protected static abstract class builder<T extends builder<T>> {
@@ -100,7 +108,6 @@ public class Node {
 			return new Node(this);
 
     	}
-	
 	}
 	
 	// A hidden class that lets up take out the parameterized class
@@ -122,7 +129,38 @@ public class Node {
 		this.location = builder.location;
 		this.nodeId = builder.nodeId;
 		this.status = builder.status;
-	}
+
+        // Add our APIs
+        Api api= new Api();
+        api.setName("setStatus");
+        api.setDescription("Sets the status of the node.");
+        api.setReturns("void");
+        api.addParameter("status","Node.STATUS");
+        this.api.add(api);
+
+        Api apiLoc= new Api();
+        apiLoc.setName("setLocation");
+        apiLoc.setDescription("Sets the location of the node.");
+        apiLoc.setReturns("void");
+        apiLoc.addParameter("longitude","number");
+        apiLoc.addParameter("latitude","number");
+        apiLoc.addParameter("altitude", "number");
+        this.api.add(apiLoc);
+
+        Api apiGetStat= new Api();
+        apiGetStat.setName("getStatus");
+        apiGetStat.setDescription("Gets the status of the node.");
+        apiGetStat.setReturns("Node.Status");
+        this.api.add(apiGetStat);
+
+        Api apiGetLoc= new Api();
+        apiGetLoc.setName("getLocation");
+        apiGetLoc.setDescription("Gets the location of the node.");
+        apiGetLoc.setReturns("{longitude:number,latitude:number, altitude:number}");
+        this.api.add(apiGetLoc);
+
+
+    }
 
 	public Node() {}
 	

@@ -1,10 +1,21 @@
 package com.topaz.communications.handlers;
 import com.topaz.communications.protocols.Protocol;
+import com.topaz.nodes.Node;
 
-public abstract class ProtocolHandler implements Runnable {
+import java.util.HashMap;
+import java.util.Map;
+
+public class ProtocolHandler implements Runnable {
 	
 	// The protocol the class handles
 	Protocol protocol;
+
+    // The nodes serviced by the protocol handler
+    Map<String, Node> nodes = new HashMap<String, Node>();
+
+    ProtocolHandler(Node node){
+        this.nodes.put(node.getNodeId(),node);
+    }
 
 	/**
 	 * @return the protocol
@@ -20,4 +31,15 @@ public abstract class ProtocolHandler implements Runnable {
 		this.protocol = protocol;
 	}
 
+
+    public void addNode(Node node) {
+
+        this.nodes.put(node.getNodeId(),node);
+
+    }
+
+    @Override
+    public void run() {
+
+    }
 }

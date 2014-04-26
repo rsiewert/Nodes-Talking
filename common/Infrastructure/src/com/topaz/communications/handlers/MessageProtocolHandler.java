@@ -3,6 +3,8 @@ package com.topaz.communications.handlers;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.QueueingConsumer;
 import com.topaz.communications.protocols.MessageProtocol;
+import com.topaz.communications.servers.MessageService;
+import com.topaz.nodes.Node;
 
 public class MessageProtocolHandler extends ProtocolHandler {
 
@@ -14,7 +16,26 @@ public class MessageProtocolHandler extends ProtocolHandler {
 	
 	// Can consume messages
 	QueueingConsumer queueConsumer=null;
-	
+
+    // The Message Service we use
+    MessageService messageService;
+
+    final static String THREAD_NAME = "MessageProtocolHandler";
+
+    public MessageProtocolHandler(MessageService ms, Node node, MessageProtocol mp) {
+
+        super(node);
+
+        // Set the message protocol
+        this.setMessageProtocol(mp);
+
+        // Set our message service
+        this.messageService = ms;
+
+        // Create our Queuing consumer
+        this.setQueueConsumer(new QueueingConsumer(this.getChannel()));
+
+    }
 	
 	public QueueingConsumer getQueueConsumer() {
 		return queueConsumer;
@@ -26,8 +47,21 @@ public class MessageProtocolHandler extends ProtocolHandler {
 
 	@Override
 	public void run() {
-	
-	}
+
+        //Set the name of this thread
+        Thread.currentThread().setName(THREAD_NAME);
+
+        // Setup the exchange and subscribe to the route we need to service
+        while (!Thread.interrupted()) {
+            try {
+                QueueingConsumer.Delivery delivery = queueConsumer.nextDelivery();
+                System.out.println("MessageProtocolHandler thread received:\n" +
+                        new String(delivery.getBody()));
+            } catch (InterruptedException e) {
+                break;
+            }
+        }
+    }
 
 	/**
 	 * @return the messageProtocol

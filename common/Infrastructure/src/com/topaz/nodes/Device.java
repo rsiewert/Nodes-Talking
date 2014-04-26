@@ -1,4 +1,5 @@
 package com.topaz.nodes;
+import com.topaz.communications.apis.Api;
 import com.topaz.controls.*;
 import com.topaz.sensors.*;
 
@@ -37,14 +38,15 @@ public class Device extends Node  {
 	        }
 	    }
 
-	    public static builder<?> builder() {
+    public static builder<?> builder() {
 	        return new builder2();
 	    }
-	protected Device(builder<?> builder) {
+
+    protected Device(builder<?> builder) {
 		super(builder);
 		this.sensors = builder.sensors;
 		this.controls = builder.controls;
-	}
+ 	}
 	
 	public Device() {}
 

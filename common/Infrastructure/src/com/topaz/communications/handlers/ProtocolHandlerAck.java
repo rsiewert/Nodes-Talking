@@ -3,6 +3,8 @@ package com.topaz.communications.handlers;
 import com.topaz.communications.protocols.*;
 
 import com.rabbitmq.client.QueueingConsumer;
+import com.topaz.communications.servers.MessageService;
+import com.topaz.nodes.Node;
 
 // Handles ACK Messages. Maintains a set of messages that we expect an ACK back from
 // the recipient.  If no ACK send within a specified time then an error is logged and the
@@ -10,17 +12,12 @@ import com.rabbitmq.client.QueueingConsumer;
 
 public class ProtocolHandlerAck extends MessageProtocolHandler {
 
-	
-	public ProtocolHandlerAck(MessageProtocol mp) {
+    final static String THREAD_NAME = "MessageProtocolHandler";
 
-		// Set the message protocol
-		this.setMessageProtocol(mp);
-		
-	
-		// Create our Queuing consumer
-		this.setQueueConsumer(new QueueingConsumer(this.getChannel()));;
-		
-	
+	public ProtocolHandlerAck( MessageService ms, Node node, MessageProtocol mp) {
+
+        super(ms,node,mp);
+
 	}
 
 	public QueueingConsumer getQueueConsumer() {
@@ -34,6 +31,8 @@ public class ProtocolHandlerAck extends MessageProtocolHandler {
 	@Override
 	public void run() {
 
+        //Set the name of this thread
+        Thread.currentThread().setName(THREAD_NAME);
 
 		// Setup the exchange and subscribe to the route we need to service
 		while (!Thread.interrupted()) {

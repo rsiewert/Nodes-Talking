@@ -1,0 +1,50 @@
+{
+    "message": {
+        "node": {
+            "actsAs": "DEVICE",
+            "nodeId": "0x55590148.gateway",
+            "location": {
+                "latitude": 59,
+                "longitude": 329,
+                "altitude": 329
+            },
+            "status": "YELLOW",
+            "protocol": {
+                "rest": {
+                    "Mirror": {
+                        "domain": "192.168.1.44",
+                        "port": 3000,
+                        "endpoint": "/json-mirror"
+                    }
+                },
+                "messenger": {
+                    "on_publish": {
+                        "exchange": "deviceExchange.0x55590148",
+                        "routing_key": "routing.on_publish",
+                        "manageExchange": true
+                    },
+                    "heartbeat": {
+                        "exchange": "deviceExchange.0x55590148",
+                        "routing_key": "routing.heartbeat",
+                        "manageExchange": true
+                    },
+                    "on_ack": {
+                        "exchange": "deviceExchange.0x55590148",
+                        "routing_key": "routing.acks",
+                        "manageExchange": true
+                    },
+                    "command_server": {
+                        "exchange": "deviceExchange.0x55590148",
+                        "routing_key": "routing.commands",
+                        "manageExchange": false
+                    }
+                }
+            },
+            "description": "Test Device 328"
+        },
+        "originTimestamp": "Apr 24, 2014 11:35:25 AM",
+        "seqId": 2467,
+        "requestAck": true,
+        "timestamp": "2014-04-24T07:35:25.761Z"
+    }
+}

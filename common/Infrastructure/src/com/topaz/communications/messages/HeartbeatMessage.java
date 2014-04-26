@@ -14,12 +14,17 @@ public class HeartbeatMessage extends Message {
 	// THe message will have a heartbeat object
 	public Heartbeat heartbeat = new Heartbeat();
 	
-	// Set the node ID for the message source
-	public HeartbeatMessage(String nodeId) {
-		this.setNodeId(nodeId);
+	// Default constructor
+	public HeartbeatMessage() {
+
 	}
 
-	/**
+    // Set the node ID for the message source
+    public HeartbeatMessage(String nodeId) {
+        this.setNodeId(nodeId);
+    }
+
+    /**
 	 * @return the status
 	 */
 	public Node.STATUS getStatus() {

@@ -63,7 +63,6 @@ public class TopazDeviceViewActivity extends FragmentActivity
             }
 
             this.onDeviceSelected(this.listSelection);
-            Log.d(APP, "Selection:" + this.listSelection);
         } else {
 
             Fragment fragment = getFragment(R.id.portrait_container);
@@ -75,7 +74,6 @@ public class TopazDeviceViewActivity extends FragmentActivity
 
             if (fragment.getClass() == DeviceBriefFragment.class) {
                 briefFragment = (DeviceBriefFragment) fragment;
-                briefFragment.getListView().setItemChecked(this.listSelection, true);
             } else {
                 briefFragment = null;
             }
@@ -221,7 +219,7 @@ public class TopazDeviceViewActivity extends FragmentActivity
                 detailFragment.updateDeviceDetailView(position);
             }
             briefFragment = this.getBriefFragment(R.id.device_brief_fragment);
-            briefFragment.getListView().setItemChecked(position, true);
+            briefFragment.setItemChecked(position,true);
 
         } else { // Portrait mode
 

@@ -1,6 +1,8 @@
 package com.topaz.communications.handlers;
 
 import java.io.IOException;
+
+import com.rabbitmq.client.QueueingConsumer;
 import com.topaz.nodes.Node;
 import com.topaz.communications.servers.*;
 import com.topaz.communications.messages.*;
@@ -11,50 +13,46 @@ public class ProtocolHandlerHeartbeat extends MessageProtocolHandler {
 	// Default value for the heart-beat message
 	private static final int INTERVAL_SEC = 1;
 
+    private static final String THREAD_NAME = "ProtocolHandlerHeartbeat";
+
 	// The interval between heart-beat messages
 	Integer heartbeatInterval = ProtocolHandlerHeartbeat.getIntervalSec();
 
-	// The heartbeat message sent out
-	HeartbeatMessage heartbeat;
 
-	// A Message service used to send the heartbeat
-	MessageService ms;
+    public ProtocolHandlerHeartbeat(MessageService ms, Node node, MessageProtocol mp) {
 
-	// Set the heartbeat status. Will be sent out on the timer
-	public void setHeartbeatStatus(Node.STATUS status) {
-		this.heartbeat.setStatus(status);
+        super(ms, node, mp);
 
-	}
-
-	public ProtocolHandlerHeartbeat(MessageService ms, HeartbeatMessage hb, MessageProtocol mp) {
-
-		// Load up our message service
-		this.ms = ms;
-
-		// And our prototype heartbeat
-		this.heartbeat = hb;
-
-		this.setMessageProtocol(mp);
-		
 	}
 
 	@Override
 	public void run() {
     int count=0;
 
-		// get the exchange and routing information
+        //Set the name of this thread
+        Thread.currentThread().setName(THREAD_NAME);
+
+        // get the exchange and routing information
 		String exchange = this.getMessageProtocol().getExchange();
 		String routingKey = this.getMessageProtocol().getRoutingKey();
+
+        HeartbeatMessage heartbeat = new HeartbeatMessage();
 
 		// Send the heartbeat
 		while (!Thread.interrupted()) {
 			try {
-				ms.sendMessage(exchange, routingKey, this.heartbeat);
-				Thread.sleep(1000 * this.heartbeatInterval);
-                if(++count %100 == 0)
-                    System.out.println(this.heartbeat.getNodeId() + " Sent "+ count + " heartbeats on exchange: " +
-                    exchange + " routingKey: " + routingKey);
-			} catch (InterruptedException e) {
+                for(Node n : this.nodes.values()) {
+                    heartbeat.setStatus(n.getStatus());
+                    heartbeat.setNodeId(n.getNodeId());
+                    messageService.sendMessage(exchange, routingKey, heartbeat);
+                    Thread.sleep(1000 * this.heartbeatInterval);
+
+                    if (count % 100 == 0)
+                        System.out.println(heartbeat.getNodeId() + " Sent " + count + " heartbeats on exchange: " +
+                                exchange + " routingKey: " + routingKey);
+                }
+                count++;
+                } catch (InterruptedException e) {
 				break;
 			} catch (IOException e) {
 				e.printStackTrace();

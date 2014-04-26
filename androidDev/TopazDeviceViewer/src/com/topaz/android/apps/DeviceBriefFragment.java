@@ -16,7 +16,9 @@ public class DeviceBriefFragment extends ListFragment
     OnDeviceSelectedListener mCallback;
 
     static final String APP = "DeviceBriefFragment";
-    // The container Activity must implement this interface so the frag can deliver messages
+
+     // Currently selected item
+     private int mSelected  = 0;
 
     // Source of our device data
     DeviceContent mDeviceContent = null;
@@ -50,6 +52,7 @@ public class DeviceBriefFragment extends ListFragment
 
         Log.d(APP, "onStart Entered:");
         getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
+
     }
 
     @Override
@@ -73,13 +76,32 @@ public class DeviceBriefFragment extends ListFragment
         }
     }
 
-    @Override
+        // Sets the selected item from the top and stores it's position
+        public void setSelectionFromTop(int position){
+
+            Log.d(APP,"setSelectionFromTop: " + position);
+            getListView().setSelectionFromTop(position,0);
+            this.mSelected = position;
+
+        }
+        // Sets the selected item and stores it's position
+        public void setItemChecked(int position, boolean selected){
+
+            Log.d(APP,"setItemChecked: " + position);
+            getListView().setItemChecked(position, selected);
+            this.mSelected = position;
+
+        }
+
+        @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
 
         Log.d(APP, "onListItemClicked: Entered");
 
         // Notify the parent activity of selected item
         mCallback.onDeviceSelected(position);
+
+            this.mSelected = position;
    }
 
     @Override
@@ -108,12 +130,20 @@ public class DeviceBriefFragment extends ListFragment
         Log.d(APP, "onDestroy Entered:");
     }
 
+
     // Callback for when the DeviceData is changed
     public void onDeviceDataChanged()
     {
-        Log.d(APP, "onDeviceDataChanged:");
+
+       Log.d(APP, "onDeviceDataChanged:");
         this.mBriefAdapter.notifyDataSetChanged();
 
+        // Adjust selected position if some devices have been removed at the tail of the list
+        if(this.mBriefAdapter.getCount() <= this.mSelected)
+        {
+            this.mSelected = this.mBriefAdapter.getCount() -1;
+            this.getListView().setItemChecked(this.mSelected, true);
+        }
     }
 
 
