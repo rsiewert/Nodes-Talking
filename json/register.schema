@@ -1,0 +1,12 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "title": "Data",
+    "description": "An instance of a registration message",
+    "type": "object",
+    "properties": {
+        "nodeId": {
+            "description": "The unique identifier for a product",
+            "type": "string"
+        }
+    }
+}
