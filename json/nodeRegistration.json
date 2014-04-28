@@ -4,7 +4,7 @@
    "data": {
        "message": {
            "node": {
-               "actsAs": "enum": ["DEVICE", "SERVER"],
+               "actsAs":  ["DEVICE", "SERVER"],
                "nodeId": "string",
                "location": {
                    "latitude": { 
@@ -15,7 +15,7 @@
                    "longitude": {
 		       "type": "float", 
 		       "minumum":0.0,
-		       "maximum":360.0
+		       "maximum":180.0
 		       }
                    "altitude": {
  		       "type": "float" 

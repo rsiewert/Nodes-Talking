@@ -55,6 +55,7 @@ module.exports = function(app, db, msgServer) {
 
     app.post('/register',function(req,res) {
         //this rest api needs to save this registration to the db
+        console.log("/register: " + req.body.data)
         db.save('register',req.body.data)
         res.json({"result": "Ok"})
     })

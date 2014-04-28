@@ -12,8 +12,8 @@ json.nodeId = 'server@' + id
 console.log('jason.id: ' + json.nodeId)
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
-        data : {
-            data: json
+        data: {
+            data: json.data
         }
     }, {json:true})
     .expectStatus(200)
