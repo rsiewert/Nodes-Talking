@@ -44,8 +44,8 @@ module.exports = function(app, db, msgServer) {
         console.log("\ngetById: coll: %s",coll)
         db.getById(coll,id,function(err,doc) {
             console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
-            console.log("\nresult = " + doc.nodeId)
-            res.json({Id:doc.nodeId})
+            console.log("\nresult = " + doc.data.message.node.nodeId)
+            res.json({Id:doc.data.message.node.nodeId})
         })
     })
 

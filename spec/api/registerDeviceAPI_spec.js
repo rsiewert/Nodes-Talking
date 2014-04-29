@@ -9,7 +9,7 @@ var theData = fs.readFileSync('./json/register.json','utf8')
 var json = JSON.parse(theData)
 var id = Math.floor(Math.random()*1000001)
 json.nodeId = 'server@' + id
-console.log('jason.id: ' + json.nodeId)
+console.log('jason.id: ' + json.data.message.node.nodeId)
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
         data: {

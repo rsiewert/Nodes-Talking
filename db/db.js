@@ -95,6 +95,10 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.save(collection,doc)
     },
+    saveWithCallback : function(doc,callback) {
+        if(this._impl)
+            this._impl.saveWithCallback(doc,callback)
+    },
     update : function(collection,doc)
     {
         // Check if any implementor is bound
@@ -156,19 +160,39 @@ Mongoose.prototype = {
     createModel: function (collection, schema) {
         //create the schema
         console.log("createModel: coll = " + collection)
-        console.log("createModel: schema = " + schema)
+        console.log("createModel: schema = " + JSON.stringify(schema))
         var userSchema = this._mongoose.Schema(schema)
         console.log("createModel: userSchema = " + userSchema)
-        var res = this._mongoose.model(collection, userSchema)
-        console.log("createModel: res = " + res)
-        return res
+        var model = this._mongoose.model(collection, userSchema)
+        console.log("createModel: res = " + model)
+        return model
     },
-    save: function (collection, doc) {
+    save: function (coll,doc) {
         console.log("model doc = " + doc)
         if (doc != undefined) {
-            doc.save(function (err) {
+            doc.save(function (err,item,numberAffected) {
                 if (err)
                     console.log("err in the save: " + err.message)
+                else {
+                    console.log("numberAffected: " + numberAffected)
+                    console.log("saved item: " + item)
+                }
+            })
+        }
+    },
+    saveWithCallback: function (doc,callback) {
+        console.log("model doc = " + doc)
+        if (doc != undefined) {
+            doc.save(function (err,item,numberAffected) {
+                if (err) {
+                    console.log("err in the save: " + err.message)
+                    callback(err, null)
+                }
+                else {
+                    console.log("numberAffected: " + numberAffected)
+                    console.log("saved item: " + item)
+                    callback(null,{"results.numberAffected":numberAffected,"Saved": item})
+                }
             })
         }
     },
@@ -206,7 +230,7 @@ MongoDB.prototype = {
     },
     getById: function(collection,Id,callback) {
         var coll = this._mongodb.collection(collection)
-        coll.findOne({"nodeId":Id},function(err,document) {
+        coll.findOne({"data.message.node.nodeId":Id},function(err,document) {
             if(err)
                 callback(err,null)
             console.log("Db: document = " + JSON.stringify(document))
