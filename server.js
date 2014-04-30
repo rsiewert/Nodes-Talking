@@ -178,8 +178,8 @@ app.post('/newMessage',function(req,res) {
 });
 
 app.post('/json-mirror',function(req,res) {
-	var newMessage = req.body.data;
-	res.json(newMessage);
+	var newMessage = req.body;
+        res.json(newMessage);
 });
 
 // Returns a JSON response containing all devices in the device DB

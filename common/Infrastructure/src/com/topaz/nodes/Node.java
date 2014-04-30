@@ -28,6 +28,8 @@ public class Node {
 	// Each node has a unique nodeid
 	private String nodeId;
 
+    // A node can be either local or remote
+    private boolean remote = false;
 
     // A node has a description
     private String description;
@@ -69,7 +71,11 @@ public class Node {
 		// The high level status of a node.
 		private STATUS status;
 
-		public T actsAs(ActsAs actsAs) {
+        // Whether the node is remote or local
+        private boolean remote;
+
+
+        public T actsAs(ActsAs actsAs) {
 			this.actsAs = actsAs;
 			return self();
 		}
@@ -89,6 +95,10 @@ public class Node {
 			return self();
 		}
 
+        public T remote(boolean remote) {
+            this.remote = remote;
+            return self();
+        }
 
 		public T status(STATUS status) {
 			this.status = status;
@@ -182,7 +192,16 @@ public class Node {
 		this.nodeId = nodeId;
 	}
 
-	public Location getLocation() {
+    public void setRemote(boolean remote) {
+        this.remote = remote;
+    }
+
+    public boolean isRemote() {
+
+        return remote;
+    }
+
+    public Location getLocation() {
 		return location;
 	}
 

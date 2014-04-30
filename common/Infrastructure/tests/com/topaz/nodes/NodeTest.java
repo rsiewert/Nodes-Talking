@@ -15,6 +15,8 @@ public class NodeTest {
     final static String DESCRIPTION = "test node description";
     final static Location LOCATION = new Location(100.31,200.21,300.12);
     final static Node.STATUS STATUS = Node.STATUS.GREEN;
+    final static boolean REMOTE = false;
+
     final static String[] NODE_IDS = {"TestId 0", "TestId 1", "Testid 2"};
 
     final static Location[] LOCATIONS = {new Location(100.00, 200.00,300.00),
@@ -29,7 +31,9 @@ public class NodeTest {
             .actsAs(this.ACTS_AS)
             .description(this.DESCRIPTION)
             .location(this.LOCATION)
-            .status(this.STATUS).build();
+            .status(this.STATUS)
+            .remote(this.REMOTE)
+            .build();
 
         // test that all values are set correctly
         Assert.assertEquals(node.getActsAs(),this.ACTS_AS);
@@ -37,6 +41,7 @@ public class NodeTest {
         Assert.assertEquals(node.getDescription(),this.DESCRIPTION);
         Assert.assertEquals(node.getLocation(),this.LOCATION);
         Assert.assertEquals(node.getStatus(),this.STATUS);
+        Assert.assertEquals(node.isRemote(),this.REMOTE);
 
 
     }
