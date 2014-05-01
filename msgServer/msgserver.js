@@ -66,9 +66,9 @@ MsgServerModule.prototype = {
         } else
             return false
     },
-    receiveMessage: function(exchangeName,q,routingKey) {
+    receiveMessage: function(exchangeName,q,routingKey,callback) {
         if(this._impl) {
-            this._impl.receiveMessage(exchangeName,q,routingKey)
+            this._impl.receiveMessage(exchangeName,q,routingKey,callback)
             return true
         } else
             return false
@@ -132,7 +132,7 @@ AmqpNode.prototype = {
             })).ensure(function() { /*conn.close();*/ })
         }).then(null, console.warn)
     },
-    receiveMessage: function(exchangeName,q,key) {
+    receiveMessage: function(exchangeName,q,key,callback) {
         this._amqpNode.then(function(conn) {
             process.once('SIGINT', function() { conn.close(); })
             return conn.createChannel().then(function(ch) {
@@ -140,7 +140,7 @@ AmqpNode.prototype = {
                 var ok = ch.assertExchange(exchangeName, 'topic', {durable: true})
 
                 ok = ok.then(function() {
-                    return ch.assertQueue(q, {exclusive: true})
+                    return ch.assertQueue(q, {exclusive: true, autoDelete: true})
                 });
 
                 ok = ok.then(function(qok) {
@@ -151,16 +151,12 @@ AmqpNode.prototype = {
                 });
 
                 ok = ok.then(function(queue) {
-                    return ch.consume(queue, rMsg, {noAck: true})
+                    return ch.consume(queue, callback, {ack: true})
                 });
 
                 return ok.then(function() {
                     console.log(' [*] Waiting for messages. To exit press CTRL+C')
                 });
-
-                function rMsg(msg) {
-                    console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content.toString())
-                }
             });
         }).then(null, console.warn)
     }
