@@ -33,8 +33,10 @@ public class RestServer {
         Response response;
         String resource = "http://" + this.ip + endpoint;
         WebTarget target = mClient.target(resource);
+
         try {
-            response = target.request(MediaType.APPLICATION_JSON).post(Entity.json(jsonQuery));
+            response = target.request(MediaType.APPLICATION_JSON)
+                    .post(Entity.json(jsonQuery));
         } catch (Exception e) {
             e.printStackTrace();
             return null;

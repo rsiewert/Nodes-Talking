@@ -27,7 +27,7 @@ public class DeviceServerTest {
     //    MessageService ms = new MessageService(SERVER,20005);
 
         // Add 1K devices to the database and start heartbeats for each
-		for (int i = 0x55590000; i < 0x55590002; i++) {
+		for (int i = 0x55590000; i < 0x55590400; i++) {
 
 			// A unique number for the device. Mimic a MAC address
 			String deviceNum = Integer.toString(i, 16);
@@ -104,7 +104,7 @@ public class DeviceServerTest {
 
 			// Start the heart beat  
 			// Notify the MessageService of the new protocol and a protocol server
-//			ms.addProtocolHandler( new ProtocolHandlerHeartbeat(ms,testDevice,messHB));
+			ms.addProtocolHandler( new ProtocolHandlerHeartbeat(ms,testDevice,messHB));
 		
 		}
 

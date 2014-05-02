@@ -28,8 +28,9 @@ public class Node {
 	// Each node has a unique nodeid
 	private String nodeId;
 
-    // A node can be either local or remote
-    private boolean remote = false;
+    // A node can be either local or remote. Mark as transient since
+    // we do not want it serialized.
+    private transient boolean remote = false;
 
     // A node has a description
     private String description;

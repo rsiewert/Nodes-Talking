@@ -49,7 +49,7 @@ public class ProtocolHandlerHeartbeat extends MessageProtocolHandler {
 
                     if (count % 100 == 0)
                         System.out.println(heartbeat.getNodeId() + " Sent " + count + " heartbeats on exchange: " +
-                                exchange + " routingKey: " + routingKey);
+                                exchange + " routingKey: " + routingKey + ":" + heartbeat.toJsonString());
                 }
                 count++;
                 } catch (InterruptedException e) {
