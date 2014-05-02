@@ -22,7 +22,7 @@ describe("Initialize the db to allow other tests to run", function() {
                     console.log("removed: " + removed)
                 })
                 collection.save(json,function(err,document) {
-                    console.log("wrote this doc: " + JSON.stringify(document))
+                    console.log("wrote this doc: " + JSON.stringify(document) + " on collection: " + config.register)
                     db.close()
                 })
             })
