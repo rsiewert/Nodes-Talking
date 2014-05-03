@@ -140,6 +140,9 @@ function Mongoose()
 
 Mongoose.prototype = {
     connect: function (collection) {
+        if(this._mongoose)
+            return this._mongoose
+
         var uri = 'mongodb://localhost/' + collection
         this._mongoose = mongoose.connect(uri, function (err, res) {
             if (err) {

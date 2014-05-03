@@ -1,7 +1,7 @@
 /**
  * Created by rsie on 4/5/2014.
  */
-module.exports = function(app, db, msgServer) {
+module.exports = function(app, db) {
 
 
     // REST: Endpoints defined by the Routes abstraction:
@@ -14,9 +14,11 @@ module.exports = function(app, db, msgServer) {
 
     app.get('/', function (req, res) {
         console.log("inside get /");
+        var coll = req.params.collection
 
         //this is now using the DbModule
-        db.getAll('register')
+        //db.getAll('register')
+        db.coll.find()
 
         res.render('index',
             {

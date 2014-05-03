@@ -6,6 +6,6 @@ var frisby = require('frisby')
     ,fs = require('fs');
 
 frisby.create('Get All Devices')
-    .get('http://localhost:3000/getAll/register')
+    .get('http://localhost:3000/getAll/:collection')
     .expectStatus(200)
 .toss()

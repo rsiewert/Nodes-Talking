@@ -1,3 +1,7 @@
+/*
+ * Server.js - This module is the entry point to nodejs application
+ */
+
 var express     = require('express')
     ,http       = require('http')
     ,jade       = require('jade')
@@ -5,20 +9,19 @@ var express     = require('express')
     ,Db         = require('./db/db')
     ,routes     = require('./routes') // Routes for the application
     ,MsgServer  = require('./msgServer/msgserver')
-    ,MongoClient = require('mongodb').MongoClient // Driver for connecting to MongoDB;
+    ,fs = require('fs')
 
 //-------------------INITIALIZATION BEGIN--------------------------
-MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
     "use strict";
-    if (err) throw err;
+    var boot = fs.readFileSync('./json/bootstrap.json','utf8')
+    var config = JSON.parse(boot)
 
     var app = express();
     app.shred = new Shred({logCurl: true})
 
 //startup native mongodb driver
-    var theDb = new Db('mongodb')
-    theDb.initialize(db)
-    theDb.connect('register')
+    var db = new Db('mongoose')
+    db.connect(config.register)
 
 //start up msg server and sit on an exchange and routing key
     var msgServer = new MsgServer('amqpnode')
@@ -36,7 +39,7 @@ MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
     });
 
 // Application routes
-    routes(app, theDb, msgServer);
+    routes(app, db)
 
     var server = http.createServer(app).listen(app.get('port'), function () {
         console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");
@@ -48,4 +51,3 @@ MongoClient.connect('mongodb://localhost:27017/register', function(err, db) {
 
     console.log("The views path is: " + app.get('views'));
 
-})
