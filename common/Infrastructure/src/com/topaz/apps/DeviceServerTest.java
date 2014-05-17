@@ -100,7 +100,7 @@ public class DeviceServerTest {
 			ms.sendMessage(EXCHANGE_NAME, ROUTE, regMessage);
 
             //Create a control protocol handler for the device and register it with the ms
-            ms.addProtocolHandler(new ControlProtocolHandler(ms, testDevice, messP));
+            ms.addProtocolHandler(new ApiProtocolHandler(ms, testDevice, messP));
 
 			// Start the heart beat  
 			// Notify the MessageService of the new protocol and a protocol server

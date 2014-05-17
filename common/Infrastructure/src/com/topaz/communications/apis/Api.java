@@ -49,4 +49,11 @@ public class Api {
         this.parameters.put(name, value);
     }
 
+    public Object getParameter(String name)
+    {
+        return this.parameters.get(name);
+    }
+
+
+
 }

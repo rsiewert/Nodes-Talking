@@ -14,7 +14,8 @@ public class ProtocolHandler implements Runnable {
     Map<String, Node> nodes = new HashMap<String, Node>();
 
     ProtocolHandler(Node node){
-        this.nodes.put(node.getNodeId(),node);
+        if(node != null)
+            this.nodes.put(node.getNodeId(),node);
     }
 
 	/**

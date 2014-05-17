@@ -19,7 +19,19 @@ public class Message {
 	
 	// Whether we want an ack on the message
 	Boolean requestAck=false;
-	
+
+    public boolean getGenSeqNumber() {
+        return genSeqNumber;
+    }
+
+    public void setGenSeqNumber(boolean genSeqNumber) {
+        this.genSeqNumber = genSeqNumber;
+    }
+
+    // Whether we want a sequence number generated
+    protected transient boolean genSeqNumber = true;
+
+
 	public Message() {
 		
 		// If GSON has not been created then create it

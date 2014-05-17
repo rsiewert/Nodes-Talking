@@ -44,5 +44,6 @@ public class RestServer {
 
         return response.readEntity(String.class);
     }
+
 }
 

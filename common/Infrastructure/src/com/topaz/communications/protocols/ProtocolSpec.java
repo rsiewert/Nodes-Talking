@@ -30,5 +30,10 @@ public class ProtocolSpec {
 		
 	}
 
-	
+
+    public MessageProtocol getMessageProtocol(String name) {
+
+        return messenger.get(name);
+
+    }
 }

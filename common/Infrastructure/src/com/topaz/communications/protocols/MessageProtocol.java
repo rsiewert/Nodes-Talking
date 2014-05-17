@@ -16,7 +16,14 @@ public class MessageProtocol extends Protocol {
 	
 	// Indicates if the application should create and destroy the exchange
 	private boolean manageExchange;
-		
+
+    public MessageProtocol(String exchange, String queue, String routing_key) {
+        this.exchange = exchange;
+        this.queue = queue;
+        this.routing_key = routing_key;
+    }
+
+    public MessageProtocol() {}
 	/**
 	 * @return the manageExchange
 	 */

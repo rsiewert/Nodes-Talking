@@ -198,7 +198,18 @@ app.get('/getDevices',function(req,res) {
     });
 });
 
- 
+// Returns a JSON response containing devices matching an id
+app.post('/getDeviceById',function(req,res) {
+
+    app.devices.get(req.body.nodeId, function(err, body) {
+        if (!err)
+            console.log(body);
+        res.json(body.device)
+    });
+
+});
+
+
 app.get('/couchDBList',function(req,res) {
 	//get the couchdb list via REST call
 ///*

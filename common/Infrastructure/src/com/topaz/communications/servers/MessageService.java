@@ -16,7 +16,16 @@ public class MessageService {
 	private Channel channel;
 	private Connection connection;
 	private BasicProperties bp;
-	
+
+    protected static final UUID myResponseRoute = UUID.randomUUID();
+    protected static final UUID myResponseQueue = UUID.randomUUID();
+
+    protected static final int TIMEOUT = 50000;
+
+    // Api Response Handlers for each exchange messages sent out on
+    protected HashMap<String,ApiResponseProtocolHandler> myResponseHandlers =
+            new HashMap<String, ApiResponseProtocolHandler>();
+
 	// Sequence id used to stamp a message
 	private static long seqId = 0;
 	
@@ -29,12 +38,24 @@ public class MessageService {
 			new ArrayList<MessageProtocol>();
 
 	private ArrayList<String> exchangeNames = new ArrayList<String>();
-	
-	// Some of our messages will want to check if there is an ack in response 
+
+
+	// Some of our messages will want to check if there is an ack in response
 	private HashMap<Long, Message>  ackChecks = new HashMap<Long, Message>();
-	
-	
-	public static MessageService getMessageService() throws IOException {
+
+
+    // Messages with a return value
+    private HashMap<Long, Message>  resultMgs = new HashMap<Long, Message>();
+
+
+    public Message getResultMsg(Long seqNumber) {
+        Message resultWaiter =  this.resultMgs.get(seqNumber);
+        this.resultMgs.remove(seqNumber);
+        return resultWaiter;
+    }
+
+
+    public static MessageService getMessageService() throws IOException {
 
 		// Check if we have an instance of the message service
 		if (MessageService.singleMS != null)
@@ -140,20 +161,75 @@ public class MessageService {
 	
 	}
 		
-	// Send a message out to a particular exhange with a given route
+	// Send a message out to a particular exchange with a given route
 	public void sendMessage(String exchange, String route, Message msg)
-			throws java.io.IOException {
-		  
-		// Set the Sequence ID of the message
-		msg.setSeqId(seqId++);
-		
-		// Check if we are requesting and ACK. If so put the message on the ACK List
-		if(msg.getRequestAck())
-			this.addAckMessage(msg);
-		
-		channel.basicPublish(exchange, route, bp, msg.toJsonString().getBytes());
-		System.out.println("Sent:" + msg.toJsonString());
-		 
+            throws java.io.IOException {
+
+        boolean waitForReply = false;
+
+        synchronized (msg) {
+
+            // Set the Sequence ID of the message
+            if(msg.getGenSeqNumber() == true)
+                msg.setSeqId(seqId++);
+
+            // Check for API messages that have return values
+           if(msg instanceof ApiMessage)
+            {
+                String returns = ((ApiMessage) msg).getApi().getReturns();
+                if(returns != null && !returns.equals("void"))
+                {
+                    // Add a reply route
+                    ((ApiMessage) msg).getApi().addParameter(ApiMessage.REPLY_ROUTE,
+                            this.myResponseRoute.toString());
+
+                    // Put the message on our list
+                    this.resultMgs.put(msg.getSeqId(),msg);
+                    System.out.println("Putting message on Results");
+
+                    // Check if we have a reply protocol handler for this exchange
+                    if(myResponseHandlers.get(exchange) == null)
+                    {
+                        // If not then create one
+                        ApiResponseProtocolHandler respProtHandler =
+                            new ApiResponseProtocolHandler(this, null,
+                                        new MessageProtocol(exchange,
+                                        this.myResponseQueue.toString(),
+                                        this.myResponseRoute.toString()));
+
+
+                        // Put it on our saved response handlers
+                        myResponseHandlers.put(exchange,respProtHandler);
+
+                        // Register it
+                        this.addProtocolHandler(respProtHandler);
+                    }
+                    waitForReply = true;
+                }
+            }
+
+            // Check if we are requesting and ACK. If so put the message on the ACK List
+            if (msg.getRequestAck())
+                this.addAckMessage(msg);
+
+            channel.basicPublish(exchange, route, bp, msg.toJsonString().getBytes());
+            System.out.println("Sent:exchange-" + exchange + " route:" + route + msg.toJsonString() );
+
+            // Notify all waiters that all clear if no need to wait for reply
+            if(waitForReply == true) {
+
+                try {
+                    msg.wait(TIMEOUT);
+                    System.out.println("Msg Wait Ended");
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    throw (new IOException("Response Timeout"));
+                }
+
+            }
+
+        }
+
 	}
 	
 	// Add a message to the group of messages waiting for an ACK
@@ -163,8 +239,8 @@ public class MessageService {
 		this.ackChecks.put(msg.getSeqId(), msg);
 
 	}
-	
-	// Create all the message exchanges and register 
+
+	// Create all the message exchanges and register
 	public void addProtocolHandler(MessageProtocolHandler protocolHandler){
 	
 		
