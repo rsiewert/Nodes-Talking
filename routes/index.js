@@ -29,7 +29,7 @@ module.exports = function(app, db, dFactory) {
     });
 
     app.get('/getAll/:model',function(req,res) {
-        var model = dFactory.getModel(req.params.model,db)
+        var model = req.params.model
 
         db.getAll(model,function(err,docs) {
             if(err)
@@ -46,14 +46,18 @@ module.exports = function(app, db, dFactory) {
     })
 
     app.get('/getById/:model/:id',function(req,res) {
-        var coll = req.params.model.toLowerCase()
+        var model = req.params.model
         var id = req.params.id
         console.log("\ngetById: id: %s",id)
-        console.log("\ngetById: coll: %s",coll)
-        db.getById(coll,id,function(err,doc) {
-            console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
-            console.log("\nresult = " + doc.data.message.node.nodeId)
-            res.json({Id:doc.data.message.node.nodeId})
+        console.log("\ngetById: model: %s",model)
+        db.getById(model,id,function(err,doc) {
+            if(doc == null) {
+                console.log("doc = null")
+            } else {
+                console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
+                // console.log("\nresult = " + doc.data.message.node.nodeId)
+                res.json({Id: data.message.node.nodeId})
+            }
         })
     })
 

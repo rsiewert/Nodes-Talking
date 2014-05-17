@@ -36,7 +36,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
     it("should persist the result of the schema obj in the previous it section",function() {
         console.log("domainInstance = " + JSON.stringify(domainInstance))
         console.log("find: data.message.node.nodeId = " + domainInstance.data.message.node.nodeId)
-        mongoose.saveWithCallback(domainInstance,function(err,result) {
+        mongoose.saveWithCallback(config.collection,domainInstance,function(err,result) {
             if(err) {
                 throw err
             }

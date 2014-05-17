@@ -11,12 +11,10 @@ var config  = JSON.parse(boot)
 describe("send and receive messages from a RabbitMQ message node", function() {
 //start up msg server and sit on an exchange and routing key
     var msgServer   = undefined
-    var instance    = undefined
 
     var mongoose    = new Db('mongoose')
-    console.log("collection = " + config.Registration)
-    mongoose.connect(config.Registration.toLowerCase())
-    var model = mongoose.createModel(config.Registration.toLowerCase(),{"name":"string","Occupation":"string"})
+    console.log("collection = " + config.model)
+    mongoose.connect(config.model.toLowerCase())
 
     it("should assert not undefined for connection to msg server", function() {
         msgServer = new MsgServer('amqpnode')
@@ -24,9 +22,7 @@ describe("send and receive messages from a RabbitMQ message node", function() {
 
         function regMsg (msg) {
             console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content.toString())
-            //var model = mongoose.createModel(config.register, JSON.parse(msg.content.toString()))
-            instance = new model({"name":"Ron Siewert","Occupation":"Grifter"})
-            mongoose.save(null,instance)
+            mongoose.save(config.model,msg)
         }
         msgServer.receiveMessage("tests"/*the exchange*/,'register-queue',["ack.rk.register"],regMsg)
         expect(msgServer).not.toBe(undefined)

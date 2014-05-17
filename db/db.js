@@ -96,9 +96,9 @@ DbModule.prototype = {
         if(this._impl)
             this._impl.save(collection,doc)
     },
-    saveWithCallback : function(doc,callback) {
+    saveWithCallback : function(model,doc,callback) {
         if(this._impl)
-            this._impl.saveWithCallback(doc,callback)
+            this._impl.saveWithCallback(model,doc,callback)
     },
     update : function(collection,doc)
     {
@@ -161,14 +161,24 @@ Mongoose.prototype = {
             }
         })
     },
-    getAll: function (model, callback) {
+    getAll: function (modelName, callback) {
+        var model = this._mongoose.model(modelName)
         model.find({},function(err,docs) {
             if(err) callback(err,null)
             callback(null,docs)
         })
     },
-    getById: function (collection, Id, callback) {
-
+    getById: function (modelName, Id, callback) {
+        var model = this._mongoose.model(modelName)
+        if(model) {
+            model.findOne({"data.message.node.nodeId": Id}, function (err, obj) {
+                console.log(JSON.stringify(obj))
+                callback(null,obj)
+            })
+        }
+        else {
+            callback(err,null)
+        }
     },
     getModel: function(modelName) {
         var model = this._mongoose.model(modelName)
@@ -187,14 +197,12 @@ Mongoose.prototype = {
         console.log("createModel: res = " + model)
         return model
     },
-    save: function (coll,doc) {
-        console.log("model doc = " + doc)
-        //doc = JSON.parse(doc)
+    save: function (modelName,doc) {
         if (doc != undefined) {
-            //doc is the incoming data, so we have to retrieve a Registration model, instantiate an instance
-            // and assign the incoming data to it
-            var model = this._mongoose.model('Registration')
-            console.log("model = " + model)
+           //console.log("doc = " + JSON.stringify(doc))
+            //doc is the incoming data, so we have to retrieve a model and instantiate an instance with the incoming json doc
+            var model = this._mongoose.model(modelName)
+            //console.log("model = " + model)
             var reg = new model(doc)
             console.log("reg = " + reg)
             reg.save(function (err,item,numberAffected) {
@@ -207,7 +215,7 @@ Mongoose.prototype = {
             })
         }
     },
-    saveWithCallback: function (doc,callback) {
+    saveWithCallback: function (model,doc,callback) {
         console.log("model doc = " + doc)
         if (doc != undefined) {
             doc.save(function (err,item,numberAffected) {
@@ -247,9 +255,9 @@ MongoDB.prototype = {
     connect: function(collection) {
         var coll = this._mongodb.collection(collection)
     },
-    getAll: function(collection,callback) {
-        var coll = this._mongodb.collection(collection)
-        coll.find().toArray(function(err,docs) {
+    getAll: function(model,callback) {
+        var model = this._mongodb.collection(model)
+        model.find().toArray(function(err,docs) {
             if(err)
                 callback(err,null)
             callback(null,docs)

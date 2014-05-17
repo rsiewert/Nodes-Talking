@@ -3,7 +3,6 @@
  */
 var Db = require('../../db/db')
     ,fs = require('fs')
-    ,domainFactory = require('./domain/domainfactory')
 
 
 describe("Initialize the db to allow other tests to run", function() {

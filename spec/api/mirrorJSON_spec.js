@@ -5,11 +5,10 @@
 var frisby = require('frisby')
     ,fs = require('fs');
 
-var json = {"data": 'I am Here: YESSSSS'}
 frisby.create('Mirror JSON')
     .post('http://localhost:3000/json-mirror', {
         data : {
-            message: json
+            message: req.body.data
         }
     }, {json:true})
     .expectStatus(200)
