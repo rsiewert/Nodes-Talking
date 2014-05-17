@@ -1,9 +1,8 @@
 var Db = require('../../db/db')
-    ,fs = require('fs');
+    ,fs = require('fs')
 
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
-var theSchema = fs.readFileSync('./json/register.schema','utf8')
 var result = {}
 
 describe("Connect/save to mongoDB via Mongoose -- create a schema object and persist to the db", function() {
@@ -12,7 +11,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
     var domainInstance = undefined
     mongoose = new Db('mongoose')
     console.log("collection = " + config.collection)
-    mongoose.connect(config.collection)
+    mongoose.connect(config.collection.toLowerCase())
     var id = undefined
 
     it("should assert not undefined if connection was successful", function () {
@@ -20,8 +19,8 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
         expect(mongoose).not.toBe(undefined)
     })
 
-    it("should create a schema on the " + config.collection + " collection", function () {
-        domainModel = mongoose.createModel(config.collection, JSON.parse(theSchema))
+    it("should create an instance on the " + config.collection + " collection", function () {
+        domainModel = mongoose.getModel(config.collection)
         console.log("domainModel: " + domainModel)
         id = Math.floor(Math.random()*1000001)
         var theId = 'server@' + id

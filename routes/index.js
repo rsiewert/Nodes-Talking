@@ -1,7 +1,9 @@
 /**
  * Created by rsie on 4/5/2014.
  */
-module.exports = function(app, db) {
+var fs = require('fs')
+
+module.exports = function(app, db, dFactory) {
 
 
     // REST: Endpoints defined by the Routes abstraction:
@@ -26,21 +28,25 @@ module.exports = function(app, db) {
             });
     });
 
-    app.get('/getAll/:collection',function(req,res) {
-        db.getAll(req.params.collection,function(err,docs) {
+    app.get('/getAll/:model',function(req,res) {
+        var model = dFactory.getModel(req.params.model,db)
+
+        db.getAll(model,function(err,docs) {
             if(err)
                 throw err
             console.log("Count = " + docs.length)
+            if(!docs.length)
+                docs = {}
             for(var i=0;i<docs.length;i++) {
                 console.log("doc = " + JSON.stringify(docs[i]))
             }
-            //console.log('getAll docs : ' + docs)
             res.json(docs)
+
         })
     })
 
-    app.get('/getById/:collection/:id',function(req,res) {
-        var coll = req.params.collection
+    app.get('/getById/:model/:id',function(req,res) {
+        var coll = req.params.model.toLowerCase()
         var id = req.params.id
         console.log("\ngetById: id: %s",id)
         console.log("\ngetById: coll: %s",coll)
@@ -57,8 +63,10 @@ module.exports = function(app, db) {
 
     app.post('/register',function(req,res) {
         //this rest api needs to save this registration to the db
-        console.log("/register: " + req.body.data)
-        db.save('register',req.body.data)
+        console.log("/register : model:  " + JSON.stringify(req.body.data))
+        var instance = req.body.data    //dFactory.getModel(req.body.data.model,db)
+       // dFactory.getModel('Registration')
+        db.save('Registration',instance)
         res.json({"result": "Ok"})
     })
 

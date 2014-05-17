@@ -3,18 +3,19 @@
  */
 
 var frisby = require('frisby')
-    ,fs = require('fs');
+    ,mongoose = require('mongoose')
+//    ,RegistrationSchema = mongoose.model('Registration')
+    ,Registration = require('../../models/registration')
 
-var theData = fs.readFileSync('./json/register.json','utf8')
-var json = JSON.parse(theData)
 var id = Math.floor(Math.random()*1000001)
-json.nodeId = 'server@' + id
-console.log('jason.id: ' + json.data.message.node.nodeId)
+var regInstance = new Registration({'data.message.node.nodeId':'server@'+id})
+if(regInstance == undefined) console.log('reg is undefined')
+
+console.log('regInstance: ' + JSON.stringify(regInstance))
+
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
-        data: {
-            data: json.data
-        }
+        data : regInstance
     }, {json:true})
     .expectStatus(200)
     .expectHeaderContains('Content-Type','json')

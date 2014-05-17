@@ -1,6 +1,7 @@
 var mongojs = require('mongojs')
     ,nano = require('nano')('http://localhost:5984')
-    ,mongoose = require('mongoose');
+    ,mongoose = require('mongoose')
+    ,Registration = require('../models/registration')
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -67,11 +68,11 @@ DbModule.prototype = {
             this._impl.close()
         }
     },
-    getAll : function(collection,callback)
+    getAll : function(model,callback)
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getAll(collection,callback);     // Forward request to implementer
+            this._impl.getAll(model,callback);     // Forward request to implementer
     },
     getById : function(collection,id,callback)
     {
@@ -112,6 +113,11 @@ DbModule.prototype = {
             return this._impl.create();     // Forward request to implementer
         }
         return null
+    },
+    getModel: function(modelName) {
+        if(this._impl) {
+            return this._impl.getModel(modelName)
+        }
     },
     createModel: function(coll,obj) {
         if(this._impl) {
@@ -155,10 +161,21 @@ Mongoose.prototype = {
             }
         })
     },
-    getAll: function (collection, callback) {
+    getAll: function (model, callback) {
+        model.find({},function(err,docs) {
+            if(err) callback(err,null)
+            callback(null,docs)
+        })
     },
     getById: function (collection, Id, callback) {
 
+    },
+    getModel: function(modelName) {
+        var model = this._mongoose.model(modelName)
+        if(model)
+            return model
+        else
+            throw err
     },
     createModel: function (collection, schema) {
         //create the schema
@@ -172,8 +189,15 @@ Mongoose.prototype = {
     },
     save: function (coll,doc) {
         console.log("model doc = " + doc)
+        //doc = JSON.parse(doc)
         if (doc != undefined) {
-            doc.save(function (err,item,numberAffected) {
+            //doc is the incoming data, so we have to retrieve a Registration model, instantiate an instance
+            // and assign the incoming data to it
+            var model = this._mongoose.model('Registration')
+            console.log("model = " + model)
+            var reg = new model(doc)
+            console.log("reg = " + reg)
+            reg.save(function (err,item,numberAffected) {
                 if (err)
                     console.log("err in the save: " + err.message)
                 else {

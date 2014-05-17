@@ -14,9 +14,9 @@ describe("send and receive messages from a RabbitMQ message node", function() {
     var instance    = undefined
 
     var mongoose    = new Db('mongoose')
-    console.log("collection = " + config.register)
-    mongoose.connect(config.register)
-    var model = mongoose.createModel(config.register,{"name":"string","Occupation":"string"})
+    console.log("collection = " + config.Registration)
+    mongoose.connect(config.Registration.toLowerCase())
+    var model = mongoose.createModel(config.Registration.toLowerCase(),{"name":"string","Occupation":"string"})
 
     it("should assert not undefined for connection to msg server", function() {
         msgServer = new MsgServer('amqpnode')
