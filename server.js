@@ -1,6 +1,17 @@
-/*
- * Server.js - This module is the entry point to nodejs application
- */
+/**
+
+ /$$$$$$                                                           /$$$$$$
+/$$__  $$                                                         /$$__  $$
+| $$  \__/  /$$$$$$   /$$$$$$  /$$    /$$ /$$$$$$   /$$$$$$       | $$  \ $$  /$$$$$$   /$$$$$$
+|  $$$$$$  /$$__  $$ /$$__  $$|  $$  /$$//$$__  $$ /$$__  $$      | $$$$$$$$ /$$__  $$ /$$__  $$
+\____  $$| $$$$$$$$| $$  \__/ \  $$/$$/| $$$$$$$$| $$  \__/      | $$__  $$| $$  \ $$| $$  \ $$
+/$$  \ $$| $$_____/| $$        \  $$$/ | $$_____/| $$            | $$  | $$| $$  | $$| $$  | $$
+|  $$$$$$/|  $$$$$$$| $$         \  $/  |  $$$$$$$| $$            | $$  | $$| $$$$$$$/| $$$$$$$/
+\______/  \_______/|__/          \_/    \_______/|__/            |__/  |__/| $$____/ | $$____/
+                                                                           | $$      | $$
+                                                                           | $$      | $$
+                                                                           |__/      |__/
+**/
 
 var express     = require('express')
     ,http       = require('http')
@@ -9,7 +20,6 @@ var express     = require('express')
     ,Db         = require('./db/db')
     ,routes     = require('./routes') // Routes for the application
     ,MsgServer  = require('./msgServer/msgserver')
-    ,domainFactory = require('./models/domainfactory')
     ,fs = require('fs')
 
 //-------------------INITIALIZATION BEGIN--------------------------
@@ -23,9 +33,6 @@ app.shred = new Shred({logCurl: true})
 //startup native mongodb driver
 var db = new Db('mongoose')
 db.connect('registration')
-
-//the domain factory that houses all our domain objects
-var dFactory = domainFactory
 
 //start up msg server and sit on an exchange and routing key
 var msgServer = new MsgServer('amqpnode')
@@ -43,7 +50,7 @@ app.configure(function () {
 });
 
 // Application routes
-routes(app, db, dFactory)
+routes(app, db)
 
 var server = http.createServer(app).listen(app.get('port'), function () {
     console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");

@@ -12,9 +12,6 @@
 
 **/
 
-
-
-
 var mongojs = require('mongojs')
     ,nano = require('nano')('http://localhost:5984')
     ,mongoose = require('mongoose')

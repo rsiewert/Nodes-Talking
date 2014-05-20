@@ -14,7 +14,7 @@
 
 var fs = require('fs')
 
-module.exports = function(app, db, dFactory) {
+module.exports = function(app, db) {
 
 
     // REST: Endpoints defined by the Routes abstraction:
@@ -79,8 +79,7 @@ module.exports = function(app, db, dFactory) {
     app.post('/register',function(req,res) {
         //this rest api needs to save this registration to the db
         console.log("/register : model:  " + JSON.stringify(req.body.data))
-        var instance = req.body.data    //dFactory.getModel(req.body.data.model,db)
-       // dFactory.getModel('Registration')
+        var instance = req.body.data
         db.save('Registration',instance)
         res.json({"result": "Ok"})
     })
