@@ -199,28 +199,32 @@ Mongoose.prototype = {
     },
     save: function (modelName,doc) {
         if (doc != undefined) {
-           //console.log("doc = " + JSON.stringify(doc))
+           console.log("save: doc = " + JSON.stringify(doc))
             //doc is the incoming data, so we have to retrieve a model and instantiate an instance with the incoming json doc
             var model = this._mongoose.model(modelName)
-            //console.log("model = " + model)
+            console.log("save: model = " + model)
             var reg = new model(doc)
-            console.log("reg = " + reg)
+            console.log("save: reg = " + JSON.stringify(reg))
             reg.save(function (err,item,numberAffected) {
                 if (err)
                     console.log("err in the save: " + err.message)
                 else {
-                    console.log("numberAffected: " + numberAffected)
-                    console.log("saved item: " + item)
+                    console.log("save: numberAffected: " + numberAffected)
+                    console.log("save: saved item: " + item)
                 }
             })
         }
     },
-    saveWithCallback: function (model,doc,callback) {
-        console.log("model doc = " + doc)
+    saveWithCallback: function (modelName,doc,callback) {
+        console.log("saveWithCallback: model doc = " + doc)
+        var model = this._mongoose.model(modelName)
+        console.log("saveWithCallback: model = " + model)
+        var reg = new model(doc)
+        console.log("saveWithCallback: reg = " + JSON.stringify(reg) )
         if (doc != undefined) {
             doc.save(function (err,item,numberAffected) {
                 if (err) {
-                    console.log("err in the save: " + err.message)
+                    console.log("saveWithCallback: err in the save: " + err.message)
                     callback(err, null)
                 }
                 else {

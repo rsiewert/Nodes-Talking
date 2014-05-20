@@ -75,6 +75,7 @@ module.exports = function(app, db, dFactory) {
     })
 
     app.post('/json-mirror',function(req,res) {
+        console.log("json-mirror: req = "+ JSON.stringify(req.body.data))
         res.json({"result": req.body.data})
     })
 
@@ -106,10 +107,10 @@ module.exports = function(app, db, dFactory) {
         console.log('Inside /newMessage');
     });
 
-    app.post('/json-mirror',function(req,res) {
-//    	var newMessage = req.body.data;
-//    	res.json(newMessage);
-    });
+//    app.post('/json-mirror',function(req,res) {
+////    	var newMessage = req.body.data;
+////    	res.json(newMessage);
+//    });
 
     app.get('/message-service',function(req,res) {
         console.log('inside get message-service');

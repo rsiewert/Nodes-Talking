@@ -1,9 +1,10 @@
 /**
  * Created by rsie on 4/29/2014.
  */
-MsgServer   = require('../../msgServer/msgserver')
-,Db         = require('../../db/db')
-,fs         = require('fs')
+    var MsgServer   = require('../../msgServer/msgserver')
+    ,Db             = require('../../db/db')
+    ,fs             = require('fs')
+    ,Registration = require('../../models/registration')
 
 var boot    = fs.readFileSync('./json/bootstrap.json','utf8')
 var config  = JSON.parse(boot)
@@ -21,8 +22,8 @@ describe("send and receive messages from a RabbitMQ message node", function() {
         msgServer.connect('amqp://localhost')
 
         function regMsg (msg) {
-            console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content.toString())
-            mongoose.save(config.model,msg)
+            console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content)
+            mongoose.save(config.model,JSON.parse(msg.content))
         }
         msgServer.receiveMessage("tests"/*the exchange*/,'register-queue',["ack.rk.register"],regMsg)
         expect(msgServer).not.toBe(undefined)
@@ -32,8 +33,11 @@ describe("send and receive messages from a RabbitMQ message node", function() {
         setTimeout(sendMsg,1500)
         //sit on the ack q
         function sendMsg() {
+            var id = Math.floor(Math.random()*1000001)
+            var reg = new Registration({'data.message.node.nodeId':'server@'+id})
+            console.log("msgServerTest: reg = " + reg)
             //send a message to the well-known reg-queue
-            msgServer.sendMessage({"name":"Ron Siewert","Occupation":"Grifter"},'tests'/*the exchange*/,'ack.rk.register')
+            msgServer.sendMessage(reg,'tests'/*the exchange*/,'ack.rk.register')
             setTimeout(sendMsg,1500)
         }
     })

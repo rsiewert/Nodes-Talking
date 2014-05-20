@@ -24,7 +24,7 @@ describe('persist a document to the db and then run frisby getById',function() {
             if(err) {
                 throw err
             }
-            console.log("Result: " + result)
+            console.log("Result: " + JSON.stringify(result))
             frisby.create("Get Device By Id from collection: "+config.collection.toLowerCase())
                .get('http://localhost:3000/getById/'+config.collection+'/'+Id)
                .expectStatus(200)
@@ -36,13 +36,4 @@ describe('persist a document to the db and then run frisby getById',function() {
             mongoose.close()
         })
     })
-
- //      .expectJSON({
-//            Id:Id
-//        })
-//    frisby.create("Get Device By Id from collection: "+config.collection.toLowerCase())
-//        .get('http://localhost:3000/getById/'+config.collection+'/'+Id)
-//        .expectStatus(200)
-//        .expectHeaderContains('Content-Type','json')
-//    .toss()
 })

@@ -3,8 +3,6 @@
  */
 
 var frisby = require('frisby')
-    ,mongoose = require('mongoose')
-//    ,RegistrationSchema = mongoose.model('Registration')
     ,Registration = require('../../models/registration')
 
 var id = Math.floor(Math.random()*1000001)

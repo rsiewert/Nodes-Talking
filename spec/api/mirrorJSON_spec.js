@@ -5,15 +5,14 @@
 var frisby = require('frisby')
     ,fs = require('fs');
 
+var data1 = {message: {"json": {"data":"testMessage","type":"message","object":"myObject"}}}
 frisby.create('Mirror JSON')
     .post('http://localhost:3000/json-mirror', {
-        data : {
-            message: req.body.data
-        }
+        data : data1
     }, {json:true})
     .expectStatus(200)
     .expectHeaderContains('Content-Type','json')
     .expectJSON({
-        result: json.message
+        result: data1
     })
 .toss()
