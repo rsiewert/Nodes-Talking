@@ -213,7 +213,6 @@ public class MessageService {
                 this.addAckMessage(msg);
 
             channel.basicPublish(exchange, route, bp, msg.toJsonString().getBytes());
-            System.out.println("Sent:exchange-" + exchange + " route:" + route + msg.toJsonString() );
 
             // Notify all waiters that all clear if no need to wait for reply
             if(waitForReply == true) {

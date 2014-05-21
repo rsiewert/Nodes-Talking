@@ -27,7 +27,7 @@ public class ProtocolHandlerHeartbeat extends MessageProtocolHandler {
 
 	@Override
 	public void run() {
-    int count=0;
+    int count=1;
 
         //Set the name of this thread
         Thread.currentThread().setName(THREAD_NAME);
