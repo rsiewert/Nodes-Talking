@@ -88,8 +88,9 @@
   <!-- Project Libraries -->
   
   <path id="library.lib.classpath">
-    <pathelement location="${basedir}/Infrastructure/lib/gson-2.2.4.jar"/>
-    <pathelement location="${basedir}/Infrastructure/lib/rabbitmq-client.jar"/>
+    <pathelement location="${basedir}/Infrastructure/lib/gson-2.2.4.jar"/> 
+   <pathelement location="${basedir}/Infrastructure/lib/rabbitmq-client.jar"/>
+   <pathelement location="${basedir}/Infrastructure/lib/javax.ws.rs-api-2.0.jar"/>
   </path>
   
   <!-- Modules -->
@@ -104,7 +105,7 @@
   <property name="module.jdk.bin.infrastructure" value="${jdk.bin.1.7}"/>
   <property name="module.jdk.classpath.infrastructure" value="jdk.classpath.1.7"/>
   
-  <property name="compiler.args.infrastructure" value="-encoding UTF-8 -source 1.6 ${compiler.args}"/>
+  <property name="compiler.args.infrastructure" value="-encoding UTF-8 -source 1.7 ${compiler.args}"/>
   
   <property name="infrastructure.output.dir" value="${module.infrastructure.basedir}/out/production/Infrastructure"/>
   <property name="infrastructure.testoutput.dir" value="${module.infrastructure.basedir}/out/test/Infrastructure"/>
