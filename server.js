@@ -20,7 +20,7 @@ var express     = require('express')
     ,Db         = require('./db/db')
     ,routes     = require('./routes') // Routes for the application
     ,MsgServer  = require('./msgServer/msgserver')
-    ,fs = require('fs')
+    ,fs         = require('fs')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 "use strict";
@@ -49,13 +49,13 @@ app.configure(function () {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
-// Application routes
-routes(app, db)
-
 var server = http.createServer(app).listen(app.get('port'), function () {
     console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");
     app.connectionStatus = 'Connected'
 });
+
+// Application routes
+routes(app, db)
 
 //setup socket.io to listen to our app
 var io = require('socket.io').listen(server);
