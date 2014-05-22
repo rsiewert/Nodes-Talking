@@ -117,17 +117,6 @@ AmqpNode.prototype = {
                 return connection
             })
     },
-//    createExchanges: function(exchangesNames) {
-//        this._amqpNode.then(function(conn) {
-//            return when(conn.createChannel().then(function(ch) {
-//                for(var exchange in exchangesNames) {
-//                    var ok = ch.assertExchange(exchange, 'topic', {durable:true})
-//                    ch.publish(exchange, 'i.am.up', new Buffer(JSON.stringify({"data": {"message":"i am here"}}),{'Content-Type': 'application/json'}))
-//                    console.log(" [x] Sent on exchange '%s'", JSON.stringify({"data": {"message":"i am here"}}));
-//                }
-//            })).ensure(function() { /*conn.close()*/})
-//        }).then(null, console.warn)
-//    },
     sendMessage: function(msg,exchangeName,routingKey) {
         this._amqpNode.then(function(conn) {
             return when(conn.createChannel().then(function(ch) {
