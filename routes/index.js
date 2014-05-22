@@ -36,8 +36,8 @@ module.exports = function(app, db) {
         res.render('index',
             {
                 title: 'Welcome to a NodesTalking Server: ' + app.connectionStatus
-            });
-    });
+            })
+    })
 
     app.get('/getAll/:model',function(req,res) {
         var model = req.params.model
@@ -52,7 +52,6 @@ module.exports = function(app, db) {
                 console.log("doc = " + JSON.stringify(docs[i]))
             }
             res.json(docs)
-
         })
     })
 
@@ -131,34 +130,6 @@ module.exports = function(app, db) {
             })
 
     })
-
-    app.get('/couchDBList',function(req,res) {
-//        //get the couchdb list via REST call
-//        ///*
-//        var req = app.shred.get({
-//            url: "http://localhost:5984/devices/_changes",//_design/listDB/_view/listDB",
-//            headers: {
-//                "Accept": "application/json",
-//                "Content-Type": "application/json"
-//            },
-//            on: {
-//                // You can use response codes as events
-//                200: function(response) {
-//                    // Shred will automatically JSON-decode response bodies that have a
-//                    // JSON Content-Type
-//                    console.log(response.content.data);
-//                    res.json(response.content.data)
-//                },
-//                // Any other response means something's wrong
-//                response: function(response) {
-//                    console.log("Houston, we have a problem...");
-//                }
-//            }
-//        })
-//        //	*/
-//        //res.render("")
-    })
-
 
     app.get('/listDB/:type',function(req,res) {
     })
