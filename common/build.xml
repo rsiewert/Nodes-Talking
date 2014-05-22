@@ -207,6 +207,19 @@
     <copy file="${basedir}/Infrastructure/lib/gson-2.2.4.jar" tofile="${artifact.output.infrastructure:jar}/gson-2.2.4.jar"/>
     <copy file="${basedir}/Infrastructure/lib/rabbitmq-client.jar" tofile="${artifact.output.infrastructure:jar}/rabbitmq-client.jar"/>
   </target>
+
+<target name="run" depends="artifact.infrastructure:jar" description="Run the infrastructure system test driver">
+   <java fork="true" classname="com.topaz.apps.DeviceServerTest">
+	      <classpath>
+		<pathelement location="Infrastructure/lib/Infrastructure.jar"/>
+		<pathelement location="Infrastructure/lib/rabbitmq-client.jar"/>
+		<pathelement location="Infrastructure/lib/javax.ws.rs-api-2.0.jar"/>
+		<pathelement location="Infrastructure/lib/gson-2.2.4.jar"/> 
+	      </classpath>
+	</java>
+
+</target>
+
   
   <target name="build.all.artifacts" depends="artifact.infrastructure:jar" description="Build all artifacts">
     
