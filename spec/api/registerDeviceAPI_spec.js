@@ -23,7 +23,7 @@ console.log('regInstance: ' + JSON.stringify(regInstance))
 
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
-        data : regInstance
+        data: regInstance
     }, {json:true})
     .expectStatus(200)
     .expectHeaderContains('Content-Type','json')

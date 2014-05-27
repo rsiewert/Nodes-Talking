@@ -31,7 +31,7 @@ module.exports = function(app, db) {
 
         //this is now using the DbModule
         //db.getAll('register')
-        db.coll.find()
+        //db.coll.find()
 
         res.render('index',
             {
@@ -66,7 +66,7 @@ module.exports = function(app, db) {
             } else {
                 console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
                 // console.log("\nresult = " + doc.data.message.node.nodeId)
-                res.json({Id: data.message.node.nodeId})
+                res.json({Id: doc.data.message.node.nodeId})
             }
         })
     })

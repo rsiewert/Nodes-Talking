@@ -20,7 +20,7 @@ var express     = require('express')
     ,Db         = require('./db/db')
     ,routes     = require('./routes') // Routes for the application
     ,MsgServer  = require('./msgServer/msgserver')
-    ,fs = require('fs')
+    ,fs         = require('fs')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 "use strict";
@@ -40,14 +40,14 @@ msgServer.connect('amqp://localhost')
 msgServer.receiveMessage("register", 'reg-queue', ["register.rk.*"])
 
 app.configure(function () {
-    app.set('port', process.env.PORT || 3000);
-    app.use(express.bodyParser());
-    //app.use(express.static(path.join(__dirname,'public')));
-    app.set('views', __dirname + '/views');
-    app.set('view engine', 'jade');
-    app.set('view options', { "pretty": true });
-    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
-});
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
+    app.use(express.json())
+    app.set('port', '3000')
+    app.use('/static',__dirname + '/public')
+    app.set('view engine', 'jade')
+    app.set('views', __dirname + '/views')
+    app.set('view options', { "pretty": true })
+})
 
 // Application routes
 routes(app, db)
