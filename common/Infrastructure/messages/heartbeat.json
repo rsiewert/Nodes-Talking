@@ -1,0 +1,11 @@
+{
+    "message": {
+        "heartbeat": {
+            "status": "GREEN"
+        },
+        "originTimestamp": "Apr 24, 2014 11:35:15 AM",
+        "nodeId": "deviceExchange.0x5559004f",
+        "seqId": 2555,
+        "requestAck": false
+    }
+}

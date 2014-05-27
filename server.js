@@ -34,10 +34,16 @@ app.shred = new Shred({logCurl: true})
 var db = new Db('mongoose')
 db.connect(config.collection.toLowerCase())
 
+
+function regMsg (msg) {
+    console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content)
+    db.save(config.model,JSON.parse(msg.content))
+}
+
 //start up msg server and sit on an exchange and routing key
 var msgServer = new MsgServer('amqpnode')
 msgServer.connect('amqp://localhost')
-msgServer.receiveMessage("register", 'reg-queue', ["register.rk.*"])
+msgServer.receiveMessage("register", 'reg-queue', ["register.rk.*"],regMsg)
 
 app.configure(function () {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
