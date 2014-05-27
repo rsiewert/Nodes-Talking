@@ -32,7 +32,7 @@ app.shred = new Shred({logCurl: true})
 
 //startup native mongodb driver
 var db = new Db('mongoose')
-db.connect('registration')
+db.connect(config.collection.toLowerCase())
 
 //start up msg server and sit on an exchange and routing key
 var msgServer = new MsgServer('amqpnode')
