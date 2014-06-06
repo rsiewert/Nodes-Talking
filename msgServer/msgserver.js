@@ -12,11 +12,13 @@
                                                      \______/
 **/
 
-var amqp = require('amqp')
-    ,amqpNode = require('amqplib')
-    ,ampq   = require('amqp')
-    ,when = require('when')
-    ,all = when.all;
+var amqp        = require('amqp')
+    ,amqpNode   = require('amqplib')
+    ,ampq       = require('amqp')
+    ,when       = require('when')
+    ,all        = when.all
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -93,10 +95,10 @@ MsgServerModule.prototype = {
     createQueues: function(queueNames) {
     },
     removeExchanges: function(exchangeNames) {
-        console.log("remove these exchanges: " + exchangeNames)
+        logger.debug("remove these exchanges: " + exchangeNames)
     },
     removeQueues: function(queueNames) {
-        console.log("remove thesse queues: " + queueNames)
+        logger.debug("remove thesse queues: " + queueNames)
     }
 }
 //                             ___________________________
@@ -113,7 +115,7 @@ AmqpNode.prototype = {
     connect: function(host) {
         this._amqpNode = amqpNode.connect(host)
             .then(function(connection) {
-                console.log("AmqpNode connected")
+                logger.debug("AmqpNode connected")
                 return connection
             })
     },
@@ -125,7 +127,7 @@ AmqpNode.prototype = {
 
                 return ok.then(function() {
                     ch.publish(exchangeName, routingKey, new Buffer(JSON.stringify(msg)),{'Content-Type': 'application/json'})
-                    console.log(" [x] Sent '%s'", JSON.stringify(msg))
+                    logger.debug(" [x] Sent '%s'", JSON.stringify(msg))
                     return ch.close()
                 })
             })).ensure(function() { /*conn.close();*/ })
@@ -154,7 +156,7 @@ AmqpNode.prototype = {
                 });
 
                 return ok.then(function() {
-                    console.log(' [*] Waiting for messages. To exit press CTRL+C')
+                    logger.debug(' [*] Waiting for messages. To exit press CTRL+C')
                 });
             });
         }).then(null, console.warn)
@@ -170,13 +172,13 @@ function Amqp() {
 
 Amqp.prototype = {
     createQueue: function() {
-        console.log("Amqp: createQueue")
+        logger.debug("Amqp: createQueue")
     },
     createExchange: function() {
-        console.log("Amqp: createExchange")
+        logger.debug("Amqp: createExchange")
     },
     receiveMessage: function() {
-        console.log("Amqp: receiveMessage")
+        logger.debug("Amqp: receiveMessage")
     }
 }
 
@@ -188,78 +190,4 @@ var getSomething = function() {
 }
 
 module.exports = MsgServerModule
-
-
-
-//JUST MEANT FOR DOC PURPOSES
-    //------------------make connection to rabbitmq, create exchange and queues(s)/binding(s),
-    //------------------set status, subscribe to queue(s)
-//    app.rabbitMqConnection = amqp.createConnection({host:"localhost"})
-//
-//    app.rabbitMqConnection.addListener('error', function (e) {
-//        throw e;
-//    })
-//
-//    app.rabbitMqConnection.on('ready',function() {
-//        app.connectionStatus = 'RabbitMQ is Connected';
-//        console.log("RabbitMq started....")
-//
-//        //-----------------create rabbit exchange----------------------
-//        exchange = app.rabbitMqConnection.exchange('test-exchange',{},function(exchange) {
-//            console.log('Exchange ' + exchange.name + ' is open')
-//            app.exchangeStatus = 'An exchange has been established!'
-//        })
-//
-//        //----------------create rabbit queue(s)
-//        q_register = app.rabbitMqConnection.queue('register-queue',function(queue) {
-//            console.log('Queue ' + queue.name + ' is open')
-//            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
-//            queue.bind(exchange,'the.routing.register')
-//            queue.subscribe('the.routing.register',function(msg,headers,deliveryInfo) {
-//                msg.message.timestamp = new Date().toJSON()
-//                console.log({'log':'the.routing.register','msg.message':msg.message})
-//                insertReg(app.register,msg.message, msg.message.node.nodeId)
-//                io.sockets.on('connection',function(socket) {
-//                    console.log("Sockets.io is Connected!!")
-//                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-//                    socket.on("my return event",function(data) {
-//                        console.log(data)
-//                    })
-//                })
-//            })
-//        })
-//        q_test = app.rabbitMqConnection.queue('test-queue',function(queue) {
-//            console.log('Queue ' + queue.name + ' is open')
-//            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
-//            queue.bind(exchange,'test.routing.key')
-//            queue.subscribe('the.routing.key',function(msg,headers,deliveryInfo) {
-//                console.log({'log':'the.routing.key','msg.message':msg.message})
-//                insertData(app.devices,msg.message)
-//                io.sockets.on('connection',function(socket) {
-//                    console.log("Sockets.io is Connected!!")
-//                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-//                    socket.on("my return event",function(data) {
-//                        console.log(data)
-//                    })
-//                })
-//            })
-//        })
-//        q_ack = app.rabbitMqConnection.queue('ack-queue',function(queue) {
-//            console.log('Queue ' + queue.name + ' is open')
-//            app.queueStatus = 'The ' + queue.name + ' is ready for use!'
-//            queue.bind(exchange,'ack.routing.key')
-//            queue.subscribe('ack.routing.key',function(msg,headers,deliveryInfo) {
-//                console.log({'log':'ack.routing.key','msg.message':msg.message})
-//                //insertData(app.devices,msg.message)
-//                io.sockets.on('connection',function(socket) {
-//                    console.log("Sockets.io is Connected!!")
-//                    socket.emit('message',{"sentMessage":msg.message,"status":msg.status})
-//                    socket.on("my return event",function(data) {
-//                        console.log(data)
-//                    })
-//                })
-//            })
-//        })
-//    })
-   // console.log('Express server listening on port 3000');
 

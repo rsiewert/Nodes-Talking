@@ -21,6 +21,8 @@ var express     = require('express')
     ,routes     = require('./routes') // Routes for the application
     ,MsgServer  = require('./msgServer/msgserver')
     ,fs         = require('fs')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 //-------------------INITIALIZATION BEGIN--------------------------
 "use strict";
@@ -34,9 +36,12 @@ app.shred = new Shred({logCurl: true})
 var db = new Db('mongoose')
 db.connect(config.collection.toLowerCase())
 
+//logger.setLevel(log4js.Level.INFO)
+//logger.addAppender( new ConsoleAppender(true) )
+logger.debug("just checking in.....")
 
 function regMsg (msg) {
-    console.log(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content)
+    logger.debug(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content)
     db.save(config.model,JSON.parse(msg.content))
 }
 
@@ -59,12 +64,13 @@ app.configure(function () {
 routes(app, db)
 
 var server = http.createServer(app).listen(app.get('port'), function () {
-    console.log("RabbitMQ + Node.js app running on " + app.get('port') + "!");
+    logger.debug("RabbitMQ + Node.js app running on " + app.get('port') + "!");
     app.connectionStatus = 'Connected'
 });
 
 //setup socket.io to listen to our app
 var io = require('socket.io').listen(server);
 
-console.log("The views path is: " + app.get('views'));
+logger.debug("The views path is: " + app.get('views'));
+
 

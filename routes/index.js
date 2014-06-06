@@ -13,6 +13,8 @@
 **/
 
 var fs = require('fs')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 module.exports = function(app, db) {
 
@@ -26,7 +28,7 @@ module.exports = function(app, db) {
     //____________________________________/   GET API        \___________________________________
 
     app.get('/', function (req, res) {
-        console.log("inside get /");
+        logger.debug("inside get /");
         var coll = req.params.collection
 
         //this is now using the DbModule
@@ -41,15 +43,15 @@ module.exports = function(app, db) {
 
     app.get('/getAll/:model',function(req,res) {
         var model = req.params.model
-
+        //var logger = log4js.getLogger('stdout')
         db.getAll(model,function(err,docs) {
             if(err)
                 throw err
-            console.log("Count = " + docs.length)
+            logger.debug("Count = " + docs.length)
             if(!docs.length)
                 docs = {}
             for(var i=0;i<docs.length;i++) {
-                console.log("doc = " + JSON.stringify(docs[i]))
+                logger.debug("doc = " + JSON.stringify(docs[i]))
             }
             res.json(docs)
         })
@@ -58,14 +60,14 @@ module.exports = function(app, db) {
     app.get('/getById/:model/:id',function(req,res) {
         var model = req.params.model
         var id = req.params.id
-        console.log("\ngetById: id: %s",id)
-        console.log("\ngetById: model: %s",model)
+        logger.debug("\ngetById: id: %s",id)
+        logger.debug("\ngetById: model: %s",model)
         db.getById(model,id,function(err,doc) {
             if(doc == null) {
-                console.log("doc = null")
+                logger.debug("doc = null")
             } else {
-                console.log("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
-                // console.log("\nresult = " + doc.data.message.node.nodeId)
+                logger.debug("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
+                // logger.debug("\nresult = " + doc.data.message.node.nodeId)
                 res.json({Id: doc.data.message.node.nodeId})
             }
         })
@@ -77,14 +79,14 @@ module.exports = function(app, db) {
 
     app.post('/register',function(req,res) {
         //this rest api needs to save this registration to the db
-        console.log("/register : model:  " + JSON.stringify(req.body.data))
+        logger.debug("/register : model:  " + JSON.stringify(req.body.data))
         var instance = req.body.data
         db.save('Registration',instance)
         res.json({"result": "Ok"})
     })
 
     app.post('/json-mirror',function(req,res) {
-        console.log("json-mirror: req = "+ JSON.stringify(req.body.data))
+        logger.debug("json-mirror: req = "+ JSON.stringify(req.body.data))
         res.json({"result": req.body.data})
     })
 
@@ -93,8 +95,8 @@ module.exports = function(app, db) {
 
 
     app.get('/devices/docs/:nodeType',function(req,res) {
-        console.log("inside routes: get by node type...")
-        console.log("node type = " + req.params.nodeType)
+        logger.debug("inside routes: get by node type...")
+        logger.debug("node type = " + req.params.nodeType)
         db.getNodeByType('register',req.params.nodeType)
         res.send("Ok")
     })
@@ -105,15 +107,15 @@ module.exports = function(app, db) {
     //____________________________________/   PUT API        \___________________________________
 
     app.post('/newReg',function(req,res) {
-        console.log("inside /newReg")
+        logger.debug("inside /newReg")
     })
 
     app.post('/newData',function(req,res) {
-        console.log("inside /newData")
+        logger.debug("inside /newData")
     })
 
     app.post('/newMessage',function(req,res) {
-        console.log('Inside /newMessage');
+        logger.debug('Inside /newMessage');
     });
 
 //    app.post('/json-mirror',function(req,res) {
@@ -122,7 +124,7 @@ module.exports = function(app, db) {
 //    });
 
     app.get('/message-service',function(req,res) {
-        console.log('inside get message-service');
+        logger.debug('inside get message-service');
         res.render('message-service',
             {
                 title:'Welcome to the messaging service',
@@ -144,7 +146,7 @@ module.exports = function(app, db) {
     })
 
     app.get('/getDbByView', function(req,res) {
-        console.log('Inside getDbByView')
+        logger.debug('Inside getDbByView')
     })
 
     // Deletes:
@@ -162,21 +164,21 @@ module.exports = function(app, db) {
 //****************************Private methods************************************
 
     var insertData = function(db,data) {
-        console.log("insertData: data = " + data.node.protocol.messenger.on_ack.exchange)
+        logger.debug("insertData: data = " + data.node.protocol.messenger.on_ack.exchange)
         db.insert({"data": {"message":data,"status":data.status}},function(err,body,header) {
             if(err) {
-                console.log("err.insert = " + err.message)
+                logger.debug("err.insert = " + err.message)
                 return
             }
-            console.log("you have inserted a message: ")
-            console.log(body)
+            logger.debug("you have inserted a message: ")
+            logger.debug(body)
             //publish back on the ack exchange the message just inserted...might want to revise in the future to have rabbit
             //do the ack/error processing
             var options = {'passive':false}
             options['passive'] = data.node.protocol.messenger.on_ack.manageExchange
             var exchange = app.rabbitMqConnection.exchange(data.node.message.protocol.messenger.on_publish.exchange,options)
             exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},{mandatory:true},function(result) {
-                console.log('insertData: result of publish (false means success) = ' + result);
+                logger.debug('insertData: result of publish (false means success) = ' + result);
 
                 //TODO: this might be the place to clean up the just created exchange?
             })
@@ -185,19 +187,19 @@ module.exports = function(app, db) {
 
 
     var insertReg = function(db,data,id) {
-        console.log("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
+        logger.debug("insertReg: data = " + data.node.protocol.messenger.on_ack.exchange)
         db.insert({"data": {"message":data,"status":data.status}},id,function(err,body,header) {
             if(err) {
-                console.log("err.insert = " + err.message)
+                logger.debug("err.insert = " + err.message)
                 return
             }
-            console.log("you have inserted a registration: ")
-            console.log(body)
+            logger.debug("you have inserted a registration: ")
+            logger.debug(body)
             //publish back on the ack the registration received
             var exchange = app.rabbitMqConnection.exchange(data.node.protocol.messenger.on_publish.exchange,{'passive':'true'})
             exchange.publish(data.node.protocol.messenger.on_ack.routing_key,{message: data},
                 {mandatory:true},function(result) {
-                    console.log('insertReg: result of publish (false means success) = ' + result);
+                    logger.debug('insertReg: result of publish (false means success) = ' + result);
                 })
         })
     }
@@ -209,26 +211,26 @@ module.exports = function(app, db) {
             var results = []
             if(!err) {
                 body.rows.forEach(function(doc) {
-                    console.log(doc)
+                    logger.debug(doc)
                     if(type == 'raw') {
                         results.push(doc.doc.data.message)
                     } else {
                         if(doc.doc.message != undefined || doc.doc.data != undefined) {
                             if(doc.doc.message == undefined) {
-                                console.log(doc.doc.data.message)
+                                logger.debug(doc.doc.data.message)
                                 if(type != 'raw') {
                                     results.push(doc.doc.data.message)
                                 }
                             }
                             else {
-                                console.log(doc.doc.message)
+                                logger.debug(doc.doc.message)
                                 results.push(doc.doc.message)
                             }
                         }
                     }
                 })
             } else {
-                //console.log("err.getDBContents = " + err.message)
+                //logger.debug("err.getDBContents = " + err.message)
                 callback({'status':err.message},[])
             }
             callback(0,results)
@@ -241,7 +243,7 @@ module.exports = function(app, db) {
             var results = new Array()
             if (!err) {
                 body.rows.forEach(function(doc) {
-                    console.log(doc.value)
+                    logger.debug(doc.value)
                     results.push(doc.value)
                 })
                 callback(0,results)
@@ -264,12 +266,12 @@ module.exports = function(app, db) {
                 200: function(response) {
                     // Shred will automatically JSON-decode response bodies that have a
                     // JSON Content-Type
-                    console.log(response.content.data);
+                    logger.debug(response.content.data);
                     callback(0,response.content.data)
                 },
                 // Any other response means something's wrong
                 response: function(response) {
-                    console.log("Houston, we have a problem...")
+                    logger.debug("Houston, we have a problem...")
                     callback("Houston we have a problem...",{})
                 }
             }

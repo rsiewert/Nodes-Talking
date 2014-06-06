@@ -12,9 +12,11 @@
                                              |  $$$$$$/
                                               \______/
 **/
-var frisby = require('frisby')
-    ,Db = require('../../db/db')
-    ,fs = require('fs');
+var frisby      = require('frisby')
+    ,Db         = require('../../db/db')
+    ,fs         = require('fs')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
@@ -35,7 +37,7 @@ describe('persist a document to the db and then run frisby getById',function() {
             if(err) {
                 throw err
             }
-            console.log("Result: " + JSON.stringify(result))
+            logger.debug("Result: " + JSON.stringify(result))
             frisby.create("Get Device By Id from collection: "+config.collection.toLowerCase())
                .get('http://localhost:3000/getById/'+config.collection+'/'+Id)
                .expectStatus(200)

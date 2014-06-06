@@ -16,6 +16,8 @@ var mongojs = require('mongojs')
     ,nano = require('nano')('http://localhost:5984')
     ,mongoose = require('mongoose')
     ,Registration = require('../models/registration')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -166,10 +168,10 @@ Mongoose.prototype = {
         var uri = 'mongodb://localhost/' + collection
         this._mongoose = mongoose.connect(uri, function (err, res) {
             if (err) {
-                console.log('ERROR connecting to: ' + uri + '. ' + err);
+                logger.debug('ERROR connecting to: ' + uri + '. ' + err);
                 return null
             } else {
-                console.log('Succeeded connected to: ' + uri);
+                logger.debug('Succeeded connected to: ' + uri);
 
                 return this._mongoose
             }
@@ -186,7 +188,7 @@ Mongoose.prototype = {
         var model = this._mongoose.model(modelName)
         if(model) {
             model.findOne({"data.message.node.nodeId": Id}, function (err, obj) {
-                console.log(JSON.stringify(obj))
+                logger.debug(JSON.stringify(obj))
                 callback(null,obj)
             })
         }
@@ -203,47 +205,47 @@ Mongoose.prototype = {
     },
     createModel: function (collection, schema) {
         //create the schema
-        console.log("createModel: coll = " + collection)
-        console.log("createModel: schema = " + JSON.stringify(schema))
+        logger.debug("createModel: coll = " + collection)
+        logger.debug("createModel: schema = " + JSON.stringify(schema))
         var userSchema = this._mongoose.Schema(schema)
-        console.log("createModel: userSchema = " + userSchema)
+        logger.debug("createModel: userSchema = " + userSchema)
         var model = this._mongoose.model(collection, userSchema)
-        console.log("createModel: res = " + model)
+        logger.debug("createModel: res = " + model)
         return model
     },
     save: function (modelName,doc) {
         if (doc != undefined) {
-           console.log("save: doc = " + JSON.stringify(doc))
+           logger.debug("save: doc = " + JSON.stringify(doc))
             //doc is the incoming data, so we have to retrieve a model and instantiate an instance with the incoming json doc
             var model = this._mongoose.model(modelName)
-            console.log("save: model = " + model)
+            logger.debug("save: model = " + model)
             var reg = new model(doc)
-            console.log("save: reg = " + JSON.stringify(reg))
+            logger.debug("save: reg = " + JSON.stringify(reg))
             reg.save(function (err,item,numberAffected) {
                 if (err)
-                    console.log("err in the save: " + err.message)
+                    logger.debug("err in the save: " + err.message)
                 else {
-                    console.log("save: numberAffected: " + numberAffected)
-                    console.log("save: saved item: " + item)
+                    logger.debug("save: numberAffected: " + numberAffected)
+                    logger.debug("save: saved item: " + item)
                 }
             })
         }
     },
     saveWithCallback: function (modelName,doc,callback) {
-        console.log("saveWithCallback: model doc = " + doc)
+        logger.debug("saveWithCallback: model doc = " + doc)
         var model = this._mongoose.model(modelName)
-        console.log("saveWithCallback: model = " + model)
+        logger.debug("saveWithCallback: model = " + model)
         var reg = new model(doc)
-        console.log("saveWithCallback: reg = " + JSON.stringify(reg) )
+        logger.debug("saveWithCallback: reg = " + JSON.stringify(reg) )
         if (doc != undefined) {
             doc.save(function (err,item,numberAffected) {
                 if (err) {
-                    console.log("saveWithCallback: err in the save: " + err.message)
+                    logger.debug("saveWithCallback: err in the save: " + err.message)
                     callback(err, null)
                 }
                 else {
-                    console.log("numberAffected: " + numberAffected)
-                    console.log("saved item: " + item)
+                    logger.debug("numberAffected: " + numberAffected)
+                    logger.debug("saved item: " + item)
                     callback(null,{"results.numberAffected":numberAffected,"Saved": item})
                 }
             })
@@ -251,7 +253,7 @@ Mongoose.prototype = {
     },
     close: function() {
         this._mongoose.disconnect(function() {
-            console.log("Disconnected...")
+            logger.debug("Disconnected...")
         })
     }
 }
@@ -286,15 +288,15 @@ MongoDB.prototype = {
         coll.findOne({"data.message.node.nodeId":Id},function(err,document) {
             if(err)
                 callback(err,null)
-            console.log("Db: document = " + JSON.stringify(document))
+            logger.debug("Db: document = " + JSON.stringify(document))
             callback(null,document)
          })
      },
     save: function(collection,doc) {
-        console.log("In Save Method")
+        logger.debug("In Save Method")
         var coll = this._mongodb.collection(collection)
         coll.save(doc,function(err,document) {
-            console.log("wrote this doc: " + JSON.stringify(document))
+            logger.debug("wrote this doc: " + JSON.stringify(document))
         })
     }
 }
@@ -310,7 +312,7 @@ MongoJS_DB.prototype = {
 
     connect: function(collection) {
         this._mongojs_db = mongojs(collection);
-        console.log("MongoDB.connect")
+        logger.debug("MongoDB.connect")
     },
     getAll: function(collection)
     {
@@ -319,60 +321,60 @@ MongoJS_DB.prototype = {
         coll.find().sort({name:1},function(err, docs) {
             // docs is an array of all the documents in mycollection
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i]._id + " name = " + docs[i].name)
+                logger.debug("doc = " + docs[i]._id + " name = " + docs[i].name)
         })
-        console.log("MongoJS_DB.getAll")
+        logger.debug("MongoJS_DB.getAll")
     },
     getById: function(collection,id)
     {
-        console.log("MongoDB: getById method")
+        logger.debug("MongoDB: getById method")
         var coll = this._mongojs_db.collection(collection)
-        console.log("getById: id = " + id)
-        console.log("coll = " + collection)
+        logger.debug("getById: id = " + id)
+        logger.debug("coll = " + collection)
         coll.find({_id:this._mongojs_db.ObjectId(id)},function(err,docs) {
-            console.log("docs.length = " +docs.length)
+            logger.debug("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
+                logger.debug("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoJS_DB.getById")
+        logger.debug("MongoJS_DB.getById")
     },
     getNodeByType: function(collection,type) {
-        console.log("MongoDB: getNodeByType")
+        logger.debug("MongoDB: getNodeByType")
         var coll = this._mongojs_db.collection(collection)
         coll.find({type:type},function(err,docs) {
-            console.log("docs.length = " +docs.length)
+            logger.debug("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
+                logger.debug("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoJS_DB.getNodeByType")
+        logger.debug("MongoJS_DB.getNodeByType")
     },
     getByIds: function(collection,ids)
     {
         //should return an array of json objects that match the ids
-        console.log("MongoDB: getByIds method")
+        logger.debug("MongoDB: getByIds method")
         var coll = this._mongojs_db.collection(collection)
-        console.log("getByIds: ids = " + ids)
-        console.log("coll = " + collection)
+        logger.debug("getByIds: ids = " + ids)
+        logger.debug("coll = " + collection)
 
         coll.find({_id:this._mongojs_db.ObjectId(ids)},function(err,docs) {
-            console.log("docs.length = " +docs.length)
+            logger.debug("docs.length = " +docs.length)
             for(var i=0;i<docs.length;i++)
-                console.log("doc = " + docs[i]._id + " name = " +docs[i].name)
+                logger.debug("doc = " + docs[i]._id + " name = " +docs[i].name)
         })
-        console.log("MongoJS_DB.getByIds")
+        logger.debug("MongoJS_DB.getByIds")
     },
     remove: function(collection,id) {
-        console.log("MongoJS_DB.remove")
+        logger.debug("MongoJS_DB.remove")
     },
     create: function(collection) {
-        console.log("MongoJS_DB.create")
+        logger.debug("MongoJS_DB.create")
     },
     save: function(collection,doc) {
         var coll = this._mongojs_db.collection(collection)
         coll.save(doc,{"myname":"Leon Siewert"},function(err,document) {
             if(err)
                 throw err
-            console.log("Saved: doc = " + JSON.stringify(document))
+            logger.debug("Saved: doc = " + JSON.stringify(document))
         })
     }
 }
@@ -389,11 +391,11 @@ CouchDB.prototype = {
 
     getAll: function(collection)
     {
-        console.log("CouchDB.getAll")
+        logger.debug("CouchDB.getAll")
     },
     getByIds: function(collection,ids)
     {
-        console.log("CouchDB.getByIds")
+        logger.debug("CouchDB.getByIds")
     }
 }
 
