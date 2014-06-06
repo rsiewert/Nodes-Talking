@@ -18,6 +18,8 @@
 
 var Db = require('../../db/db')
     ,fs = require('fs')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
@@ -28,7 +30,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
     var domainModel = undefined
     var domainInstance = undefined
     mongoose = new Db('mongoose')
-    console.log("collection = " + config.collection)
+    logger.debug("collection = " + config.collection)
     mongoose.connect(config.collection.toLowerCase())
     var id = undefined
 
@@ -39,7 +41,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
 
     it("should create an instance on the " + config.collection + " collection", function () {
         domainModel = mongoose.getModel(config.collection)
-        console.log("domainModel: " + domainModel)
+        logger.debug("domainModel: " + domainModel)
         id = Math.floor(Math.random()*1000001)
         var theId = 'server@' + id
         domainInstance = new domainModel({"data.message.node.nodeId": theId})
@@ -52,19 +54,19 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
     })
 
     it("should persist the result of the schema obj in the previous it section",function() {
-        console.log("domainInstance = " + JSON.stringify(domainInstance))
-        console.log("find: data.message.node.nodeId = " + domainInstance.data.message.node.nodeId)
+        logger.debug("domainInstance = " + JSON.stringify(domainInstance))
+        logger.debug("find: data.message.node.nodeId = " + domainInstance.data.message.node.nodeId)
         mongoose.saveWithCallback(config.collection,domainInstance,function(err,result) {
             if(err) {
                 throw err
             }
-            console.log("Result: " + result)
+            logger.debug("Result: " + result)
             domainModel.find({"data.message.node.nodeId":domainInstance.data.message.node.nodeId}, function (err, docs) {
-                console.log("len = " + docs.length)
+                logger.debug("len = " + docs.length)
                 docs.forEach(function (doc) {
-                    console.log("doc: " + JSON.stringify(doc))
+                    logger.debug("doc: " + JSON.stringify(doc))
                     result = doc.data.message.node.nodeId
-                    console.log("result nodeId = " + JSON.stringify(result))
+                    logger.debug("result nodeId = " + JSON.stringify(result))
                 })
                 mongoose.close()
                 expect(result.Saved.data.message.node.nodeId).toEqual({"data.message.node.nodeId": 'server@' + id})

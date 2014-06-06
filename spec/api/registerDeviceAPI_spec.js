@@ -14,12 +14,14 @@
 
 var frisby = require('frisby')
     ,Registration = require('../../models/registration')
+    ,log4js     = require('log4js')
+    ,logger     = log4js.getLogger('stout')
 
 var id = Math.floor(Math.random()*1000001)
 var regInstance = new Registration({'data.message.node.nodeId':'server@'+id})
-if(regInstance == undefined) console.log('reg is undefined')
+if(regInstance == undefined) logger.debug('reg is undefined')
 
-console.log('regInstance: ' + JSON.stringify(regInstance))
+logger.debug('regInstance: ' + JSON.stringify(regInstance))
 
 frisby.create('Register Device')
     .post('http://localhost:3000/register', {
