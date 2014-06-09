@@ -1,34 +1,36 @@
-node-rabbit-prototype
-=====================
 
-Notes for installing/setup a nodejs server on Windows 7 (for now just generic)
- install nodejs and npm (nodejs package manager) should be part of the nodejs install
- point your path to the nodejs install dir (want to pickup the node exe and npm script)
- then to test run: npm ls -g
-   it should show an empty list since that command just lists your globally installed packages and you don't have any yet
- then from the dir where you cloned the server code run: npm install
-   it's running against the file: package.json...which is where I put the dependencies for the project
- now if that works ok then you should be able to run : node server   and it should start the server (check cmd line)...if so goto localhost:3000 and you should see a page with some buttons on it 
+# Nodes-Talking
+
+<img src="https://d3i6fms1cm1j0i.cloudfront.net/github-wiki/images/snowplow-logo-large.png"
+ alt="Snowplow logo" title="Snowplow" align="right" />
+
+Nodes-Talking provides all the components needed to set up and maintain a community of Nodes. Nodes can be servers or devices or extended to be other types.  Nodes have protocols and APIS and are self-describing as they register with persistence servers (themselves nodes).  We invision uses of Nodes-Talking to include setup and adminstration of a system of remote sensors, control devices, logging servers etc but the system is flexible enough to be adapted ot other uses as well/
+
+##Nodes-Talking System
+
+A complete Node-Talking system consists of at least three elements, base versions of each provided:
+
+1. A Nodes-Talking server (Nodejs based with a Mongodb implementation of the backend database)
+2. Devices that register and provide protocols for communications and published APIs for interaction. (Device Test included)
+3. User device to administer or interact with nodes (Android based user device included that displays Test Nodes)
+
+## Nodes-Talking Base Technology
+
+## Contributing
+
+We have a loosely-coupled architecture for Nodes-Talking and encourage  contributions within each of or three main systems (Devices, Servers, User Applications). Get in touch with us. We would love to hear from you!
 
 
-On Ubuntu I got some unresolved dependencies when I ran npm install in the server directory. I was able to correct these by doing some installs manually and also updating npm and node to their most recent version.
- 
-Notes on RabbitMQ Install Ubuntu 12.04
-For Ubuntu the install of npm installs an older version of node. Need to get the latest version otherwise will get errors:
 
-I  followed the install directions for Rabbit on the following site:
-https://www.rabbitmq.com/install-debian.html
 
-I used their APT repository directions:
-Our APT repository
-To use our APT repository:
+## Copyright and license
 
-Add the following line to your /etc/apt/sources.list:
-deb http://www.rabbitmq.com/debian/ testing main
-(Please note that the word testing in this line refers to the state of our release of RabbitMQ, not any particular Debian distribution. You can use it with Debian stable, testing or unstable, as well as with Ubuntu. We describe the release as "testing" to emphasise that we release somewhat frequently.)
-(optional) To avoid warnings about unsigned packages, add our public key to your trusted key list using apt-key(8):
-wget http://www.rabbitmq.com/rabbitmq-signing-key-public.asc
-sudo apt-key add rabbitmq-signing-key-public.asc
-Run apt-get update.
-Install packages as usual; for instance,
-sudo apt-get install rabbitmq-server
+
+Licensed under the **[Apache License, Version 2.0] [license]** (the "License");
+you may not use this software except in compliance with the License.
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
