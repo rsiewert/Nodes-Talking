@@ -1,9 +1,6 @@
 
 # Nodes-Talking
 
-<img src="https://d3i6fms1cm1j0i.cloudfront.net/github-wiki/images/snowplow-logo-large.png"
- alt="Snowplow logo" title="Snowplow" align="right" />
-
 Nodes-Talking provides all the components needed to set up and maintain a community of Nodes. Nodes can be servers or devices or extended to be other types.  Nodes have protocols and APIS and are self-describing as they register with persistence servers (themselves nodes).  We invision uses of Nodes-Talking to include setup and adminstration of a system of remote sensors, control devices, logging servers etc but the system is flexible enough to be adapted ot other uses as well/
 
 ##Nodes-Talking System
