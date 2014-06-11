@@ -1,17 +1,27 @@
 {
-	"name":"initial-test-node-over-rabbitmq",
-	"version":"0.0.1",
-	"description": "really nice nodejs app",
-	"scripts": 
-		{
-			"start": "node server"
-		},
-	"dependencies": {
-		"express":"*",
-		"amqp":"*",
-		"jade":"*",
-		"nano":"*",
-		"socket.io":"*",
-		"shred":"*"
-	}
+  "name": "NodesTalking",
+  "version": "0.0.1",
+  "description": "really nice nodejs app",
+  "scripts": {
+    "start": "node server"
+  },
+  "dependencies": {
+    "express": "3.5.1",
+    "amqp": "*",
+    "jade": "*",
+    "nano": "*",
+    "socket.io": "*",
+    "mongodb": "*",
+    "mongojs": "*",
+    "jasmine-node": "*",
+    "cookiejar": "*",
+    "datejs": "*",
+    "shred": "*",
+    "when": "*",
+    "amqplib": "*",
+    "frisby": "*",
+    "mongoose": "~3.8.8",
+    "mongoose-gen": "0.0.3",
+    "log4js": "*"
+  }
 }

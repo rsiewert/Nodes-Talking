@@ -1,4 +1,4 @@
-node-rabbit-prototype
+Nodes-Talking
 =====================
 
 Notes for installing/setup a nodejs server on Windows 7 (for now just generic)

@@ -7,21 +7,22 @@ html
 		title=title
 		h3 Please type in a message below:
 	body
-		form(action='/newMessage',method='post')
-			input(name='data',type='text')
-			input(type='submit',value='Send message')
-		
+		block content
+		//form(action='/newMessage',method='post')
+		//	input(name='data',type='text')
+		//	input(type='submit',value='Send message')
+
 		script.
 			var socket = io.connect('http://localhost:3000');
 			socket.on('message',function(data) {
 				//console.log("Connected to client socket");
-				//alert('message = ' + data.sentMessage);				
+				//alert('message = ' + data.sentMessage);
 				//socket.emit("my return event",{"sentMessage":data.sentMessage});
 				$('#sentMessage').html('<br/><h3> Sent message: </h3>&nbsp;&nbsp;' + data.sentMessage);
 				$('#status').html('<br/><h3> Sent status : </h3>&nbsp;&nbsp;' + data.status);
 			});
-			
+
 		#sentMessage
-		
+
 		#status
-		
+

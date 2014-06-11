@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Topaz Devices</string>
+    <string name="title_device_detail">Topaz Device Detail</string>
+    <string name="button1">Test Button</string>
+
+</resources>
