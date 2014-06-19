@@ -1,4 +1,4 @@
-#Ignore class files 
+#Ignore class files
 *.class
 *.classpath
 
@@ -16,6 +16,9 @@ out/
 #intelliJ related
 *.iml
 .idea
+
+#property files
+common/build.properties
 
 # Package Files #
 *.jar
