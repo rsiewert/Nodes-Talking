@@ -89,9 +89,13 @@ public class Message {
 		// Wrap the message in outer type of 'message'
 		Map<String, Object> map = new HashMap<String, Object>();
 		map.put("message", this);
+
+		// Wrap the message in outer type of 'data'
+		Map<String, Object> finalMap = new HashMap<String, Object>();
+		finalMap.put("data", map);
 		
 		// Convert to a JSON and send back
-		return gson.toJson(map);
+		return gson.toJson(finalMap);
 	}
 
 	/**
