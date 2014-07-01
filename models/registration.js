@@ -27,13 +27,45 @@ var RegistrationSchema = new Schema ({
     "data": {
         "message": {
             "node": {
-                "actsAs": String,
-                "nodeId": String,
+                "actsAs": [String],  //this I think can be used as: ['Server','Device'] etc...
+                "nodeId": Number,
                 "location": {
-                    "latitude": String,
-                    "longitude": String,
-                    "altitude": String
+                    "latitude": Number,
+                    "longitude": Number,
+                    "altitude": Number
                 },
+                "api": {
+               		"getLocation": {
+               			"name": String,
+               			"description": String,
+               			"parameters": {},
+               			"returns": String
+               		},
+               		"getStatus": {
+               			"name": String,
+               			"description": String,
+               			"parameters": {},
+               			"returns": String
+               		},
+               		"setLocation": {
+               			"name": String,
+               			"description": String,
+               			"parameters": {
+               				"altitude": Number,
+               				"longitude": Number,
+               				"latitude": Number
+               			},
+               			"returns": String
+               		},
+               		"setStatus": {
+               			"name": String,
+               			"description": String,
+               			"parameters": {
+               				"status": String
+               			},
+               			"returns": String
+               		}
+               	},
                 "status": String,
                 "protocol": {
                     "rest": {
@@ -52,7 +84,7 @@ var RegistrationSchema = new Schema ({
                         "heartbeat": {
                             "exchange": String,
                             "routing_key": String,
-                            "manageExchange": String
+                            "manageExchange": Boolean
                         },
                         "on_ack": {
                             "exchange": String,
@@ -68,8 +100,8 @@ var RegistrationSchema = new Schema ({
                 },
                 "description": String
             },
-            "originTimestamp": String,
-            "seqId": String,
+            "originTimestamp": Date,
+            "seqId": Number,
             "requestAck": Boolean,
             "timestamp": Date,
             "updated": Date
