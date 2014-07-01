@@ -43,7 +43,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
         domainModel = mongoose.getModel(config.collection)
         logger.debug("domainModel: " + domainModel)
         id = Math.floor(Math.random()*1000001)
-        var theId = 'server@' + id
+        var theId = id
         domainInstance = new domainModel({"data.message.node.nodeId": theId})
         domainInstance.title = 'My Title'
         domainInstance.description = "I hope this helps...take my wife, please Hennie Youngman"

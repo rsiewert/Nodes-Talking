@@ -21,7 +21,7 @@ var frisby      = require('frisby')
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
 var id = Math.floor(Math.random()*1000001)
-var Id = 'server@'+id
+var Id = id
 
 describe('persist a document to the db and then run frisby getById',function() {
     var mongoose = new Db('mongoose')

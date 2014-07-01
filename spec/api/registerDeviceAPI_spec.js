@@ -18,7 +18,7 @@ var frisby = require('frisby')
     ,logger     = log4js.getLogger('stout')
 
 var id = Math.floor(Math.random()*1000001)
-var regInstance = new Registration({'data.message.node.nodeId':'server@'+id})
+var regInstance = new Registration({'data.message.node.nodeId':id})
 if(regInstance == undefined) logger.debug('reg is undefined')
 
 logger.debug('regInstance: ' + JSON.stringify(regInstance))
