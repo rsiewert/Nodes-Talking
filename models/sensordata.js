@@ -21,9 +21,7 @@ var SensorDataSchema = new Schema ({
     "nodeId" : Number,
     "sensorType": [String],
     "data": {
-        "type": {
-            "measurement": [{"key":"value"}]
-        }
+        "measurement": [{"key":"value"}]
     }
 })
 
