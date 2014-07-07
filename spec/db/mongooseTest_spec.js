@@ -20,6 +20,7 @@ var Db = require('../../db/db')
     ,fs = require('fs')
     ,log4js     = require('log4js')
     ,logger     = log4js.getLogger('stout')
+    ,uuid       = require('node-uuid')
 
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
@@ -42,7 +43,7 @@ describe("Connect/save to mongoDB via Mongoose -- create a schema object and per
     it("should create an instance on the " + config.collection + " collection", function () {
         domainModel = mongoose.getModel(config.collection)
         logger.debug("domainModel: " + domainModel)
-        id = Math.floor(Math.random()*1000001)
+        id = uuid.v4() //Math.floor(Math.random()*1000001)
         var theId = id
         domainInstance = new domainModel({"data.message.node.nodeId": theId})
         domainInstance.title = 'My Title'

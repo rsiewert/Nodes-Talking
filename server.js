@@ -12,12 +12,12 @@
                                                                            | $$      | $$
                                                                            |__/      |__/
 **/
+
 global.app_require = function(name) {
     return require(__dirname + '/' + name);
 }
 var express         = require('express')
     ,http           = require('http')
-    ,jade           = require('jade')
     ,Shred          = require('shred')
     ,Db             = app_require('db/db')
     ,routes         = require('./routes') // Routes for the application

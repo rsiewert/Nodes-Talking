@@ -27,8 +27,8 @@ var RegistrationSchema = new Schema ({
     "data": {
         "message": {
             "node": {
-                "actsAs": [String],  //this I think can be used as: ['Server','Device'] etc...
-                "nodeId": Number,
+                "actsAs": String,  //this I think can be used as: ['Server','Device'] etc...
+                "nodeId": String, //generated using node-uuid
                 "location": {
                     "latitude": Number,
                     "longitude": Number,
@@ -39,13 +39,13 @@ var RegistrationSchema = new Schema ({
                			"name": String,
                			"description": String,
                			"parameters": {},
-               			"returns": String
+               			"returns": {}
                		},
                		"getStatus": {
                			"name": String,
                			"description": String,
                			"parameters": {},
-               			"returns": String
+               			"returns": {}
                		},
                		"setLocation": {
                			"name": String,
@@ -55,7 +55,7 @@ var RegistrationSchema = new Schema ({
                				"longitude": Number,
                				"latitude": Number
                			},
-               			"returns": String
+               			"returns": {}
                		},
                		"setStatus": {
                			"name": String,
@@ -63,7 +63,7 @@ var RegistrationSchema = new Schema ({
                			"parameters": {
                				"status": String
                			},
-               			"returns": String
+               			"returns": {}
                		}
                	},
                 "status": String,
@@ -71,7 +71,7 @@ var RegistrationSchema = new Schema ({
                     "rest": {
                         "Mirror": {
                             "domain": String,
-                            "port": String,
+                            "port": Number,
                             "endpoint": String
                         }
                     },

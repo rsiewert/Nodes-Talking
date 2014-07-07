@@ -17,10 +17,11 @@ var frisby      = require('frisby')
     ,fs         = require('fs')
     ,log4js     = require('log4js')
     ,logger     = log4js.getLogger('stout')
+    ,uuid       = require('node-uuid')
 
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
-var id = Math.floor(Math.random()*1000001)
+var id = uuid.v4()   // Math.floor(Math.random()*1000001)
 var Id = id
 
 describe('persist a document to the db and then run frisby getById',function() {

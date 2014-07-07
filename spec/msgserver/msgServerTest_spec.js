@@ -18,6 +18,7 @@
     ,Registration   = require('../../models/registration')
     ,log4js         = require('log4js')
     ,logger         = log4js.getLogger('stout')
+    ,uuid           = require('node-uuid')
 
 var boot    = fs.readFileSync('./json/bootstrap.json','utf8')
 var config  = JSON.parse(boot)
@@ -38,7 +39,7 @@ describe("send and receive messages from a RabbitMQ message node", function() {
             logger.debug(" [x]: Routing Key: '%s' -- Received Msg: '%s'", msg.fields.routingKey, msg.content)
             mongoose.save(config.model,JSON.parse(msg.content))
             var jsonMsg = JSON.parse(msg.content)
-            logger.debug("Received nodId : " + jsonMsg.data.message.node.nodeId)
+            logger.debug("Received nodeId : " + jsonMsg.data.message.node.nodeId)
         }
         msgServer.receiveMessage("tests"/*the exchange*/,'register-queue',["ack.rk.register"],regMsg)
         expect(msgServer).not.toBe(undefined)
@@ -48,8 +49,8 @@ describe("send and receive messages from a RabbitMQ message node", function() {
         setTimeout(sendMsg,1500)
         //sit on the ack q
         function sendMsg() {
-            var id = Math.floor(Math.random()*1000001)
-            var reg = new Registration({'data.message.node.nodeId':'server@'+id})
+            var id = uuid.v4()
+            var reg = new Registration({'data.message.node.nodeId':id})
             logger.debug("msgServerTest: reg = " + reg)
             //send a message to the well-known reg-queue
             msgServer.sendMessage(reg,'tests'/*the exchange*/,'ack.rk.register')

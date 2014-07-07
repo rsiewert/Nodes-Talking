@@ -18,8 +18,8 @@ var mongoose = require('mongoose')
 var SensorDataSchema = new Schema ({
     "title" : String,
     "description" : String,
-    "nodeId" : Number,
-    "sensorType": [String],
+    "nodeId" : String,
+    "sensorType": String,
     "data": {
         "measurement": [{String:String}]
     }

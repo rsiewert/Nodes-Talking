@@ -16,8 +16,9 @@ var frisby = require('frisby')
     ,Registration = require('../../models/registration')
     ,log4js     = require('log4js')
     ,logger     = log4js.getLogger('stout')
+    ,uuid       = require('node-uuid')
 
-var id = Math.floor(Math.random()*1000001)
+var id = uuid.v4() //Math.floor(Math.random()*1000001)
 var regInstance = new Registration({'data.message.node.nodeId':id})
 if(regInstance == undefined) logger.debug('reg is undefined')
 
