@@ -26,7 +26,8 @@
     "requirefrom": "~0.2.0",
     "node-uuid": "~1.4.1",
     "bower": "~1.3.7",
-    "passport": "~0.2.0"
+    "passport": "~0.2.0",
+    "cors": "*"
   },
   "main": "server.js",
   "directories": {

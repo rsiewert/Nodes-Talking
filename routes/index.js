@@ -28,8 +28,8 @@ module.exports = function(app, db) {
     //____________________________________/   GET API        \___________________________________
 
     app.get('/', function (req, res) {
-        logger.debug("inside get /");
-        var coll = req.params.collection
+        logger.debug("inside get /")
+//        var coll = req.params.collection
 
         //this is now using the DbModule
         //db.getAll('register')
@@ -51,7 +51,7 @@ module.exports = function(app, db) {
             if(!docs.length)
                 docs = {}
             for(var i=0;i<docs.length;i++) {
-                logger.debug("doc = " + JSON.stringify(docs[i]))
+                logger.debug("getAll: doc = " + JSON.stringify(docs[i]))
             }
             res.json(docs)
         })
@@ -62,13 +62,29 @@ module.exports = function(app, db) {
         var id = req.params.id
         logger.debug("\ngetById: id: %s",id)
         logger.debug("\ngetById: model: %s",model)
-        db.getById(model,id,function(err,doc) {
+        db.getById(model,id,function(err,docs) {
+            if(docs == []) {
+                logger.debug("docs = null")
+            } else {
+                logger.debug("\ngetById: json = " + JSON.stringify(docs[0]) + "\n")
+                // logger.debug("\nresult = " + doc.data.message.node.nodeId)
+                res.json(docs)
+            }
+        })
+    })
+
+    app.get('/getByNodeId/:model/:id',function(req,res) {
+        var model = req.params.model
+        var id = req.params.id
+        logger.debug("\ngetByNodeId: id: %s",id)
+        logger.debug("\ngetByNodeId: model: %s",model)
+        db.getByNodeId(model,id,function(err,doc) {
             if(doc == null) {
                 logger.debug("doc = null")
             } else {
-                logger.debug("\n\napp.get: json = " + JSON.stringify(doc) + "\n\n")
+                logger.debug("\n\napp.getByNodeId: json = " + JSON.stringify(doc) + "\n\n")
                 // logger.debug("\nresult = " + doc.data.message.node.nodeId)
-                res.json({Id: doc.data.message.node.nodeId})
+                res.json(doc)
             }
         })
     })

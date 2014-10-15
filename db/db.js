@@ -26,22 +26,22 @@ function DbModule(dbType)
 {
 // Implementation reference:
 
-  this._impl = null;
+  this._impl = null
 
 // Setup procedure:
 
-  this._SetImplementation(this._EstablishImplementer(dbType));
+  this._SetImplementation(this._EstablishImplementer(dbType))
 
-  return this;
+  return this
 }
 
 DbModule.prototype = {
 
     _SetImplementation: function(implementer)
     {
-        this._impl = null;
+        this._impl = null
         if(implementer)
-            this._impl = implementer;
+            this._impl = implementer
     },
 
     // EstablishImplementer - function that creates
@@ -59,7 +59,7 @@ DbModule.prototype = {
         else if(container === 'couchdb')
             return new CouchDB()
 
-        return null;
+        return null
     },
 
   // Functions "exported" by the DbModule abstraction:
@@ -74,7 +74,7 @@ DbModule.prototype = {
     {
         // Check if any implementor is bound and has the required method:
         if(this._impl) {
-            this._impl.connect(collection);     // Forward request to implementer
+            this._impl.connect(collection)       // Forward request to implementer
             return true
         } else
             return false
@@ -88,19 +88,25 @@ DbModule.prototype = {
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getAll(model,callback);     // Forward request to implementer
+            this._impl.getAll(model,callback)     // Forward request to implementer
     },
     getById : function(collection,id,callback)
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getById(collection,id,callback);     // Forward request to implementer
+            this._impl.getById(collection,id,callback)     // Forward request to implementer
+    },
+    getByNodeId : function(collection,id,callback)
+    {
+        // Check if any implementor is bound
+        if(this._impl)
+            this._impl.getByNodeId(collection,id,callback)     // Forward request to implementer
     },
     getByIds : function(collection,ids)
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.getByIds(collection,ids);     // Forward request to implementer
+            this._impl.getByIds(collection,ids)     // Forward request to implementer
     },
     getNodeByType: function(collection,type)
     {
@@ -120,13 +126,13 @@ DbModule.prototype = {
     {
         // Check if any implementor is bound
         if(this._impl)
-            this._impl.update(doc);     // Forward request to implementer
+            this._impl.update(doc)       // Forward request to implementer
     },
     create : function()
     {
         // Check if any implementor is bound
         if(this._impl) {
-            return this._impl.create();     // Forward request to implementer
+            return this._impl.create()     // Forward request to implementer
         }
         return null
     },
@@ -145,7 +151,7 @@ DbModule.prototype = {
     {
         // Check if any implementor is bound and has the required method:
         if(this._impl)
-            this._impl.remove(collection,id);     // Forward request to implementer
+            this._impl.remove(collection,id)     // Forward request to implementer
     }
 }
 
@@ -168,26 +174,41 @@ Mongoose.prototype = {
         var uri = 'mongodb://localhost/' + collection
         this._mongoose = mongoose.connect(uri, function (err, res) {
             if (err) {
-                logger.debug('ERROR connecting to: ' + uri + '. ' + err);
+                logger.debug('ERROR connecting to: ' + uri + '. ' + err)
                 return null
             } else {
-                logger.debug('Succeeded connected to: ' + uri);
+                logger.debug('Succeeded connected to: ' + uri)
 
                 return this._mongoose
             }
         })
     },
     getAll: function (modelName, callback) {
-        var model = this._mongoose.model(modelName)
-        model.find({},function(err,docs) {
-            if(err) callback(err,null)
-            callback(null,docs)
-        })
+        console.log("inside getAll : modelName = " + modelName)
+        var model = this.getModel(modelName)
+        if(model) {
+            model.find({}, function (err, docs) {
+                if (err) callback(err, null)
+                callback(null, docs)
+            })
+        }
     },
     getById: function (modelName, Id, callback) {
-        var model = this._mongoose.model(modelName)
+        var model = this.getModel(modelName)
         if(model) {
-            model.findOne({"data.message.node.nodeId": Id}, function (err, obj) {
+            model.find({_id: Id}, function (err, obj) {
+                logger.debug(JSON.stringify(obj))
+                callback(null,obj)
+            })
+        }
+        else {
+            callback(err,null)
+        }
+    },
+    getByNodeId: function (modelName, Id, callback) {
+        var model = this.getModel(modelName)
+        if(model) {
+            model.find({"data.message.node.nodeId": Id}, function (err, obj) {
                 logger.debug(JSON.stringify(obj))
                 callback(null,obj)
             })
@@ -311,12 +332,12 @@ function MongoJS_DB()
 MongoJS_DB.prototype = {
 
     connect: function(collection) {
-        this._mongojs_db = mongojs(collection);
+        this._mongojs_db = mongojs(collection)
         logger.debug("MongoDB.connect")
     },
     getAll: function(collection)
     {
-        var coll = this._mongojs_db.collection(collection);
+        var coll = this._mongojs_db.collection(collection)
 
         coll.find().sort({name:1},function(err, docs) {
             // docs is an array of all the documents in mycollection

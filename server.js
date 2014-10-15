@@ -13,10 +13,13 @@
                                                                            |__/      |__/
 **/
 
+"use strict"
+
 global.app_require = function(name) {
     return require(__dirname + '/' + name);
 }
 var express         = require('express')
+    ,cors           = require('cors')
     ,http           = require('http')
     ,Shred          = require('shred')
     ,Db             = app_require('db/db')
@@ -28,14 +31,14 @@ var express         = require('express')
 
 
 //-------------------INITIALIZATION BEGIN--------------------------
-"use strict";
+
 var boot = fs.readFileSync('./json/bootstrap.json','utf8')
 var config = JSON.parse(boot)
 
-var app = express();
+var app = express()
 app.shred = new Shred({logCurl: true})
 
-//startup native mongodb driver
+//startup mongoose mongo mapper
 var db = new Db('mongoose')
 db.connect(config.collection.toLowerCase())
 
@@ -56,12 +59,18 @@ msgServer.receiveMessage("register", 'reg-queue', ["register.rk.*"],regMsg)
 app.configure(function () {
     app.use(express.errorHandler({ dumpExceptions: true, showStack: true }))
     app.use(express.json())
+    app.use(cors())
     app.set('port', '3000')
     app.use('/static',__dirname + '/public')
     app.set('view engine', 'jade')
     app.set('views', __dirname + '/views')
-    app.set('view options', { "pretty": true })
+    app.set('view options', { "pretty": true } )
+    app.use(express.logger('dev'))
 })
+
+var corsOptions = {
+    origin: 'http://localhost:8000'
+}
 
 // Application routes
 routes(app, db)
@@ -74,6 +83,6 @@ var server = http.createServer(app).listen(app.get('port'), function () {
 //setup socket.io to listen to our app
 var io = require('socket.io').listen(server);
 
-logger.debug("The views path is: " + app.get('views'));
+logger.debug("The views path is: " + app.get('views'))
 
 
