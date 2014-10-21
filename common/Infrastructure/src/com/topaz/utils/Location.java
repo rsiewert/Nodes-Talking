@@ -3,9 +3,9 @@ package com.topaz.utils;
 public class Location {
 
 	// Locations are specified absolutely using lat, long, alt
-	double latitude = 0;
-	double longitude = 0;
-	double altitude = 0;
+	double latitude = 0.0;
+	double longitude = 0.0;
+	double altitude = 0.0;
 	
 	public Location(double latitude, double longitude, double altitude) {
 		this.latitude = latitude;

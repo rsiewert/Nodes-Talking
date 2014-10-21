@@ -36,24 +36,24 @@ var RegistrationSchema = new Schema ({
                 },
                 "api": {
                		"getLocation": {
-               			"name": String,
-               			"description": String,
+               			"name": {type:String,required: false,default:"name"},
+               			"description": {type:String,required: false,default:"description"},
                			"parameters": {},
                			"returns": {}
                		},
                		"getStatus": {
-               			"name": String,
-               			"description": String,
+               			"name": {type:String,required: false,default:"name"},
+               			"description": {type:String,required: false,default:"description"},
                			"parameters": {},
                			"returns": {}
                		},
                		"setLocation": {
-               			"name": String,
-               			"description": String,
+               			"name":         {type:String,required: false,default:"name"},
+               			"description":  {type:String,required: false,default:"Description"},
                			"parameters": {
-               				"altitude": Number,
-               				"longitude": Number,
-               				"latitude": Number
+                            "latitude":{type:Number,required: false,default:33.2},
+               				"longitude":{type:Number,required: false,default:110.3},
+                            "altitude":{type:Number,required: false,default:10.2}
                			},
                			"returns": {}
                		},

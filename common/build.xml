@@ -2,11 +2,12 @@
 <project name="infrastructure" default="all">
 
 
-  <property file="build.properties"/>
+  <!--<property file="build.properties"/>-->
   <!-- Uncomment the following property if no tests compilation is needed -->
   <!--
   <property name="skip.tests" value="true"/>
    -->
+  <property file="build.properties"/>
 
   <!-- Compiler options -->
 
@@ -57,7 +58,7 @@
   </patternset>
 
   <!-- JDK definitions -->
-
+  <!--<property name="jdk.home" value="C:\Program Files\Java\jdk1.7.0_55"/>-->
   <property name="jdk.bin" value="${jdk.home}/bin"/>
   <property name="jdk.jre" value="${jdk.home}/jre"/>
 

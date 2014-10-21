@@ -159,9 +159,9 @@ public class Node {
         apiLoc.setName("setLocation");
         apiLoc.setDescription("Sets the location of the node.");
         apiLoc.setReturns("void");
-        apiLoc.addParameter("longitude", "number");
-        apiLoc.addParameter("latitude", "number");
-        apiLoc.addParameter("altitude", "number");
+        apiLoc.addParameter("longitude", 118.3);
+        apiLoc.addParameter("latitude", 42.5);
+        apiLoc.addParameter("altitude", 12.3);
         this.api.put(apiLoc.getName(), apiLoc);
 
         Api apiGetStat = new Api();
