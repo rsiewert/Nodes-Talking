@@ -20,7 +20,7 @@
     "when": "*",
     "amqplib": "*",
     "frisby": "*",
-    "mongoose": "*",
+    "mongoose": "~3.6.18",
     "mongoose-gen": "*",
     "log4js": "*",
     "requirefrom": "~0.2.0",
