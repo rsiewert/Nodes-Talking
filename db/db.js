@@ -12,12 +12,14 @@
 
 **/
 
-var mongojs = require('mongojs')
-    ,nano = require('nano')('http://localhost:5984')
-    ,mongoose = require('mongoose')
-    ,Registration = require('../models/registration')
-    ,log4js     = require('log4js')
-    ,logger     = log4js.getLogger('stout')
+var mongojs         = require('mongojs')
+    ,util           = require('util')
+    ,jsonSchema     = require('json-schema-converter')
+    ,nano           = require('nano')('http://localhost:5984')
+    ,mongoose       = require('mongoose')
+    //,Registration_schema   = require('../models/json_schema_reg.json')
+    ,Registration_schema   = require('../models/Registration.js')
+    ,logger         = require('log4js').getLogger('stout')
 
 //                                 _______________________________
 //________________________________/    Client Side Abstraction    \___________________________________
@@ -239,10 +241,14 @@ Mongoose.prototype = {
            logger.debug("save: doc = " + JSON.stringify(doc))
             //doc is the incoming data, so we have to retrieve a model and instantiate an instance with the incoming json doc
             var model = this._mongoose.model(modelName)
-            logger.debug("save: model = " + model)
-            var reg = new model(doc)
-            logger.debug("save: reg = " + JSON.stringify(reg))
-            reg.save(function (err,item,numberAffected) {
+//            if(!jsonSchema.is_valid(Registration_schema)) {
+//                logger.debug("JSON SCHEMA REG NOT Valid: " + util.inspect(jsonSchema.validate(Registration_schema)))
+//            }
+            //var model = jsonSchema.to_mongoose_schema(Registration_schema)
+            logger.debug("save: model = " + JSON.stringify(model))
+            var saveDoc = new model(doc)
+            logger.debug("save: saveDoc = " + saveDoc ) //JSON.stringify(saveDoc))
+            saveDoc.save(function (err,item,numberAffected) {
                 if (err)
                     logger.debug("err in the save: " + err.message)
                 else {
