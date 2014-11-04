@@ -51,9 +51,9 @@ var RegistrationSchema = new Schema ({
                			"name": String,
                			"description": String,
                			"parameters": {
-               				"altitude": Number,
-               				"longitude": Number,
-               				"latitude": Number
+               				"altitude": String,
+               				"longitude": String,
+               				"latitude": String
                			},
                			"returns": {}
                		},
