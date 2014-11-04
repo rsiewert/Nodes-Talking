@@ -16,7 +16,7 @@
     "jasmine-node": "*",
     "cookiejar": "*",
     "datejs": "*",
-    "shred": "*",
+    "shred": "0.8.10",
     "when": "*",
     "amqplib": "*",
     "frisby": "*",
