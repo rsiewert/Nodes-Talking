@@ -1,5 +1,5 @@
 {
-  "name": "NodesTalking",
+  "name": "Nodes-Talking",
   "version": "0.0.1",
   "description": "really nice nodejs app",
   "scripts": {
@@ -16,7 +16,7 @@
     "jasmine-node": "*",
     "cookiejar": "*",
     "datejs": "*",
-    "shred": "*",
+    "shred": "0.8.10",
     "when": "*",
     "amqplib": "*",
     "frisby": "*",
