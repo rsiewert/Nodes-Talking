@@ -3,7 +3,8 @@
 ###Dependencies:
     ant : http://ant.apache.org/bindownload.cgi
 
-###Usage:   clone the repository
+###Usage:
+            clone the repository
             cd <install dir>
             npm install
             node server
