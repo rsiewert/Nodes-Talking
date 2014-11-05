@@ -10,8 +10,7 @@
             node server
 ####In another window (same install dir):
             echo "<your jdk home>" > common/build.properties
-            ant // to build the jar file
-            ant run // to populate the database with registration documents
+            ant run // to build the .jar file and use it to populate the database with registration documents
 
 
 ##Nodes-Talking System
