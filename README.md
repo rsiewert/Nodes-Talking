@@ -7,6 +7,7 @@
             cd <install dir>
             npm install
             node server
+####In another window:
             echo "<your jdk home>" > common/build.properties
             ant // to build the jar file
             ant run // to populate the database with registration documents
