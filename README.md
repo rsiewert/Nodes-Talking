@@ -1,7 +1,7 @@
 # Nodes-Talking
 
-###dependencies:
-    ant
+###Dependencies:
+    ant : http://ant.apache.org/bindownload.cgi
 
 ###Usage:   clone the repository
             cd <install dir>
