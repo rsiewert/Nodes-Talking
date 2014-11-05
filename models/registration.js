@@ -51,9 +51,9 @@ var RegistrationSchema = new Schema ({
                			"name":         {type:String,required: false,default:"name"},
                			"description":  {type:String,required: false,default:"Description"},
                			"parameters": {
-                            "latitude":{type:Number,required: false,default:33.2},
-               				"longitude":{type:Number,required: false,default:110.3},
-                            "altitude":{type:Number,required: false,default:10.2}
+                            "latitude":{type:String,required: false,default:'33.2'},
+               				"longitude":{type:String,required: false,default:'110.3'},
+                            "altitude":{type:String,required: false,default:'10.2'}
                			},
                			"returns": {}
                		},
