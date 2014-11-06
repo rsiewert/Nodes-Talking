@@ -4,21 +4,21 @@
     ant : http://ant.apache.org/bindownload.cgi
 
 ##Usage:
-            clone the repository
-            cd <install dir>
-            npm install
-            node server
+clone the repository
+cd <install dir>
+npm install
+node server
+
 ##In another window (same install dir):
-            echo "<your jdk home>" > common/build.properties
-            ant run // to build the .jar file and use it to populate the database with registration documents
+echo "<your jdk home>" > common/build.properties
+ant run // to build the .jar file and use it to populate the database with registration documents
 
 
 ##Nodes-Talking System
-
-    Nodes-Talking provides all the components needed to set up and maintain a community of Nodes. Nodes can be servers or devices or
-    extended to be other types. Nodes have protocols and APIs and are self-describing as they register with persistence servers (themselves Nodes).
-    We envision uses of Nodes-Talking to include setup and adminstration of a system of remote sensors, control devices, logging servers, etc.
-    The system is flexible enough to be adapted to other uses as well.
+Nodes-Talking provides all the components needed to set up and maintain a community of Nodes. Nodes can be servers or devices or
+extended to be other types. Nodes have protocols and APIs and are self-describing as they register with persistence servers (themselves Nodes).
+We envision uses of Nodes-Talking to include setup and adminstration of a system of remote sensors, control devices, logging servers, etc.
+The system is flexible enough to be adapted to other uses as well.
 
 A complete Node-Talking system consists of at least three elements, base versions of each provided:
 
