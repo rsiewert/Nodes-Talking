@@ -9,9 +9,11 @@
     npm install
     nodemon server
 
-##In another window (same install dir):
-    echo "<your jdk home>" > common/build.properties
-    ant run // to build the .jar file and use it to populate the database with registration documents
+##In another window:
+    cd common
+    echo "<your jdk home>" > build.properties
+    ant // to build the Infrastructure.jar file
+    ant run //to populate the database with registration documents
 
 
 ##Nodes-Talking System
