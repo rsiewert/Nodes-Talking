@@ -7,7 +7,7 @@
     clone the repository
     cd <install dir>
     npm install
-    node server
+    nodemon server
 
 ##In another window (same install dir):
     echo "<your jdk home>" > common/build.properties
