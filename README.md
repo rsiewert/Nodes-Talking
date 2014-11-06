@@ -10,7 +10,7 @@
     cd common
     echo "<your jdk home>" > build.properties
 
-##Run:
+##Run (in common dir):
     ant     // to build the Infrastructure.jar file
     ant run //to populate the database with registration documents
     nodemon server //start the server
