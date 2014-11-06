@@ -3,18 +3,17 @@
 ##Dependencies:
     ant : http://ant.apache.org/bindownload.cgi
 
-##Usage:
+##Install:
     clone the repository
     cd <install dir>
     npm install
-    nodemon server
 
-##In another window:
+##Run:
     cd common
     echo "<your jdk home>" > build.properties
-    ant // to build the Infrastructure.jar file
+    ant     // to build the Infrastructure.jar file
     ant run //to populate the database with registration documents
-
+    nodemon server
 
 ##Nodes-Talking System
 Nodes-Talking provides all the components needed to set up and maintain a community of Nodes. Nodes can be servers or devices or
