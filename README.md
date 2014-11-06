@@ -34,7 +34,8 @@ Node-talking is based on opensource Java, MongoDB (with ability to roll new impl
 
 ## Contributing
 
-We have a loosely-coupled architecture for Nodes-Talking and encourage  contributions within each of or three main systems (Devices, Servers, User Applications). Get in touch with us. We would love to hear from you!
+We have a loosely-coupled architecture for Nodes-Talking and encourage  contributions within each of the three main systems (Devices, Servers, User Applications). Get in touch with us. We would love to hear from you!
+Current contributors are 4 developers and 2 consultants.
 
 
 ## Copyright and license
