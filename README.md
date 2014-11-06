@@ -13,6 +13,7 @@
 ##Run (in common dir):
     ant     // to build the Infrastructure.jar file
     ant run //to populate the database with registration documents
+    cd ..
     nodemon server //start the server
 
 ##Nodes-Talking System
