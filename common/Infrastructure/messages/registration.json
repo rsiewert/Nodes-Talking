@@ -34,12 +34,14 @@
                             "altitude": 0
                         }
                     },
-                    "setStatus": "",
-                    "description": "",
-                    "parameters": {
-                        "status": ""
-                    },
-                    "returns": {}
+                    "setStatus": {
+                        "name": "",
+                        "description": "",
+                        "parameters": {
+                            "status": ""
+                        },
+                        "returns": {}
+                    }
                 },
                 "status": "YELLOW",
                 "protocol": {

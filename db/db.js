@@ -18,7 +18,7 @@ var mongojs         = require('mongojs')
     ,nano           = require('nano')('http://localhost:5984')
     ,mongoose       = require('mongoose')
     //,Registration_schema   = require('../models/json_schema_reg.json')
-    ,Registration_schema   = require('../models/Registration.js')
+    ,Registration_schema   = require('../models/registration.js')
     ,logger         = require('log4js').getLogger('stout')
 
 //                                 _______________________________
