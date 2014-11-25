@@ -8,7 +8,7 @@
     cd <install dir>
     npm install
     cd common
-    echo "<your jdk home>" > build.properties
+    echo "jdk.home=<your jdk home>" > build.properties
 
 ##Run (in common dir):
     ant     // to build the Infrastructure.jar file
