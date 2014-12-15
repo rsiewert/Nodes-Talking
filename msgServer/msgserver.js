@@ -140,22 +140,22 @@ AmqpNode.prototype = {
 
                 var ok = ch.assertExchange(exchangeName, 'topic', {durable: true})
 
-                ok = ok.then(function() {
+                var exchangeOk = ok.then(function() {
                     return ch.assertQueue(q, {exclusive: true, autoDelete: true})
                 });
 
-                ok = ok.then(function(qok) {
+                queueOk = exchangeOk.then(function(qok) {
                     var queue = qok.queue
                     return all(key.map(function(rk) {
                         ch.bindQueue(queue, exchangeName, rk)
                     })).then(function() { return queue; })
                 });
 
-                ok = ok.then(function(queue) {
+                consumerOk = queueOk.then(function(queue) {
                     return ch.consume(queue, callback, {ack: true})
                 });
 
-                return ok.then(function() {
+                return consumerOk.then(function() {
                     logger.debug(' [*] Waiting for messages. To exit press CTRL+C')
                 });
             });
